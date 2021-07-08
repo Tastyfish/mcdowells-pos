@@ -1,19 +1,20 @@
 <template>
   <Button v-if="tile.type === 'BUTTON'"
-    :class="['base', 'p-button-sm', severityClass, ...tile.classes]" @click="tile.onPress"
-    :label="tile.label" :icon="tile.icon" />
+    :class="['base', 'p-button-sm', ...extraClasses, ...tile.classes]"
+    @click="tile.onPress" :label="tile.label" :icon="tile.icon" />
   <Button v-else-if="tile.type === 'TOGGLE'"
-    :class="['base', 'toggle', 'p-button-sm', severityClass,
+    :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
       { ['p-button-outlined']: tile.state}, ...tile.classes]"
-    @click="tile.onPress" :label="tile.label"  :icon="tile.icon" />
+    @click="tile.onPress" :label="tile.label" :icon="tile.icon" />
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
-    :class="['base', 'split', 'p-button-sm', severityClass, ...tile.classes]"
+    :class="['base', 'split', 'p-button-sm', ...extraClasses, ...tile.classes]"
     @click="tile.onPress">
     {{ tile.topLabel }}
     <div class="stogdiv"></div>
     {{ tile.bottomLabel }}
   </Button>
-  <div :class="['base', 'label', severityClass, ...tile.classes]" v-else>
+  <div v-else
+    :class="['base', 'label', ...extraClasses, ...tile.classes]">
     <span>{{ tile.label }}</span>
   </div>
 </template>
@@ -44,12 +45,26 @@ export default class TileView extends Vue {
         return '';
     }
   }
+
+  get extraClasses(): string[] {
+    return [
+      this.severityClass,
+      this.tile.xSpan === 2 ? 'doublex' : undefined,
+      this.tile.ySpan === 2 ? 'doubley' : undefined,
+    ];
+  }
 }
 </script>
 
 <style scoped>
   .base {
     display: block;
+  }
+  .doublex {
+    min-width: calc(200% + .5em) !important;
+  }
+  .doubley {
+    min-height: calc(200% + .5em) !important;
   }
   .label {
     display: flex;
