@@ -1,5 +1,5 @@
 import {
-  SplitToggleState, Severity, newToggle, newSplitToggle, newButton, severeup,
+  SplitToggleState, Severity, newToggle, newSplitToggle, severeup,
 } from '@/api/tile';
 import {
   StripProvider, newArrayStrip,
@@ -13,7 +13,7 @@ function onClicky() {
 }
 
 export default function generateTabsGraph(): StripProvider {
-  return newArrayStrip(new Rectangle(0, 3, 10, 1), [
+  return newArrayStrip(new Rectangle(0, 3, 9, 1), [
     severeup(
       newSplitToggle(SplitToggleState.Untoggled, onClicky, 'Breakfast', 'Breakfast 2'),
       Severity.Primary,
@@ -49,10 +49,6 @@ export default function generateTabsGraph(): StripProvider {
     severeup(
       newSplitToggle(SplitToggleState.Untoggled, onClicky, 'Condiments', 'Gifts'),
       Severity.Primary,
-    ),
-    severeup(
-      newButton(onClicky, 'Special Functions'),
-      Severity.Danger,
     ),
   ]);
 }

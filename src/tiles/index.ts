@@ -5,17 +5,29 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
+import vxm from '@/store';
+
 import generateChoiceGraph from './choices';
 import generateSizeGraph from './sizes';
 import generateTabsGraph from './tabs';
 import generateCountGraph from './count';
+import generateCommandsGraph from './commands';
+
+import generateTotalScreenGraph from './totalScreen';
 
 // Should be cached between state changes.
 export default function generateGraph(): StripProvider {
+  if (vxm.order.totallingOrder) {
+    // Running the total and cashing out screen
+    return generateTotalScreenGraph();
+  }
+
+  // Main screen
   return newContainerStrip(new Rectangle(0, 0, 10, 10), [
     generateChoiceGraph(),
     generateCountGraph(),
     generateTabsGraph(),
     generateSizeGraph(),
+    generateCommandsGraph(),
   ]);
 }

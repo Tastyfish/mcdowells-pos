@@ -31,6 +31,13 @@ export class OrderStore extends OrderVuexModule {
   // Multiplying count selection.
   countSelection: OrderCount = 1;
 
+  // Showing the total screen, and also sealing order.
+  totallingOrder = false;
+
+  // /////////////////////////////////////////////////////////
+  // Getters
+  // /////////////////////////////////////////////////////////
+
   get currentLine(): OrderLine | undefined {
     return this.lines.find((line) => line.id === this.currentLineID);
   }
@@ -81,5 +88,10 @@ export class OrderStore extends OrderVuexModule {
   @mutation
   startCountSelection(count: OrderCount): void {
     this.countSelection = count;
+  }
+
+  @mutation
+  setTotallingOrder(totalling: boolean): void {
+    this.totallingOrder = totalling;
   }
 }
