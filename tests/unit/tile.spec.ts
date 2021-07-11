@@ -33,7 +33,7 @@ describe('tile.ts', () => {
   });
 
   it('identifies SplitToggleTiles', () => {
-    const bt = Tile.newSplitToggle(Tile.SplitToggleState.TopToggled,
+    const bt = Tile.newSplitToggle(Tile.SplitToggleState.Top,
       empty, 'Hi!', 'Bye!');
 
     expect(Tile.isLabel(bt)).toBeFalsy();

@@ -57,8 +57,8 @@ export interface ToggleTile extends ButtonBaseTile {
 
 export enum SplitToggleState {
   Untoggled = 'neither',
-  TopToggled = 'top',
-  BottomToggled = 'bottom',
+  Top = 'top',
+  Bottom = 'bottom',
 }
 
 export interface SplitToggleTile extends Tile {
