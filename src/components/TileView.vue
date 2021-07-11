@@ -9,9 +9,11 @@
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
     :class="['base', 'split', 'p-button-sm', ...extraClasses, ...tile.classes]"
     @click="tile.onPress">
-    {{ tile.topLabel }}
+    <b v-if="tile.state == 'top'">{{ tile.topLabel }}</b>
+    <span v-else>{{ tile.topLabel }}</span>
     <div class="stogdiv"></div>
-    {{ tile.bottomLabel }}
+    <b v-if="tile.state == 'bottom'">{{ tile.bottomLabel }}</b>
+    <span v-else>{{ tile.bottomLabel }}</span>
   </Button>
   <div v-else
     :class="['base', 'label', ...extraClasses, ...tile.classes]">
