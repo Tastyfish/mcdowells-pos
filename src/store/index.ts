@@ -4,7 +4,8 @@ import { extractVuexModule, createProxy } from 'vuex-class-component';
 
 import { OrderStore } from './order';
 
-export { OrderCount, NO_CURRENT_LINE } from './order';
+export { NO_CURRENT_LINE, ChoiceMenuMode } from './order';
+export type { OrderCount } from './order';
 
 Vue.use(Vuex);
 

@@ -1,17 +1,24 @@
 <template>
   <div id="app">
-    <Tree class="orderBar" />
+    <Tree class="orderBar" :value="nodes" :expandedKeys="expandedNodes" />
     <TileGrid :strip="root" class="grid" />
   </div>
 </template>
 
 <script lang="ts">
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["root"] }] */
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["root", "nodes"] }] */
 
 import { Component, /* Prop, */ Vue } from 'vue-property-decorator';
 import { StripProvider } from '@/api/strip';
 import TileGrid from '@/components/TileGrid.vue';
 import generateTiles from '@/tiles';
+import { generateLineTree, TreeNode } from '@/api/tree';
+
+import vxm from '@/store';
+
+interface NodeExpansionInfo {
+  [key: number]: boolean
+}
 
 @Component({
   components: {
@@ -21,6 +28,14 @@ import generateTiles from '@/tiles';
 export default class App extends Vue {
   get root(): StripProvider {
     return generateTiles();
+  }
+
+  get nodes(): TreeNode[] {
+    return generateLineTree(vxm.order.lines, vxm.order.choices, vxm.order.currentLineID);
+  }
+
+  get expandedNodes(): NodeExpansionInfo {
+    return this.nodes.reduce((dict, node) => ({ ...dict, [node.key]: true }), {});
   }
 }
 </script>

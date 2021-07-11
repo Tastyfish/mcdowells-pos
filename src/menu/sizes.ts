@@ -1,9 +1,9 @@
 enum Sizes {
-  HappyMeal = 'H',
+  HappyMeal = 'HM',
   XSmall = 'XS',
-  Small = 'S',
-  Medium = 'M',
-  Large = 'L',
+  Small = 'Sm',
+  Medium = 'Med',
+  Large = 'Lg',
   Senior = 'Sr',
 }
 

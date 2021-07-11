@@ -46,7 +46,7 @@ export default class TileView extends Vue {
     }
   }
 
-  get extraClasses(): string[] {
+  get extraClasses(): (string | undefined)[] {
     return [
       this.severityClass,
       this.tile.xSpan === 2 ? 'doublex' : undefined,
