@@ -12,6 +12,7 @@ import generateSizeGraph from './sizes';
 import generateTabsGraph from './tabs';
 import generateCountGraph from './count';
 import generateCommandsGraph from './commands';
+import generateTabViewGraph from './tabviews';
 
 import generateTotalScreenGraph from './totalScreen';
 
@@ -29,5 +30,6 @@ export default function generateGraph(): StripProvider {
     generateTabsGraph(),
     generateSizeGraph(),
     generateCommandsGraph(),
+    generateTabViewGraph(),
   ]);
 }
