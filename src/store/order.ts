@@ -54,6 +54,9 @@ export class OrderStore extends OrderVuexModule {
   // Showing the total screen, and also sealing order.
   totallingOrder = false;
 
+  // Selected menu tab for the lower 4/5 area.
+  selectedMenuTab = 'lunch0';
+
   // /////////////////////////////////////////////////////////
   // Getters
   // /////////////////////////////////////////////////////////
@@ -169,5 +172,9 @@ export class OrderStore extends OrderVuexModule {
   setChoiceMenuMode(mode: ChoiceMenuMode): void {
     this.choiceMenuMode = mode;
     this.choicePage = 0;
+  }
+
+  @mutation setSelectedMenuTab(tab: string): void {
+    this.selectedMenuTab = tab;
   }
 }
