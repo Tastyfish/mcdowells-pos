@@ -55,7 +55,7 @@ export class OrderStore extends OrderVuexModule {
   totallingOrder = false;
 
   // Selected menu tab for the lower 4/5 area.
-  selectedMenuTab = 'lunch0';
+  selectedMenuTab = 'lu0';
 
   // /////////////////////////////////////////////////////////
   // Getters
