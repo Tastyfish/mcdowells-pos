@@ -84,7 +84,10 @@ export class OrderStore extends OrderVuexModule {
 
   @mutation
   clearLine(line: OrderLine): void {
+    // Remove line and its choices.
     this.lines = this.lines.filter((l) => l.id !== line.id);
+    this.choices = this.choices.filter((c) => c.line !== line);
+
     // Also unset current line IF it's the one being removed.
     if (this.currentLineID === line.id) {
       this.currentLineID = NO_CURRENT_LINE;
