@@ -44,7 +44,11 @@ export default function generateCommanndsGraph(): StripProvider {
     newButton(demoPromo, 'Promo Item'),
     newButton(onClicky, 'Clear Choice'),
     newButton(onClicky, 'Side Choice'),
-    newButton(onClicky, 'Void Line'),
+    newButton(() => {
+      if (vxm.order.currentLine) {
+        vxm.order.clearLine(vxm.order.currentLine);
+      }
+    }, 'Void Line'),
     { ...newButton(() => vxm.order.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
   ]);
 }
