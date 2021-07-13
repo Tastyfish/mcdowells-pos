@@ -9,7 +9,7 @@ export type { OrderCount } from './order';
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
+export const store = new Vuex.Store({
   modules: {
     ...extractVuexModule(OrderStore),
   },
