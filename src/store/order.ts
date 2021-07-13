@@ -80,6 +80,8 @@ export class OrderStore extends OrderVuexModule {
     this.lines = this.lines.concat([realLine]);
     this.currentLineID = this.highestOrderID;
     this.choicePage = 0;
+    this.sizeSelection = null;
+    this.countSelection = 1;
   }
 
   @mutation
