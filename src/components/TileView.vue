@@ -9,10 +9,10 @@
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
     :class="['base', 'split', 'p-button-sm', ...extraClasses, ...tile.classes]"
     @click="tile.onPress">
-    <b v-if="tile.state == 'top'">{{ tile.topLabel }}</b>
+    <b v-if="tile.state == 'top'" class="stogsel">{{ tile.topLabel }}</b>
     <span v-else>{{ tile.topLabel }}</span>
     <div class="stogdiv"></div>
-    <b v-if="tile.state == 'bottom'">{{ tile.bottomLabel }}</b>
+    <b v-if="tile.state == 'bottom'" class="stogsel">{{ tile.bottomLabel }}</b>
     <span v-else>{{ tile.bottomLabel }}</span>
   </Button>
   <div v-else
@@ -87,6 +87,12 @@ export default class TileView extends Vue {
     min-height: 1px;
     background-color: var(--primary-color-text);
     content: "";
+  }
+  .stogsel {
+    background-color: var(--primary-color-text);
+    color: var(--primary-color);
+    margin: -.125rem;
+    padding: .125rem;
   }
 
   .circle {
