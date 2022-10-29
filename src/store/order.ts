@@ -1,10 +1,11 @@
 import {
-  createModule, mutation,
+  createModule, mutation, action,
 } from 'vuex-class-component';
 
 import {
-  NewOrderLine, OrderLine, NewOrderChoice, OrderChoice,
+  NewOrderLine, OrderLine, NewOrderChoice, OrderChoice, ChoiceSlot,
 } from '@/api/order';
+import { menu, choices, choiceSlots } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 const OrderVuexModule = createModule({
@@ -21,6 +22,7 @@ export type OrderCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export enum ChoiceMenuMode {
   Default,
   ChangeComboSize,
+  ChangeSlot,
 }
 
 export class OrderStore extends OrderVuexModule {
@@ -51,11 +53,17 @@ export class OrderStore extends OrderVuexModule {
   // Change to special choice menus.
   choiceMenuMode: ChoiceMenuMode = ChoiceMenuMode.Default;
 
+  // What is the slot ID for choiceMenuMode.ChangeSlot?
+  choiceMenuSlotID: string | null = null;
+
   // Showing the total screen, and also sealing order.
   totallingOrder = false;
 
   // Selected menu tab for the lower 4/5 area.
   selectedMenuTab = 'lu0';
+
+  // Incremented to indicate we should scroll the receipt order view.
+  scrollOrderCounter = 0;
 
   // /////////////////////////////////////////////////////////
   // Getters
@@ -66,8 +74,8 @@ export class OrderStore extends OrderVuexModule {
   }
 
   @mutation
-  setCurrentLine(line: OrderLine): void {
-    this.currentLineID = line.id;
+  setCurrentLine(line: OrderLine | number): void {
+    this.currentLineID = typeof line === 'number' ? line : line.id;
     this.choicePage = 0;
   }
 
@@ -92,7 +100,8 @@ export class OrderStore extends OrderVuexModule {
 
     // Also unset current line IF it's the one being removed.
     if (this.currentLineID === line.id) {
-      this.currentLineID = NO_CURRENT_LINE;
+      this.currentLineID = this.lines.length === 0
+        ? NO_CURRENT_LINE : this.lines[this.lines.length - 1].id;
       this.choicePage = 0;
     }
   }
@@ -174,12 +183,108 @@ export class OrderStore extends OrderVuexModule {
   }
 
   @mutation
-  setChoiceMenuMode(mode: ChoiceMenuMode): void {
-    this.choiceMenuMode = mode;
-    this.choicePage = 0;
+  setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
+    if (typeof modeOrSlotID === 'number') {
+      this.choiceMenuMode = modeOrSlotID;
+      this.choiceMenuSlotID = null;
+    } else {
+      this.choiceMenuMode = ChoiceMenuMode.ChangeSlot;
+      this.choiceMenuSlotID = modeOrSlotID;
+      this.choicePage = 0;
+    }
   }
 
-  @mutation setSelectedMenuTab(tab: string): void {
+  @mutation
+  setSelectedMenuTab(tab: string): void {
     this.selectedMenuTab = tab;
+  }
+
+  @mutation
+  scrollOrderView(): void {
+    this.scrollOrderCounter += 1;
+  }
+
+  /**
+    Add an order line, considering size, count, and default choices.
+    @param {string} menuItemKey The menu item key.
+    @param {Sizes} defaultSize The default size, if no size selected.
+    @return {OrderLine} the resulting order.
+  */
+  @action
+  addSmartOrderLine(payload: { menuItemKey: string, defaultSize?: Sizes }): Promise<OrderLine[]> {
+    const { menuItemKey, defaultSize } = payload;
+
+    const menuItem = menu.find((a) => a.internalName === menuItemKey);
+
+    if (!menuItem) {
+      throw new Error(`Menu item ${menuItemKey} does not exist.`);
+    }
+
+    // Get size, if a size is selefcted and valid for menu item.
+    const size = this.sizeSelection
+      && menuItem.allowedSizes?.includes(this.sizeSelection)
+      ? this.sizeSelection : defaultSize;
+
+    // copy of count to preserve across loop.
+    const count = this.countSelection;
+
+    // Our list of lines.
+    const lines: OrderLine[] = Array(count);
+
+    for (let i = 0; i < count; i += 1) {
+      this.addLine({ menuItem, size });
+      const line = this.currentLine;
+
+      // Add default choices, if they're set.
+      if (line) {
+        Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
+          if (slotDefault) {
+            const slot = choiceSlots.find((s) => s.internalName === slotID);
+            const choiceItem = choices.find((c) => c.internalName === slotDefault);
+            if (slot && choiceItem) {
+              this.addChoice({ line, choiceItem });
+            }
+          }
+        });
+
+        lines[i] = line;
+      }
+
+      // Select first item again.
+      if (lines[0]) {
+        this.setCurrentLine(lines[0]);
+        this.scrollOrderView();
+      }
+    }
+
+    return new Promise(() => lines[0]);
+  }
+
+  /**
+    Add a choice, removing any overlapping old one.
+    @param {Object} payload Info about choice.
+  */
+  @action
+  addSmartChoice(payload: {
+    choiceItemKey: string, line: OrderLine, slot: ChoiceSlot
+  }): Promise<void> {
+    // Remove old choice, if applicable.
+    const { choiceItemKey, line, slot } = payload;
+
+    const oldChoice = this.choices.find((c) => c.line === line
+      && c.choiceItem.slot === slot.internalName);
+    if (oldChoice) {
+      this.clearChoice(oldChoice);
+    }
+
+    // Add new choice
+    const choiceItem = choices.find((c) => c.internalName === choiceItemKey);
+    if (choiceItem) {
+      this.addChoice({ line, choiceItem });
+    }
+
+    return new Promise(() => {
+      // return void
+    });
   }
 }

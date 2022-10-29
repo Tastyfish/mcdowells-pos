@@ -23,18 +23,30 @@ interface ItemBase<MetaInfo> {
 /**
   Info about a menu item.
 */
-export interface MenuItem<M> extends ItemBase<M> {
+export interface MenuItemM<M> extends ItemBase<M> {
   /** Slot names and default values for choices */
   readonly choiceSlots: ChoiceSlotInfo
 
   /** Sizes allowed for comboing this item. */
-  readonly allowedSizes?: Sizes[];
+  readonly allowedSizes?: Sizes[]
 }
 
 /**
   Info about a specific choice of a menu item.
 */
-export interface ChoiceItem<M> extends ItemBase<M> {
+export interface ChoiceItemM<M> extends ItemBase<M> {
   /** Which slots it can fit into. */
-  readonly slots: string[]
+  readonly slot: string
+}
+
+/**
+  Info about a choice slot.
+*/
+export interface ChoiceSlotM<M> extends ItemBase<M> {
+  /** True if listed in a receipt as its own line. */
+  readonly isListed?: boolean
+  /** This choice is specific to combos. */
+  readonly isComboOnly?: boolean
+  /** The label in the grill bar, if applicable. */
+  readonly grillLabel?: string
 }

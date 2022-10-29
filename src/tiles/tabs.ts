@@ -55,7 +55,7 @@ function getTTab(base: string): boolean {
 }
 
 export default function generateTabsGraph(): StripProvider {
-  return newArrayStrip(new Rectangle(0, 3, 9, 1), [
+  return newArrayStrip(new Rectangle(0, 3, 10, 1), [
     severeup(
       newSplitToggle(getSTab('br'), () => setSTab('br'), 'Breakfast', 'Breakfast 2'),
       Severity.Primary,
@@ -91,6 +91,10 @@ export default function generateTabsGraph(): StripProvider {
     severeup(
       newSplitToggle(getSTab('co'), () => setSTab('co'), 'Condiments', 'Gifts'),
       Severity.Primary,
+    ),
+    severeup(
+      newToggle(getTTab('special'), () => setTTab('special'), 'Special Functions'),
+      Severity.Danger,
     ),
   ]);
 }

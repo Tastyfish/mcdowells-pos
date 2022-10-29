@@ -22,6 +22,6 @@ export default function generateCountGraph(): StripProvider {
         }
       },
       (index + 1).toString(),
-    ), 'circle'),
+    ), ['circle']),
   ));
 }

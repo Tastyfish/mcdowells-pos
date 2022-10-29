@@ -1,23 +1,27 @@
 <template>
   <Button v-if="tile.type === 'BUTTON'"
-    :class="['base', 'p-button-sm', ...extraClasses, ...tile.classes]"
-    @click="tile.onPress" :label="tile.label" :icon="tile.icon" />
+    :class="['base', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
+    @click="buttonTile.onPress"
+    :label="buttonTile.label"
+    :icon="buttonTile.icon" />
   <Button v-else-if="tile.type === 'TOGGLE'"
     :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
-      { ['p-button-outlined']: tile.state}, ...tile.classes]"
-    @click="tile.onPress" :label="tile.label" :icon="tile.icon" />
+      { ['p-button-outlined']: toggleTile.state}, ...(tile.classes || [])]"
+    @click="toggleTile.onPress"
+    :label="toggleTile.label"
+    :icon="toggleTile.icon" />
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
-    :class="['base', 'split', 'p-button-sm', ...extraClasses, ...tile.classes]"
-    @click="tile.onPress">
-    <b v-if="tile.state == 'top'" class="stogsel">{{ tile.topLabel }}</b>
-    <span v-else>{{ tile.topLabel }}</span>
+    :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
+    @click="splitTile.onPress">
+    <b v-if="splitTile.state == 'top'" class="stogsel">{{ splitTile.topLabel }}</b>
+    <span v-else>{{ splitTile.topLabel }}</span>
     <div class="stogdiv"></div>
-    <b v-if="tile.state == 'bottom'" class="stogsel">{{ tile.bottomLabel }}</b>
-    <span v-else>{{ tile.bottomLabel }}</span>
+    <b v-if="splitTile.state == 'bottom'" class="stogsel">{{ splitTile.bottomLabel }}</b>
+    <span v-else>{{ splitTile.bottomLabel }}</span>
   </Button>
   <div v-else
-    :class="['base', 'label', ...extraClasses, ...tile.classes]">
-    <span>{{ tile.label }}</span>
+    :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]">
+    <span>{{ labelTile.label }}</span>
   </div>
 </template>
 
@@ -25,7 +29,9 @@
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["id"] }] */
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Tile, TileType, emptyTile } from '@/api/tile';
+import {
+  Tile, TileType, emptyTile, LabelTile, ButtonTile, ToggleTile, SplitToggleTile,
+} from '@/api/tile';
 
 @Component
 export default class TileView extends Vue {
@@ -54,6 +60,22 @@ export default class TileView extends Vue {
       this.tile.xSpan === 2 ? 'doublex' : undefined,
       this.tile.ySpan === 2 ? 'doubley' : undefined,
     ];
+  }
+
+  get buttonTile(): ButtonTile {
+    return (this.tile as ButtonTile);
+  }
+
+  get toggleTile(): ToggleTile {
+    return (this.tile as ToggleTile);
+  }
+
+  get splitTile(): SplitToggleTile {
+    return (this.tile as SplitToggleTile);
+  }
+
+  get labelTile(): LabelTile {
+    return (this.tile as LabelTile);
   }
 }
 </script>

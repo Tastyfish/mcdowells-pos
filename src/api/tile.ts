@@ -20,7 +20,7 @@ export enum TileType {
 * */
 export interface Tile {
   readonly type: TileType
-  readonly classes?: string // Optional style on the element.
+  readonly classes?: string[] // Optional style on the element.
 
   // If tile is multiple tiles big.
   readonly xSpan?: number
@@ -136,7 +136,7 @@ export const emptyTile: LabelTile = {
   @param {Tile} tile The tile to change the class of.
   @param {string} classes The classes to add.
 * */
-export function classup(tile: Tile, classes: string): Tile {
+export function classup(tile: Tile, classes: string[]): Tile {
   return { ...tile, classes };
 }
 

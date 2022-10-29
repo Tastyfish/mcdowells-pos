@@ -1,12 +1,12 @@
 import Sizes from '@/menu/sizes';
-import { MenuItem, ChoiceItem } from './menu';
+import { MenuItemM, ChoiceItemM, ChoiceSlotM } from './menu';
 
 /**
   The new line before it's assigned an ID by the datastore.
 */
 export interface NewOrderLine {
   /** info about menu item. */
-  readonly menuItem: MenuItem<NewOrderLine>
+  readonly menuItem: MenuItemM<NewOrderLine>
 
   /** If this is a combo, the size. */
   readonly size?: Sizes;
@@ -33,10 +33,24 @@ export interface NewOrderChoice {
   /** Line this is for. */
   readonly line: OrderLine
   /** info about choice. */
-  readonly choiceItem: ChoiceItem<NewOrderChoice>
+  readonly choiceItem: ChoiceItemM<NewOrderChoice>
 }
 
 export interface OrderChoice extends NewOrderChoice {
   /** The unique ID of this choice entry. */
   readonly id: number
 }
+
+export interface ChoiceSlotMetaInfo {
+  /** What is our slot? */
+  readonly slot: ChoiceSlotM<ChoiceSlotMetaInfo>
+
+  /** What is the filled in order choice selected, if any? */
+  readonly choice?: NewOrderChoice
+}
+
+// Now export the complete menu interfaces.
+
+export type MenuItem = MenuItemM<NewOrderLine>;
+export type ChoiceItem = ChoiceItemM<NewOrderChoice>;
+export type ChoiceSlot = ChoiceSlotM<ChoiceSlotMetaInfo>;

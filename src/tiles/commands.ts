@@ -1,5 +1,5 @@
 import {
-  Severity, newButton, severeup,
+  Severity, newButton,
 } from '@/api/tile';
 import {
   StripProvider, newArrayStrip,
@@ -8,41 +8,35 @@ import Rectangle from '@/api/rectangle';
 
 import vxm from '@/store';
 
-import { menu, choices } from '@/menu';
-import Sizes from '@/menu/sizes';
+import { menu } from '@/menu';
 
 function onClicky() {
   // do nothing
 }
 
 function demoPromo() {
-  const bigmac = menu.find((i) => i.internalName === 'bigmac');
-  const coke = choices.find((i) => i.internalName === 'cocacola');
+  const gift25 = menu.find((i) => i.internalName === 'gift25');
 
-  if (bigmac && coke) {
+  if (gift25) {
     vxm.order.addLine({
-      menuItem: bigmac,
-      size: Sizes.Small,
+      menuItem: gift25,
     });
-    const line = vxm.order.currentLine;
-
-    if (line) {
-      vxm.order.addChoice({
-        line,
-        choiceItem: coke,
-      });
-    }
   }
 }
 
 export default function generateCommanndsGraph(): StripProvider {
-  return newArrayStrip(new Rectangle(9, 3, 1, 7), [
-    severeup(
-      newButton(onClicky, 'Special Functions'),
-      Severity.Danger,
-    ),
+  return newArrayStrip(new Rectangle(9, 4, 1, 6), [
     newButton(demoPromo, 'Promo Item'),
-    newButton(onClicky, 'Clear Choice'),
+    newButton(() => {
+      const line = vxm.order.currentLine;
+      if (line) {
+        // clear last choice for line.
+        const choice = vxm.order.choices.reverse().find((c) => c.line === line);
+        if (choice) {
+          vxm.order.clearChoice(choice);
+        }
+      }
+    }, 'Clear Choice'),
     newButton(onClicky, 'Side Choice'),
     newButton(() => {
       if (vxm.order.currentLine) {

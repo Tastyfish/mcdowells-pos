@@ -1,5 +1,5 @@
 import {
-  newLabel, newButton, newToggle, severeup, Tile, Severity,
+  newLabel, newButton, severeup, Tile, Severity,
 } from '@/api/tile';
 import {
   StripProvider, newListStrip, newDownwardStrip, newArrayStrip, newContainerStrip,
@@ -7,12 +7,9 @@ import {
 import Rectangle from '@/api/rectangle';
 
 import vxm, { ChoiceMenuMode } from '@/store';
+import { choices, choiceSlots } from '@/menu';
 import Sizes from '@/menu/sizes';
-import { OrderLine } from '@/api/order';
-
-function onClicky() {
-  // do nothing
-}
+import { OrderLine, ChoiceItem } from '@/api/order';
 
 const choiceRect = new Rectangle(0, 0, 10, 2);
 const rowRect = new Rectangle(0, 0, 10, 1);
@@ -21,6 +18,16 @@ const choiceModeBack = severeup(newButton(
   () => vxm.order.setChoiceMenuMode(ChoiceMenuMode.Default),
   'Back', 'pi pi-arrow-left',
 ), Severity.Info);
+
+// A mock order line for generating the side buttons.
+const mockOrderLine: OrderLine = {
+  id: 0,
+  menuItem: {
+    choiceSlots: { side: null },
+    internalName: 'mock',
+    getDisplayName: () => 'na',
+  },
+};
 
 // A button to retroactively change an item's size.
 function newSizeButton(size: Sizes): Tile {
@@ -45,6 +52,44 @@ function generateChoiceButtons(line: OrderLine): Tile[] {
   return [];
 }
 
+// A button to replace the side of the current line
+function newChoiceButton(choice: ChoiceItem): Tile {
+  const sideSlot = choiceSlots.find((s) => s.internalName === choice.slot);
+
+  if (!sideSlot) {
+    throw new Error('Side slot missing.');
+  }
+
+  return newButton(() => {
+    const line = vxm.order.currentLine;
+    // Make sure the current line is exists and is a combo.
+    if (line && line.size) {
+      // Update side.
+      vxm.order.addSmartChoice({
+        choiceItemKey: choice.internalName,
+        line,
+        slot: sideSlot,
+      });
+    }
+
+    // Regardless, return to normal choices.
+    vxm.order.setChoiceMenuMode(ChoiceMenuMode.Default);
+  }, choice.getDisplayName({
+    choiceItem: choice,
+    line: mockOrderLine,
+  }));
+}
+
+function generateSlotButtons(slotID: string): Tile[] {
+  return choices.filter((c) => c.slot === slotID).map(newChoiceButton);
+}
+
+function slotName(id: string): string {
+  const slot = choiceSlots.find((s) => s.internalName === id);
+
+  return slot?.grillLabel ?? id;
+}
+
 export default function generateChoiceGraph(): StripProvider {
   switch (vxm.order.choiceMenuMode) {
     case ChoiceMenuMode.ChangeComboSize:
@@ -56,26 +101,43 @@ export default function generateChoiceGraph(): StripProvider {
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
       ]);
-    default:
+    case ChoiceMenuMode.ChangeSlot:
       return newDownwardStrip(choiceRect, [
-        newListStrip(rowRect, [
-          newLabel('Hi!'),
-          newLabel('Bye!'),
-          newButton(onClicky, 'Other CB'),
-          newToggle(vxm.order.showingPrices, () => vxm.order.showPrices(!vxm.order.showingPrices), 'Show Prices'),
-          newLabel('Subtotal: '),
-          newLabel('Total: '),
-          newButton(onClicky, 'Grill', 'pi pi-bars'),
-          newLabel('1'),
-          newLabel('2'),
-          newLabel('3'),
-          newLabel('4'),
-        ], vxm.order.choicePage, vxm.order.gotoNextChoicePage),
-        newArrayStrip(rowRect, [
-          severeup(newButton(() => {
-            vxm.order.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
-          }, 'Combo', 'pi pi-arrow-right'), Severity.Info),
+        newListStrip(rowRect,
+          generateSlotButtons(vxm.order.choiceMenuSlotID ?? 'side'),
+          vxm.order.choicePage, vxm.order.gotoNextChoicePage),
+        newContainerStrip(rowRect, [
+          newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
       ]);
+    default:
+    {
+      const line = vxm.order.currentLine;
+      if (!line) {
+        return newArrayStrip(choiceRect, []);
+      }
+
+      const canCombo = line.menuItem.allowedSizes !== undefined;
+      const canHaveSide = 'side' in line.menuItem.choiceSlots && line.size;
+
+      const remainingSlots = Object.keys(line.menuItem.choiceSlots).filter((slotID) => slotID !== 'side' && slotID !== 'drink');
+
+      return newDownwardStrip(choiceRect, [
+        newListStrip(rowRect, remainingSlots.map((slot) => newButton(() => vxm.order.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
+          vxm.order.choicePage, vxm.order.gotoNextChoicePage),
+        newArrayStrip(rowRect, [
+          canCombo
+            ? severeup(newButton(() => {
+              vxm.order.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
+            }, 'Combo', 'pi pi-arrow-right'), Severity.Info)
+            : newLabel(''),
+          canHaveSide
+            ? severeup(newButton(() => {
+              vxm.order.setChoiceMenuMode('side');
+            }, 'Side', 'pi pi-palette'), Severity.Info)
+            : newLabel(''),
+        ]),
+      ]);
+    }
   }
 }

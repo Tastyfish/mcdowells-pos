@@ -1,28 +1,31 @@
 <template>
   <div id="app">
-    <Tree class="orderBar" :value="nodes" :expandedKeys="expandedNodes" />
+    <OrderTree :nodes="nodes" :scrollOrderCounter="scrollOrderCounter" @select="select" />
     <TileGrid :strip="root" class="grid" />
   </div>
 </template>
 
 <script lang="ts">
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["root", "nodes"] }] */
+/* eslint class-methods-use-this: [
+  "error", { "exceptMethods": ["root", "nodes", "scrollOrderCounter", "select"
+] }] */
 
-import { Component, /* Prop, */ Vue } from 'vue-property-decorator';
+import {
+  Component, Vue,
+} from 'vue-property-decorator';
 import { StripProvider } from '@/api/strip';
-import TileGrid from '@/components/TileGrid.vue';
-import generateTiles from '@/tiles';
 import { generateLineTree, TreeNode } from '@/api/tree';
+import TileGrid from '@/components/TileGrid.vue';
+import OrderTree from '@/OrderTree.vue';
+import generateTiles from '@/tiles';
+import { choiceSlots } from '@/menu';
 
 import vxm from '@/store';
-
-interface NodeExpansionInfo {
-  [key: number]: boolean
-}
 
 @Component({
   components: {
     TileGrid,
+    OrderTree,
   },
 })
 export default class App extends Vue {
@@ -31,11 +34,19 @@ export default class App extends Vue {
   }
 
   get nodes(): TreeNode[] {
-    return generateLineTree(vxm.order.lines, vxm.order.choices, vxm.order.currentLineID);
+    return generateLineTree(
+      vxm.order.lines, vxm.order.choices,
+      choiceSlots, vxm.order.currentLineID,
+    );
   }
 
-  get expandedNodes(): NodeExpansionInfo {
-    return this.nodes.reduce((dict, node) => ({ ...dict, [node.key]: true }), {});
+  get scrollOrderCounter(): number {
+    return vxm.order.scrollOrderCounter;
+  }
+
+  // An order was selected.
+  select(lineID: number): void {
+    vxm.order.setCurrentLine(lineID);
   }
 }
 </script>
@@ -54,10 +65,9 @@ body {
   flex-direction: row;
   align-items: stretch;
 }
-.orderBar {
-  width: 33.33%;
-  margin: 0.5em;
-}
+</style>
+
+<style scoped>
 .grid {
   width: 66.67%;
 }
