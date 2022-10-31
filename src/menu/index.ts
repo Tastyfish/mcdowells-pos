@@ -52,6 +52,11 @@ export const menu: MenuItem[] = [
     choiceSlots: { side: null },
     allowedSizes: baseSizesAndSr,
   },
+  {
+    id: 'sauce',
+    getDisplayName: () => 'Condiment',
+    choiceSlots: { sauce: null },
+  },
 
   {
     id: 'gift25',
