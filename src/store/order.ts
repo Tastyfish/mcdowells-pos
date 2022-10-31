@@ -5,7 +5,7 @@ import {
 import {
   NewOrderLine, OrderLine, NewOrderChoice, OrderChoice, ChoiceSlot,
 } from '@/api/order';
-import { menu, choices, choiceSlots } from '@/menu';
+import { getMenuItem, getChoiceSlot, getChoiceItem } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 const OrderVuexModule = createModule({
@@ -23,6 +23,14 @@ export enum ChoiceMenuMode {
   Default,
   ChangeComboSize,
   ChangeSlot,
+}
+
+/// Advanced payload for addSmartOrderLine
+export interface SmartOrderPayload {
+  /// The menu item key.
+  menuItemKey: string
+  /// The default size, if no size selected.
+  defaultSize?: Sizes
 }
 
 export class OrderStore extends OrderVuexModule {
@@ -70,12 +78,12 @@ export class OrderStore extends OrderVuexModule {
   // /////////////////////////////////////////////////////////
 
   get currentLine(): OrderLine | undefined {
-    return this.lines.find((line) => line.id === this.currentLineID);
+    return this.lines.find((line) => line.uid === this.currentLineID);
   }
 
   @mutation
   setCurrentLine(line: OrderLine | number): void {
-    this.currentLineID = typeof line === 'number' ? line : line.id;
+    this.currentLineID = typeof line === 'number' ? line : line.uid;
     this.choicePage = 0;
   }
 
@@ -83,7 +91,7 @@ export class OrderStore extends OrderVuexModule {
   addLine(line: NewOrderLine): void {
     // Assign ID to line.
     this.highestOrderID += 1;
-    const realLine: OrderLine = { ...line, id: this.highestOrderID };
+    const realLine: OrderLine = { ...line, uid: this.highestOrderID };
 
     this.lines = this.lines.concat([realLine]);
     this.currentLineID = this.highestOrderID;
@@ -95,13 +103,13 @@ export class OrderStore extends OrderVuexModule {
   @mutation
   clearLine(line: OrderLine): void {
     // Remove line and its choices.
-    this.lines = this.lines.filter((l) => l.id !== line.id);
+    this.lines = this.lines.filter((l) => l.uid !== line.uid);
     this.choices = this.choices.filter((c) => c.line !== line);
 
     // Also unset current line IF it's the one being removed.
-    if (this.currentLineID === line.id) {
+    if (this.currentLineID === line.uid) {
       this.currentLineID = this.lines.length === 0
-        ? NO_CURRENT_LINE : this.lines[this.lines.length - 1].id;
+        ? NO_CURRENT_LINE : this.lines[this.lines.length - 1].uid;
       this.choicePage = 0;
     }
   }
@@ -113,7 +121,7 @@ export class OrderStore extends OrderVuexModule {
   * */
   @mutation
   replaceLine(line: OrderLine): void {
-    const idx = this.lines.findIndex((l) => l.id === line.id);
+    const idx = this.lines.findIndex((l) => l.uid === line.uid);
 
     if (idx === -1) {
       throw new RangeError('No existing order with ID.');
@@ -129,7 +137,7 @@ export class OrderStore extends OrderVuexModule {
 
     // And now also update all choices.
     this.choices = this.choices.map((c) => {
-      if (c.line.id === line.id) {
+      if (c.line.uid === line.uid) {
         return { ...c, line };
       }
 
@@ -141,7 +149,7 @@ export class OrderStore extends OrderVuexModule {
   addChoice(choice: NewOrderChoice): void {
     // Assign ID to choice.
     this.highestChoiceID += 1;
-    const realChoice: OrderChoice = { ...choice, id: this.highestChoiceID };
+    const realChoice: OrderChoice = { ...choice, uid: this.highestChoiceID };
 
     this.choices = this.choices.concat([realChoice]);
     this.choicePage = 0;
@@ -149,7 +157,7 @@ export class OrderStore extends OrderVuexModule {
 
   @mutation
   clearChoice(choice: OrderChoice): void {
-    this.choices = this.choices.filter((l) => l.id !== choice.id);
+    this.choices = this.choices.filter((l) => l.uid !== choice.uid);
   }
 
   @mutation
@@ -206,15 +214,17 @@ export class OrderStore extends OrderVuexModule {
 
   /**
     Add an order line, considering size, count, and default choices.
-    @param {string} menuItemKey The menu item key.
-    @param {Sizes} defaultSize The default size, if no size selected.
+    @param {SmartOrderPayload | string} Either the menu item key, or a SmartOrderPayload.
     @return {OrderLine} the resulting order.
   */
   @action
-  addSmartOrderLine(payload: { menuItemKey: string, defaultSize?: Sizes }): Promise<OrderLine[]> {
-    const { menuItemKey, defaultSize } = payload;
+  addSmartOrderLine(payload: SmartOrderPayload | string): Promise<OrderLine[]> {
+    const { menuItemKey, defaultSize } = (typeof payload !== 'string') ? payload : {
+      menuItemKey: payload,
+      defaultSize: undefined,
+    };
 
-    const menuItem = menu.find((a) => a.internalName === menuItemKey);
+    const menuItem = getMenuItem(menuItemKey);
 
     if (!menuItem) {
       throw new Error(`Menu item ${menuItemKey} does not exist.`);
@@ -239,8 +249,8 @@ export class OrderStore extends OrderVuexModule {
       if (line) {
         Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
           if (slotDefault) {
-            const slot = choiceSlots.find((s) => s.internalName === slotID);
-            const choiceItem = choices.find((c) => c.internalName === slotDefault);
+            const slot = getChoiceSlot(slotID);
+            const choiceItem = getChoiceItem(slotDefault);
             if (slot && choiceItem) {
               this.addChoice({ line, choiceItem });
             }
@@ -257,7 +267,7 @@ export class OrderStore extends OrderVuexModule {
       }
     }
 
-    return new Promise(() => lines[0]);
+    return new Promise((resolve) => resolve(lines));
   }
 
   /**
@@ -266,25 +276,23 @@ export class OrderStore extends OrderVuexModule {
   */
   @action
   addSmartChoice(payload: {
-    choiceItemKey: string, line: OrderLine, slot: ChoiceSlot
+    choiceItemID: string, line: OrderLine, slot: ChoiceSlot
   }): Promise<void> {
     // Remove old choice, if applicable.
-    const { choiceItemKey, line, slot } = payload;
+    const { choiceItemID, line, slot } = payload;
 
     const oldChoice = this.choices.find((c) => c.line === line
-      && c.choiceItem.slot === slot.internalName);
+      && c.choiceItem.slot === slot.id);
     if (oldChoice) {
       this.clearChoice(oldChoice);
     }
 
     // Add new choice
-    const choiceItem = choices.find((c) => c.internalName === choiceItemKey);
+    const choiceItem = getChoiceItem(choiceItemID);
     if (choiceItem) {
       this.addChoice({ line, choiceItem });
     }
 
-    return new Promise(() => {
-      // return void
-    });
+    return new Promise((resolve) => resolve());
   }
 }

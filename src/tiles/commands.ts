@@ -15,7 +15,7 @@ function onClicky() {
 }
 
 function demoPromo() {
-  const gift25 = menu.find((i) => i.internalName === 'gift25');
+  const gift25 = menu.find((i) => i.id === 'gift25');
 
   if (gift25) {
     vxm.order.addLine({

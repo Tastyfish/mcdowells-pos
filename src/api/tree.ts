@@ -30,7 +30,7 @@ const emptySelectedSlotStyle = 'background-color: var(--orange-400); color: var(
 */
 export function convertLineToTreeNode(line: OrderLine, selected: boolean): TreeNode {
   return {
-    key: line.id.toString(),
+    key: line.uid.toString(),
     label: line.menuItem.getDisplayName(line),
     style: selected ? selectedStyle : undefined,
   };
@@ -53,7 +53,7 @@ export function convertSlotToTreeNode(
   line: OrderLine, slot: ChoiceSlot, choice: OrderChoice | null, selected: boolean,
 ): TreeNode {
   return {
-    key: `${line.id}:${slot.internalName}`,
+    key: `${line.uid}:${slot.id}`,
     label: slot.getDisplayName({ slot, choice: choice ?? undefined }),
     style: getSlotStyle(selected, choice === null),
   };
@@ -68,9 +68,9 @@ export function generateLineTree(
   // Generate receipt tree based on provided order.
   return lines.map(
     (line) => ({
-      ...convertLineToTreeNode(line, currentLineID === line.id),
+      ...convertLineToTreeNode(line, currentLineID === line.uid),
       children: Object.keys(line.menuItem.choiceSlots)
-        .map((slotID) => ({ slotID, slot: slots.find((s) => s.internalName === slotID) }))
+        .map((slotID) => ({ slotID, slot: slots.find((s) => s.id === slotID) }))
         // Undefined slots always show up for debugging.
         // Otherwise, require it be a listed slot and:
         //   Either this is a combo, or the slot still exists on non-combo items.
@@ -87,7 +87,7 @@ export function generateLineTree(
             (c) => c.line === line && c.choiceItem.slot === s.slotID,
           ) ?? null;
           // Convert.
-          return convertSlotToTreeNode(line, s.slot, choice, currentLineID === line.id);
+          return convertSlotToTreeNode(line, s.slot, choice, currentLineID === line.uid);
         }),
     }),
   );

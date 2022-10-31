@@ -26,7 +26,7 @@ export function makeCombo(order: NewOrderLine, size: Sizes): NewOrderLine | null
 */
 export interface OrderLine extends NewOrderLine {
   /** Unique ID of this line within order */
-  readonly id: number
+  readonly uid: number
 }
 
 export interface NewOrderChoice {
@@ -38,7 +38,7 @@ export interface NewOrderChoice {
 
 export interface OrderChoice extends NewOrderChoice {
   /** The unique ID of this choice entry. */
-  readonly id: number
+  readonly uid: number
 }
 
 export interface ChoiceSlotMetaInfo {

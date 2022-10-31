@@ -7,7 +7,7 @@ import {
 import Rectangle from '@/api/rectangle';
 
 import vxm, { ChoiceMenuMode } from '@/store';
-import { choices, choiceSlots } from '@/menu';
+import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 import { OrderLine, ChoiceItem } from '@/api/order';
 
@@ -21,10 +21,10 @@ const choiceModeBack = severeup(newButton(
 
 // A mock order line for generating the side buttons.
 const mockOrderLine: OrderLine = {
-  id: 0,
+  uid: 0,
   menuItem: {
     choiceSlots: { side: null },
-    internalName: 'mock',
+    id: 'mock',
     getDisplayName: () => 'na',
   },
 };
@@ -54,7 +54,7 @@ function generateChoiceButtons(line: OrderLine): Tile[] {
 
 // A button to replace the side of the current line
 function newChoiceButton(choice: ChoiceItem): Tile {
-  const sideSlot = choiceSlots.find((s) => s.internalName === choice.slot);
+  const sideSlot = getChoiceSlot(choice.slot);
 
   if (!sideSlot) {
     throw new Error('Side slot missing.');
@@ -66,7 +66,7 @@ function newChoiceButton(choice: ChoiceItem): Tile {
     if (line && line.size) {
       // Update side.
       vxm.order.addSmartChoice({
-        choiceItemKey: choice.internalName,
+        choiceItemID: choice.id,
         line,
         slot: sideSlot,
       });
@@ -81,11 +81,11 @@ function newChoiceButton(choice: ChoiceItem): Tile {
 }
 
 function generateSlotButtons(slotID: string): Tile[] {
-  return choices.filter((c) => c.slot === slotID).map(newChoiceButton);
+  return getChoicesBySlot(slotID).map(newChoiceButton);
 }
 
 function slotName(id: string): string {
-  const slot = choiceSlots.find((s) => s.internalName === id);
+  const slot = getChoiceSlot(id);
 
   return slot?.grillLabel ?? id;
 }

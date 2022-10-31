@@ -14,7 +14,7 @@ interface ChoiceSlotInfo {
 
 interface ItemBase<MetaInfo> {
   /** Internal unique identifier */
-  readonly internalName: string
+  readonly id: string
 
   /** Generator for user-friendly display name. */
   readonly getDisplayName: (info: MetaInfo) => string

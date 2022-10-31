@@ -20,7 +20,7 @@ function displaySlot(info: ChoiceSlotMetaInfo, name: string): string {
 
 export const menu: MenuItem[] = [
   {
-    internalName: 'bigmac',
+    id: 'bigmac',
     getDisplayName: (line) => displayComboName(line, 'Big Mac'),
     choiceSlots: {
       grill: null,
@@ -30,7 +30,7 @@ export const menu: MenuItem[] = [
     allowedSizes: baseSizesAndHMAndSr,
   },
   {
-    internalName: 'nuggets8',
+    id: 'nuggets8',
     getDisplayName: (line) => displayComboName(line, '8pc Nuggets'),
     choiceSlots: {
       sauce: null,
@@ -41,20 +41,20 @@ export const menu: MenuItem[] = [
   },
 
   {
-    internalName: 'drink',
+    id: 'drink',
     getDisplayName: (line) => displayComboName(line, 'Drink'),
     choiceSlots: { drink: null },
     allowedSizes: baseSizesAndSr,
   },
   {
-    internalName: 'side',
+    id: 'side',
     getDisplayName: (line) => displayComboName(line, 'Side'),
     choiceSlots: { side: null },
     allowedSizes: baseSizesAndSr,
   },
 
   {
-    internalName: 'gift25',
+    id: 'gift25',
     getDisplayName: () => '$25 Gift Card',
     choiceSlots: { },
   },
@@ -62,69 +62,69 @@ export const menu: MenuItem[] = [
 
 export const choices: ChoiceItem[] = [
   {
-    internalName: 'coke',
+    id: 'coke',
     getDisplayName: (choice) => displayComboName(choice.line, 'Coca-Cola'),
     slot: 'drink',
   },
   {
-    internalName: 'dietcoke',
+    id: 'dietcoke',
     getDisplayName: (choice) => displayComboName(choice.line, 'Diet Coke'),
     slot: 'drink',
   },
   {
-    internalName: 'sprite',
+    id: 'sprite',
     getDisplayName: (choice) => displayComboName(choice.line, 'Sprite'),
     slot: 'drink',
   },
   {
-    internalName: 'fantaorange',
+    id: 'fantaorange',
     getDisplayName: (choice) => displayComboName(choice.line, 'Fanta Orange'),
     slot: 'drink',
   },
   {
-    internalName: 'icedtea',
+    id: 'icedtea',
     getDisplayName: (choice) => displayComboName(choice.line, 'Iced Tea'),
     slot: 'drink',
   },
   {
-    internalName: 'sweettea',
+    id: 'sweettea',
     getDisplayName: (choice) => displayComboName(choice.line, 'Sweet Tea'),
     slot: 'drink',
   },
   {
-    internalName: 'coffee',
+    id: 'coffee',
     getDisplayName: (choice) => displayComboName(choice.line, 'Coffee'),
     slot: 'drink',
   },
 
   {
-    internalName: 'fries',
+    id: 'fries',
     getDisplayName: (choice) => displayComboName(choice.line, 'Fries'),
     slot: 'side',
   },
   {
-    internalName: 'apples',
+    id: 'apples',
     getDisplayName: (choice) => displayComboName(choice.line, 'Apple Slices'),
     slot: 'side',
   },
 
   {
-    internalName: 'no_sauce',
+    id: 'no_sauce',
     getDisplayName: () => 'No Sauce',
     slot: 'sauce',
   },
   {
-    internalName: 'ketchup',
+    id: 'ketchup',
     getDisplayName: () => 'Ketchup',
     slot: 'sauce',
   },
   {
-    internalName: 'honey_mustard',
+    id: 'honey_mustard',
     getDisplayName: () => 'Honey Mustard',
     slot: 'sauce',
   },
   {
-    internalName: 'bbq',
+    id: 'bbq',
     getDisplayName: () => 'BBQ Sauce',
     slot: 'sauce',
   },
@@ -132,27 +132,43 @@ export const choices: ChoiceItem[] = [
 
 export const choiceSlots: ChoiceSlot[] = [
   {
-    internalName: 'drink',
+    id: 'drink',
     getDisplayName: (info) => displaySlot(info, 'Drink'),
     isListed: true,
     isComboOnly: true,
   },
   {
-    internalName: 'side',
+    id: 'side',
     getDisplayName: (info) => displaySlot(info, 'Side'),
     isListed: true,
     isComboOnly: true,
   },
   {
-    internalName: 'grill',
+    id: 'grill',
     getDisplayName: (info) => displaySlot(info, 'Toppings'),
     isListed: true,
     grillLabel: 'Grill',
   },
   {
-    internalName: 'sauce',
+    id: 'sauce',
     getDisplayName: (info) => displaySlot(info, 'Sauce'),
     isListed: true,
     grillLabel: 'Sauce',
   },
 ];
+
+export function getMenuItem(id: string): MenuItem | undefined {
+  return menu.find((item) => item.id === id);
+}
+
+export function getChoiceItem(id: string): ChoiceItem | undefined {
+  return choices.find((item) => item.id === id);
+}
+
+export function getChoicesBySlot(slotID: string): ChoiceItem[] {
+  return choices.filter((item) => item.slot === slotID);
+}
+
+export function getChoiceSlot(id: string): ChoiceSlot | undefined {
+  return choiceSlots.find((item) => item.id === id);
+}
