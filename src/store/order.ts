@@ -287,6 +287,16 @@ export class OrderStore extends OrderVuexModule {
       this.clearChoice(oldChoice);
     }
 
+    // Is this a valid choice?
+    if (!(slot.id in line.menuItem.choiceSlots)) {
+      return new Promise((_resolve, reject) => reject(new Error(`${line.menuItem.id} can not accept slot ${slot.grillLabel ?? slot.id}`)));
+    }
+
+    // Is this a combo choice on a non-combo line?
+    if (!line.size && slot.isComboOnly) {
+      return new Promise((_resolve, reject) => reject(new Error(`Line is not a combo so cannot accept slot ${slot.grillLabel ?? slot.id}`)));
+    }
+
     // Add new choice
     const choiceItem = getChoiceItem(choiceItemID);
     if (choiceItem) {

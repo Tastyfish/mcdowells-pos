@@ -63,7 +63,7 @@ function newChoiceButton(choice: ChoiceItem): Tile {
   return newButton(() => {
     const line = vxm.order.currentLine;
     // Make sure the current line is exists and is a combo.
-    if (line && line.size) {
+    if (line) {
       // Update side.
       vxm.order.addSmartChoice({
         choiceItemID: choice.id,
@@ -90,6 +90,23 @@ function slotName(id: string): string {
   return slot?.grillLabel ?? id;
 }
 
+/// Generate single row for managing a strip.
+const generateSlotGraph = (slotID: string): StripProvider => (
+  newListStrip(rowRect,
+    generateSlotButtons(slotID),
+    vxm.order.choicePage, vxm.order.gotoNextChoicePage)
+);
+
+/// Generate a single row of either slot options, or the slot graph if there is only one.
+function generateRemainingSlotsGraph(slots: string[]): StripProvider {
+  if (slots.length === 1) {
+    return generateSlotGraph(slots[0]);
+  }
+
+  return newListStrip(rowRect, slots.map((slot) => newButton(() => vxm.order.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
+    vxm.order.choicePage, vxm.order.gotoNextChoicePage);
+}
+
 export default function generateChoiceGraph(): StripProvider {
   switch (vxm.order.choiceMenuMode) {
     case ChoiceMenuMode.ChangeComboSize:
@@ -103,9 +120,7 @@ export default function generateChoiceGraph(): StripProvider {
       ]);
     case ChoiceMenuMode.ChangeSlot:
       return newDownwardStrip(choiceRect, [
-        newListStrip(rowRect,
-          generateSlotButtons(vxm.order.choiceMenuSlotID ?? 'side'),
-          vxm.order.choicePage, vxm.order.gotoNextChoicePage),
+        generateSlotGraph(vxm.order.choiceMenuSlotID ?? 'side'),
         newContainerStrip(rowRect, [
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
@@ -123,13 +138,12 @@ export default function generateChoiceGraph(): StripProvider {
       const remainingSlots = Object.keys(line.menuItem.choiceSlots).filter((slotID) => slotID !== 'side' && slotID !== 'drink');
 
       return newDownwardStrip(choiceRect, [
-        newListStrip(rowRect, remainingSlots.map((slot) => newButton(() => vxm.order.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
-          vxm.order.choicePage, vxm.order.gotoNextChoicePage),
+        generateRemainingSlotsGraph(remainingSlots),
         newArrayStrip(rowRect, [
           canCombo
             ? severeup(newButton(() => {
               vxm.order.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
-            }, 'Combo', 'pi pi-arrow-right'), Severity.Info)
+            }, line.size ? 'Size' : 'Combo', 'pi pi-arrow-right'), Severity.Info)
             : newLabel(''),
           canHaveSide
             ? severeup(newButton(() => {

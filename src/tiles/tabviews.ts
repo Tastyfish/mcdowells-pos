@@ -11,18 +11,33 @@ import Rectangle from '@/api/rectangle';
 import vxm from '@/store';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
+import { OrderLine } from '@/api/order';
 
 const drink = getChoiceSlot('drink');
 const sauce = getChoiceSlot('sauce');
 
-function addDrink(choiceItemID: string): void {
+async function addDrink(choiceItemID: string): Promise<void> {
   const line = vxm.order.currentLine;
   if (drink && line) {
-    vxm.order.addSmartChoice({
-      choiceItemID,
-      line,
-      slot: drink,
-    });
+    try {
+      await vxm.order.addSmartChoice({
+        choiceItemID,
+        line,
+        slot: drink,
+      });
+    } catch {
+      // Likely due to the line not supporting drinks, add a stand-alone smart line.
+      (await vxm.order.addSmartOrderLine({
+        menuItemKey: 'drink',
+        defaultSize: Sizes.Medium,
+      })).forEach((newLine: OrderLine) => {
+        vxm.order.addSmartChoice({
+          choiceItemID,
+          line: newLine,
+          slot: drink,
+        });
+      });
+    }
   }
 }
 
