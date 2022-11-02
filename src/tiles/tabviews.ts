@@ -9,7 +9,7 @@ import {
 import Rectangle from '@/api/rectangle';
 
 import { ChoiceSlot, OrderLine } from '@/api/order';
-import { getChoiceSlot, getChoicesBySlot, getMenuItem } from '@/menu';
+import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 import vxm from '@/store';
@@ -136,7 +136,7 @@ const stripButtonDummyLine: OrderLine = {
   menuItem: {
     choiceSlots: {},
     id: 'dummy',
-    getDisplayName: () => 'dummy',
+    getDisplayName: () => { throw new Error('This shouldn\'t be called.'); },
   },
 };
 
