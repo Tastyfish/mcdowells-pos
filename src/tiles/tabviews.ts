@@ -11,33 +11,46 @@ import Rectangle from '@/api/rectangle';
 import vxm from '@/store';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
-import { OrderLine } from '@/api/order';
 
 const drink = getChoiceSlot('drink');
 const sauce = getChoiceSlot('sauce');
 
+async function addSeperateDrink(choiceItemID: string) {
+  if (!drink) {
+    throw new Error('Drink slot missing. This is a serious error.');
+  }
+
+  const lines = await vxm.order.addSmartOrderLine({
+    menuItemKey: 'drink',
+    defaultSize: Sizes.Medium,
+  });
+
+  await Promise.all(lines.map((line) => (
+    vxm.order.addSmartChoice({ choiceItemID, line, slot: drink })
+  )));
+}
+
 async function addDrink(choiceItemID: string): Promise<void> {
+  if (!drink) {
+    throw new Error('Drink slot missing. This is a serious error.');
+  }
+
   const line = vxm.order.currentLine;
-  if (drink && line) {
-    try {
-      await vxm.order.addSmartChoice({
-        choiceItemID,
-        line,
-        slot: drink,
-      });
-    } catch {
-      // Likely due to the line not supporting drinks, add a stand-alone smart line.
-      (await vxm.order.addSmartOrderLine({
-        menuItemKey: 'drink',
-        defaultSize: Sizes.Medium,
-      })).forEach((newLine: OrderLine) => {
-        vxm.order.addSmartChoice({
-          choiceItemID,
-          line: newLine,
-          slot: drink,
-        });
-      });
-    }
+  if (!line) {
+    // Just add a drink to the order.
+    await addSeperateDrink(choiceItemID);
+    return;
+  }
+
+  try {
+    await vxm.order.addSmartChoice({
+      choiceItemID,
+      line,
+      slot: drink,
+    });
+  } catch {
+    // Likely due to the line not supporting drinks, add a stand-alone smart line.
+    await addSeperateDrink(choiceItemID);
   }
 }
 
@@ -52,27 +65,7 @@ const generateSpecialFunctionsStrips = (): StripProvider[] => ([
   ]),
 ]);
 
-const generateMenuTabStrips = (): StripProvider[] => ([
-  newArrayStrip(new Rectangle(2, 2, 3, 1), [
-    newButton(
-      () => vxm.order.addSmartOrderLine({
-        menuItemKey: 'drink',
-        defaultSize: Sizes.Medium,
-      }),
-      'Drink',
-    ),
-    newButton(
-      () => {
-        vxm.order.addSmartOrderLine({
-          menuItemKey: 'side',
-          defaultSize: Sizes.Medium,
-        });
-        vxm.order.setChoiceMenuMode('side');
-      },
-      'Side',
-    ),
-    severeup(newLabel(vxm.order.selectedMenuTab), Severity.Info),
-  ]),
+const generateDrinkStrips = (): StripProvider[] => ([
   newArrayStrip(new Rectangle(0, 4, 8, 2), [
     newButton(() => addDrink('coke'), 'Coke'),
     newButton(() => addDrink('dietcoke'), 'Diet Coke'),
@@ -89,7 +82,7 @@ const generateMenuTabStrips = (): StripProvider[] => ([
 ]);
 
 const generateLunchStrips = (): StripProvider[] => ([
-  ...generateMenuTabStrips(),
+  ...generateDrinkStrips(),
   newArrayStrip(new Rectangle(0, 0, 3, 1), [
     newButton(
       () => vxm.order.addSmartOrderLine('bigmac'),
@@ -100,27 +93,49 @@ const generateLunchStrips = (): StripProvider[] => ([
       'Nuggets',
     ),
   ]),
+  newArrayStrip(new Rectangle(2, 2, 3, 1), [
+    newButton(
+      () => vxm.order.addSmartOrderLine({
+        menuItemKey: 'drink',
+        defaultSize: Sizes.Medium,
+      }),
+      'Drink',
+    ),
+    newButton(
+      async () => {
+        await vxm.order.addSmartOrderLine({
+          menuItemKey: 'side',
+          defaultSize: Sizes.Medium,
+        });
+        vxm.order.setChoiceMenuMode('side');
+      },
+      'Side',
+    ),
+    severeup(newLabel(vxm.order.selectedMenuTab), Severity.Info),
+  ]),
 ]);
 
 const generateCondimentStrips = (): StripProvider[] => ([
-  ...generateMenuTabStrips(),
+  ...generateDrinkStrips(),
   newArrayStrip(new Rectangle(0, 0, 8, 2),
     // Automatically generate tiles based on existing sauces
     getChoicesBySlot('sauce').map((choice) => (
       newButton(
         async () => {
           if (!sauce) {
-            throw new Error('Sauce slot missing.');
+            throw new Error('Sauce slot missing. This is a serious error');
           }
 
           // Apply sauce to all of the lines added.
-          (await vxm.order.addSmartOrderLine('sauce')).forEach((line) => {
+          const lines = await vxm.order.addSmartOrderLine('sauce');
+
+          await Promise.all(lines.map((line) => (
             vxm.order.addSmartChoice({
               line,
               choiceItemID: choice.id,
               slot: sauce,
-            });
-          });
+            })
+          )));
         },
         choice.getDisplayName({
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -141,5 +156,5 @@ export default function generateTabViewGraph(): StripProvider {
   const currentTab = vxm.order.selectedMenuTab;
 
   return newContainerStrip(new Rectangle(1, 4, 8, 6),
-    tabMap[currentTab]?.() ?? generateMenuTabStrips());
+    tabMap[currentTab]?.() ?? generateDrinkStrips());
 }

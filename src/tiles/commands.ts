@@ -9,10 +9,7 @@ import Rectangle from '@/api/rectangle';
 import vxm from '@/store';
 
 import { menu } from '@/menu';
-
-function onClicky() {
-  // do nothing
-}
+import Sizes from '@/menu/sizes';
 
 function demoPromo() {
   const gift25 = menu.find((i) => i.id === 'gift25');
@@ -37,7 +34,13 @@ export default function generateCommanndsGraph(): StripProvider {
         }
       }
     }, 'Clear Choice'),
-    newButton(onClicky, 'Side Choice'),
+    newButton(async () => {
+      await vxm.order.addSmartOrderLine({
+        menuItemKey: 'side',
+        defaultSize: Sizes.Medium,
+      });
+      vxm.order.setChoiceMenuMode('side');
+    }, 'Side Choice'),
     newButton(() => {
       if (vxm.order.currentLine) {
         vxm.order.clearLine(vxm.order.currentLine);
