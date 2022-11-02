@@ -8,12 +8,24 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm from '@/store';
-import { getChoiceSlot, getChoicesBySlot } from '@/menu';
+import { ChoiceSlot, OrderLine } from '@/api/order';
+import { getChoiceSlot, getChoicesBySlot, getMenuItem } from '@/menu';
 import Sizes from '@/menu/sizes';
 
-const drink = getChoiceSlot('drink');
-const sauce = getChoiceSlot('sauce');
+import vxm from '@/store';
+
+function assertGetSlot(slotID: string) {
+  const slot = getChoiceSlot(slotID);
+
+  if (!slot) {
+    throw new Error(`Slot ${slotID} could not be found. This is catastrophic.`);
+  }
+
+  return slot;
+}
+
+const drink = assertGetSlot('drink');
+const sauce = assertGetSlot('sauce');
 
 async function addSeperateDrink(choiceItemID: string) {
   if (!drink) {
@@ -58,7 +70,7 @@ function voidMenu() {
   vxm.order.lines.forEach((line) => vxm.order.clearLine(line));
 }
 
-const generateSpecialFunctionsStrips = (): StripProvider[] => ([
+const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
   newArrayStrip(new Rectangle(0, 0, 1, 2), [
     newLabel(`Total Items: ${vxm.order.lines.length}`),
     newButton(voidMenu, 'Void Order'),
@@ -85,7 +97,7 @@ function finishAddLines(): void {
   vxm.ui.setChoicePage(0);
 }
 
-const generateLunchStrips = (): StripProvider[] => ([
+const generateLunchViewStrips = (): StripProvider[] => ([
   ...generateDrinkStrips(),
   newArrayStrip(new Rectangle(0, 0, 3, 1), [
     newButton(
@@ -119,42 +131,54 @@ const generateLunchStrips = (): StripProvider[] => ([
   ]),
 ]);
 
-const generateCondimentStrips = (): StripProvider[] => ([
+const stripButtonDummyLine: OrderLine = {
+  uid: -1,
+  menuItem: {
+    choiceSlots: {},
+    id: 'dummy',
+    getDisplayName: () => 'dummy',
+  },
+};
+
+// For the dedicated drinks and condiments menus
+const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripProvider[] => ([
   ...generateDrinkStrips(),
-  newArrayStrip(new Rectangle(0, 0, 8, 2),
+  newArrayStrip(new Rectangle(0, 0, 8, 4),
     // Automatically generate tiles based on existing sauces
-    getChoicesBySlot('sauce').map((choice) => (
+    getChoicesBySlot(slot.id).map((choice) => (
       newButton(
         async () => {
-          if (!sauce) {
-            throw new Error('Sauce slot missing. This is a serious error');
-          }
-
           // Apply sauce to all of the lines added.
-          const lines = await vxm.order.addSmartOrderLine('sauce');
+          const lines = await vxm.order.addSmartOrderLine({
+            menuItemKey: menuID ?? slot.id,
+            defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
+          });
           vxm.ui.setChoicePage(0);
 
           await Promise.all(lines.map((line) => (
             vxm.order.addSmartChoice({
               line,
               choiceItemID: choice.id,
-              slot: sauce,
+              slot,
             })
           )));
         },
         choice.getDisplayName({
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          line: vxm.order.currentLine!,
+          line: stripButtonDummyLine,
           choiceItem: choice,
         }),
       )
     ))),
 ]);
 
+const generateCondimentViewStrips = (): StripProvider[] => generateStandaloneSlotStrips(sauce);
+const generateDrinkViewStrips = (): StripProvider[] => generateStandaloneSlotStrips(drink);
+
 const tabMap: {[tabKey: string]: () => StripProvider[]} = {
-  special: generateSpecialFunctionsStrips,
-  lu0: generateLunchStrips,
-  co0: generateCondimentStrips,
+  special: generateSpecialFunctionsViewStrips,
+  lu0: generateLunchViewStrips,
+  co0: generateCondimentViewStrips,
+  dr: generateDrinkViewStrips,
 };
 
 export default function generateTabViewGraph(): StripProvider {
