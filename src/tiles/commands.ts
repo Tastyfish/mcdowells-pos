@@ -22,7 +22,7 @@ function demoPromo() {
   }
 }
 
-export default function generateCommanndsGraph(): StripProvider {
+export default function generateCommandsGraph(): StripProvider {
   return newArrayStrip(new Rectangle(9, 4, 1, 6), [
     newButton(demoPromo, 'Promo Item'),
     newButton(() => {
