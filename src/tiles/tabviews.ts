@@ -12,7 +12,7 @@ import { ChoiceSlot, OrderLine } from '@/api/order';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
-import vxm from '@/store';
+import vxm, { ChoiceMenuMode } from '@/store';
 
 function assertGetSlot(slotID: string) {
   const slot = getChoiceSlot(slotID);
@@ -94,7 +94,7 @@ const generateDrinkStrips = (): StripProvider[] => ([
 ]);
 
 function finishAddLines(): void {
-  vxm.ui.setChoicePage(0);
+  vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
 }
 
 const generateLunchViewStrips = (): StripProvider[] => ([
@@ -153,7 +153,7 @@ const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripP
             menuItemKey: menuID ?? slot.id,
             defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
           });
-          vxm.ui.setChoicePage(0);
+          vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
 
           await Promise.all(lines.map((line) => (
             vxm.order.addSmartChoice({

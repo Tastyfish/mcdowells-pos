@@ -20,7 +20,7 @@ import OrderTree from '@/OrderTree.vue';
 import generateTiles from '@/tiles';
 import { choiceSlots } from '@/menu';
 
-import vxm from '@/store';
+import vxm, { ChoiceMenuMode } from '@/store';
 
 @Component({
   components: {
@@ -47,7 +47,7 @@ export default class App extends Vue {
   // An order was selected.
   select(lineID: number): void {
     vxm.order.setCurrentLine(lineID);
-    vxm.ui.setChoicePage(0);
+    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
   }
 }
 </script>

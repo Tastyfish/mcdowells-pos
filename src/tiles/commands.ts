@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm from '@/store';
+import vxm, { ChoiceMenuMode } from '@/store';
 
 import { menu } from '@/menu';
 import Sizes from '@/menu/sizes';
@@ -18,7 +18,7 @@ function demoPromo() {
     vxm.order.addLine({
       menuItem: gift25,
     });
-    vxm.ui.setChoicePage(0);
+    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
   }
 }
 
@@ -45,7 +45,7 @@ export default function generateCommandsGraph(): StripProvider {
     newButton(() => {
       if (vxm.order.currentLine) {
         vxm.order.clearLine(vxm.order.currentLine);
-        vxm.ui.setChoicePage(0);
+        vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
       }
     }, 'Void Line'),
     { ...newButton(() => vxm.ui.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
