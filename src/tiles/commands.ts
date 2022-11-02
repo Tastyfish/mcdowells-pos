@@ -37,7 +37,7 @@ export default function generateCommandsGraph(): StripProvider {
     }, 'Clear Choice'),
     newButton(async () => {
       await vxm.order.addSmartOrderLine({
-        menuItemKey: 'side',
+        menuItemID: 'side',
         defaultSize: Sizes.Medium,
       });
       vxm.ui.setChoiceMenuMode('side');

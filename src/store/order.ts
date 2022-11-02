@@ -15,8 +15,8 @@ export type OrderCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 /// Advanced payload for addSmartOrderLine
 export interface SmartOrderPayload {
-  /// The menu item key.
-  menuItemKey: string
+  /// The menu item id.
+  menuItemID: string
   /// The default size, if no size selected.
   defaultSize?: Sizes
 }
@@ -162,8 +162,8 @@ export class OrderStore extends OrderVuexModule {
   */
   @action
   addSmartOrderLine(payload: SmartOrderPayload | string): Promise<OrderLine[]> {
-    const { menuItemKey, defaultSize } = (typeof payload !== 'string') ? payload : {
-      menuItemKey: payload,
+    const { menuItemID: menuItemKey, defaultSize } = (typeof payload !== 'string') ? payload : {
+      menuItemID: payload,
       defaultSize: undefined,
     };
 

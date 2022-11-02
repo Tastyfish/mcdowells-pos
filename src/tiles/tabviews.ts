@@ -33,7 +33,7 @@ async function addSeperateDrink(choiceItemID: string) {
   }
 
   const lines = await vxm.order.addSmartOrderLine({
-    menuItemKey: 'drink',
+    menuItemID: 'drink',
     defaultSize: Sizes.Medium,
   });
 
@@ -112,7 +112,7 @@ const generateLunchViewStrips = (): StripProvider[] => ([
   newArrayStrip(new Rectangle(2, 2, 3, 1), [
     newButton(
       () => vxm.order.addSmartOrderLine({
-        menuItemKey: 'drink',
+        menuItemID: 'drink',
         defaultSize: Sizes.Medium,
       }).then(finishAddLines),
       'Drink',
@@ -120,7 +120,7 @@ const generateLunchViewStrips = (): StripProvider[] => ([
     newButton(
       async () => {
         await vxm.order.addSmartOrderLine({
-          menuItemKey: 'side',
+          menuItemID: 'side',
           defaultSize: Sizes.Medium,
         });
         vxm.ui.setChoiceMenuMode('side');
@@ -150,7 +150,7 @@ const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripP
         async () => {
           // Apply sauce to all of the lines added.
           const lines = await vxm.order.addSmartOrderLine({
-            menuItemKey: menuID ?? slot.id,
+            menuItemID: menuID ?? slot.id,
             defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
           });
           vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
