@@ -15,7 +15,7 @@ const choiceRect = new Rectangle(0, 0, 10, 2);
 const rowRect = new Rectangle(0, 0, 10, 1);
 
 const choiceModeBack = severeup(newButton(
-  () => vxm.order.setChoiceMenuMode(ChoiceMenuMode.Default),
+  () => vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default),
   'Back', 'pi pi-arrow-left',
 ), Severity.Info);
 
@@ -40,7 +40,7 @@ function newSizeButton(size: Sizes): Tile {
     }
 
     // Regardless, return to normal choices.
-    vxm.order.setChoiceMenuMode(ChoiceMenuMode.Default);
+    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
   }, size);
 }
 
@@ -73,7 +73,7 @@ function newChoiceButton(choice: ChoiceItem): Tile {
     }
 
     // Regardless, return to normal choices.
-    vxm.order.setChoiceMenuMode(ChoiceMenuMode.Default);
+    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
   }, choice.getDisplayName({
     choiceItem: choice,
     line: mockOrderLine,
@@ -94,7 +94,7 @@ function slotName(id: string): string {
 const generateSlotGraph = (slotID: string): StripProvider => (
   newListStrip(rowRect,
     generateSlotButtons(slotID),
-    vxm.order.choicePage, vxm.order.gotoNextChoicePage)
+    vxm.ui.choicePage, vxm.ui.gotoNextChoicePage)
 );
 
 /// Generate a single row of either slot options, or the slot graph if there is only one.
@@ -103,24 +103,24 @@ function generateRemainingSlotsGraph(slots: string[]): StripProvider {
     return generateSlotGraph(slots[0]);
   }
 
-  return newListStrip(rowRect, slots.map((slot) => newButton(() => vxm.order.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
-    vxm.order.choicePage, vxm.order.gotoNextChoicePage);
+  return newListStrip(rowRect, slots.map((slot) => newButton(() => vxm.ui.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
+    vxm.ui.choicePage, vxm.ui.gotoNextChoicePage);
 }
 
 export default function generateChoiceGraph(): StripProvider {
-  switch (vxm.order.choiceMenuMode) {
+  switch (vxm.ui.choiceMenuMode) {
     case ChoiceMenuMode.ChangeComboSize:
       return newDownwardStrip(choiceRect, [
         newListStrip(rowRect,
           vxm.order.currentLine ? generateChoiceButtons(vxm.order.currentLine) : [],
-          vxm.order.choicePage, vxm.order.gotoNextChoicePage),
+          vxm.ui.choicePage, vxm.ui.gotoNextChoicePage),
         newContainerStrip(rowRect, [
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
       ]);
     case ChoiceMenuMode.ChangeSlot:
       return newDownwardStrip(choiceRect, [
-        generateSlotGraph(vxm.order.choiceMenuSlotID ?? 'side'),
+        generateSlotGraph(vxm.ui.choiceMenuSlotID ?? 'side'),
         newContainerStrip(rowRect, [
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
@@ -142,12 +142,12 @@ export default function generateChoiceGraph(): StripProvider {
         newArrayStrip(rowRect, [
           canCombo
             ? severeup(newButton(() => {
-              vxm.order.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
+              vxm.ui.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
             }, line.size ? 'Size' : 'Combo', 'pi pi-arrow-right'), Severity.Info)
             : newLabel(''),
           canHaveSide
             ? severeup(newButton(() => {
-              vxm.order.setChoiceMenuMode('side');
+              vxm.ui.setChoiceMenuMode('side');
             }, 'Side', 'pi pi-palette'), Severity.Info)
             : newLabel(''),
         ]),

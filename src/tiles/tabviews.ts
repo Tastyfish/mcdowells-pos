@@ -77,19 +77,23 @@ const generateDrinkStrips = (): StripProvider[] => ([
 
     newToggle(false, () => { /* no */ }, 'Show Product Build'),
 
-    newToggle(vxm.order.showingPrices, () => vxm.order.showPrices(!vxm.order.showingPrices), 'Show Prices'),
+    newToggle(vxm.ui.showingPrices, () => vxm.ui.showPrices(!vxm.ui.showingPrices), 'Show Prices'),
   ]),
 ]);
+
+function finishAddLines(): void {
+  vxm.ui.setChoicePage(0);
+}
 
 const generateLunchStrips = (): StripProvider[] => ([
   ...generateDrinkStrips(),
   newArrayStrip(new Rectangle(0, 0, 3, 1), [
     newButton(
-      () => vxm.order.addSmartOrderLine('bigmac'),
+      () => vxm.order.addSmartOrderLine('bigmac').then(finishAddLines),
       'Big Mac',
     ),
     newButton(
-      () => vxm.order.addSmartOrderLine('nuggets8'),
+      () => vxm.order.addSmartOrderLine('nuggets8').then(finishAddLines),
       'Nuggets',
     ),
   ]),
@@ -98,7 +102,7 @@ const generateLunchStrips = (): StripProvider[] => ([
       () => vxm.order.addSmartOrderLine({
         menuItemKey: 'drink',
         defaultSize: Sizes.Medium,
-      }),
+      }).then(finishAddLines),
       'Drink',
     ),
     newButton(
@@ -107,11 +111,11 @@ const generateLunchStrips = (): StripProvider[] => ([
           menuItemKey: 'side',
           defaultSize: Sizes.Medium,
         });
-        vxm.order.setChoiceMenuMode('side');
+        vxm.ui.setChoiceMenuMode('side');
       },
       'Side',
     ),
-    severeup(newLabel(vxm.order.selectedMenuTab), Severity.Info),
+    severeup(newLabel(vxm.ui.selectedMenuTab), Severity.Info),
   ]),
 ]);
 
@@ -128,6 +132,7 @@ const generateCondimentStrips = (): StripProvider[] => ([
 
           // Apply sauce to all of the lines added.
           const lines = await vxm.order.addSmartOrderLine('sauce');
+          vxm.ui.setChoicePage(0);
 
           await Promise.all(lines.map((line) => (
             vxm.order.addSmartChoice({
@@ -153,7 +158,7 @@ const tabMap: {[tabKey: string]: () => StripProvider[]} = {
 };
 
 export default function generateTabViewGraph(): StripProvider {
-  const currentTab = vxm.order.selectedMenuTab;
+  const currentTab = vxm.ui.selectedMenuTab;
 
   return newContainerStrip(new Rectangle(1, 4, 8, 6),
     tabMap[currentTab]?.() ?? generateDrinkStrips());

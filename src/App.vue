@@ -47,6 +47,7 @@ export default class App extends Vue {
   // An order was selected.
   select(lineID: number): void {
     vxm.order.setCurrentLine(lineID);
+    vxm.ui.setChoicePage(0);
   }
 }
 </script>

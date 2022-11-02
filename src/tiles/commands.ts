@@ -18,6 +18,7 @@ function demoPromo() {
     vxm.order.addLine({
       menuItem: gift25,
     });
+    vxm.ui.setChoicePage(0);
   }
 }
 
@@ -39,13 +40,14 @@ export default function generateCommanndsGraph(): StripProvider {
         menuItemKey: 'side',
         defaultSize: Sizes.Medium,
       });
-      vxm.order.setChoiceMenuMode('side');
+      vxm.ui.setChoiceMenuMode('side');
     }, 'Side Choice'),
     newButton(() => {
       if (vxm.order.currentLine) {
         vxm.order.clearLine(vxm.order.currentLine);
+        vxm.ui.setChoicePage(0);
       }
     }, 'Void Line'),
-    { ...newButton(() => vxm.order.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
+    { ...newButton(() => vxm.ui.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
   ]);
 }

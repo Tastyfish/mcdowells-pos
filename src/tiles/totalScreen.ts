@@ -12,7 +12,7 @@ import vxm from '@/store';
 
 function backOut() {
   // Leave the screen and go back.
-  vxm.order.setTotallingOrder(false);
+  vxm.ui.setTotallingOrder(false);
 }
 
 export default function generateTotalScreenGraph(): StripProvider {

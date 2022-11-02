@@ -18,7 +18,7 @@ import generateTotalScreenGraph from './totalScreen';
 
 // Should be cached between state changes.
 export default function generateGraph(): StripProvider {
-  if (vxm.order.totallingOrder) {
+  if (vxm.ui.totallingOrder) {
     // Running the total and cashing out screen
     return generateTotalScreenGraph();
   }

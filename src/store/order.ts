@@ -8,22 +8,10 @@ import {
 import { getMenuItem, getChoiceSlot, getChoiceItem } from '@/menu';
 import Sizes from '@/menu/sizes';
 
-const OrderVuexModule = createModule({
-  namespaced: 'order',
-  strict: true,
-});
-
 export const NO_CURRENT_LINE = -1;
 
 // Options for multiplier choice buttons.
 export type OrderCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-
-// Alternative "choice" menus to show
-export enum ChoiceMenuMode {
-  Default,
-  ChangeComboSize,
-  ChangeSlot,
-}
 
 /// Advanced payload for addSmartOrderLine
 export interface SmartOrderPayload {
@@ -33,6 +21,12 @@ export interface SmartOrderPayload {
   defaultSize?: Sizes
 }
 
+const OrderVuexModule = createModule({
+  namespaced: 'order',
+  strict: true,
+});
+
+/// Store module for orders. Is fully replicated to DB.
 export class OrderStore extends OrderVuexModule {
   lines: OrderLine[] = [];
 
@@ -46,29 +40,11 @@ export class OrderStore extends OrderVuexModule {
 
   currentLineID: number = NO_CURRENT_LINE;
 
-  // Current page on listed choice.
-  choicePage = 0;
-
-  // Show prices on buttons.
-  showingPrices = false;
-
   // Handle size selection.
   sizeSelection: Sizes | null = null;
 
   // Multiplying count selection.
   countSelection: OrderCount = 1;
-
-  // Change to special choice menus.
-  choiceMenuMode: ChoiceMenuMode = ChoiceMenuMode.Default;
-
-  // What is the slot ID for choiceMenuMode.ChangeSlot?
-  choiceMenuSlotID: string | null = null;
-
-  // Showing the total screen, and also sealing order.
-  totallingOrder = false;
-
-  // Selected menu tab for the lower 4/5 area.
-  selectedMenuTab = 'lu0';
 
   // Incremented to indicate we should scroll the receipt order view.
   scrollOrderCounter = 0;
@@ -81,10 +57,13 @@ export class OrderStore extends OrderVuexModule {
     return this.lines.find((line) => line.uid === this.currentLineID);
   }
 
+  // /////////////////////////////////////////////////////////
+  // Mutations
+  // /////////////////////////////////////////////////////////
+
   @mutation
   setCurrentLine(line: OrderLine | number): void {
     this.currentLineID = typeof line === 'number' ? line : line.uid;
-    this.choicePage = 0;
   }
 
   @mutation
@@ -95,7 +74,6 @@ export class OrderStore extends OrderVuexModule {
 
     this.lines = this.lines.concat([realLine]);
     this.currentLineID = this.highestOrderID;
-    this.choicePage = 0;
     this.sizeSelection = null;
     this.countSelection = 1;
   }
@@ -110,7 +88,6 @@ export class OrderStore extends OrderVuexModule {
     if (this.currentLineID === line.uid) {
       this.currentLineID = this.lines.length === 0
         ? NO_CURRENT_LINE : this.lines[this.lines.length - 1].uid;
-      this.choicePage = 0;
     }
   }
 
@@ -152,27 +129,11 @@ export class OrderStore extends OrderVuexModule {
     const realChoice: OrderChoice = { ...choice, uid: this.highestChoiceID };
 
     this.choices = this.choices.concat([realChoice]);
-    this.choicePage = 0;
   }
 
   @mutation
   clearChoice(choice: OrderChoice): void {
     this.choices = this.choices.filter((l) => l.uid !== choice.uid);
-  }
-
-  @mutation
-  setChoicePage(page: number): void {
-    this.choicePage = page;
-  }
-
-  @mutation
-  gotoNextChoicePage(): void {
-    this.choicePage += 1;
-  }
-
-  @mutation
-  showPrices(show: boolean): void {
-    this.showingPrices = show;
   }
 
   @mutation
@@ -186,31 +147,13 @@ export class OrderStore extends OrderVuexModule {
   }
 
   @mutation
-  setTotallingOrder(totalling: boolean): void {
-    this.totallingOrder = totalling;
-  }
-
-  @mutation
-  setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
-    if (typeof modeOrSlotID === 'number') {
-      this.choiceMenuMode = modeOrSlotID;
-      this.choiceMenuSlotID = null;
-    } else {
-      this.choiceMenuMode = ChoiceMenuMode.ChangeSlot;
-      this.choiceMenuSlotID = modeOrSlotID;
-      this.choicePage = 0;
-    }
-  }
-
-  @mutation
-  setSelectedMenuTab(tab: string): void {
-    this.selectedMenuTab = tab;
-  }
-
-  @mutation
   scrollOrderView(): void {
     this.scrollOrderCounter += 1;
   }
+
+  // /////////////////////////////////////////////////////////
+  // Actions
+  // /////////////////////////////////////////////////////////
 
   /**
     Add an order line, considering size, count, and default choices.
@@ -245,26 +188,28 @@ export class OrderStore extends OrderVuexModule {
       this.addLine({ menuItem, size });
       const line = this.currentLine;
 
+      if (!line) {
+        throw new Error('Order store is in an invalid state and lines cannot be added.');
+      }
+
       // Add default choices, if they're set.
-      if (line) {
-        Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
-          if (slotDefault) {
-            const slot = getChoiceSlot(slotID);
-            const choiceItem = getChoiceItem(slotDefault);
-            if (slot && choiceItem) {
-              this.addChoice({ line, choiceItem });
-            }
+      Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
+        if (slotDefault) {
+          const slot = getChoiceSlot(slotID);
+          const choiceItem = getChoiceItem(slotDefault);
+          if (slot && choiceItem) {
+            this.addChoice({ line, choiceItem });
           }
-        });
+        }
+      });
 
-        lines[i] = line;
-      }
+      lines[i] = line;
+    }
 
-      // Select first item again.
-      if (lines[0]) {
-        this.setCurrentLine(lines[0]);
-        this.scrollOrderView();
-      }
+    // Select first item again.
+    if (lines[0]) {
+      this.setCurrentLine(lines[0]);
+      this.scrollOrderView();
     }
 
     return new Promise((resolve) => resolve(lines));
