@@ -6,19 +6,20 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm from '@/store';
+import { useUIStore } from '@/store';
 
 /**
-  Select a [tab]0, unless it's already selected, then pick tab[1].
+  Select a [tab]0, unless it's already selected, then pick [tab]1.
   @param {string} base The key name of the tab.
 */
 function setSTab(base: string): void {
   const tab0 = `${base}0`;
+  const uiStore = useUIStore();
 
-  if (vxm.ui.selectedMenuTab === tab0) {
-    vxm.ui.setSelectedMenuTab(`${base}1`);
+  if (uiStore.selectedMenuTab === tab0) {
+    uiStore.setSelectedMenuTab(`${base}1`);
   } else {
-    vxm.ui.setSelectedMenuTab(tab0);
+    uiStore.setSelectedMenuTab(tab0);
   }
 }
 
@@ -28,10 +29,12 @@ function setSTab(base: string): void {
   @return {SplitToggleState} the corresponding state.
 */
 function getSTab(base: string): SplitToggleState {
-  if (vxm.ui.selectedMenuTab === `${base}0`) {
+  const uiStore = useUIStore();
+
+  if (uiStore.selectedMenuTab === `${base}0`) {
     return SplitToggleState.Top;
   }
-  if (vxm.ui.selectedMenuTab === `${base}1`) {
+  if (uiStore.selectedMenuTab === `${base}1`) {
     return SplitToggleState.Bottom;
   }
   return SplitToggleState.Untoggled;
@@ -42,7 +45,7 @@ function getSTab(base: string): SplitToggleState {
   @param {string} base The key name of the tab.
 */
 function setTTab(base: string): void {
-  vxm.ui.setSelectedMenuTab(base);
+  useUIStore().setSelectedMenuTab(base);
 }
 
 /**
@@ -51,7 +54,7 @@ function setTTab(base: string): void {
   @return {boolean} the corresponding state.
 */
 function getTTab(base: string): boolean {
-  return vxm.ui.selectedMenuTab === base;
+  return useUIStore().selectedMenuTab === base;
 }
 
 export default function generateTabsGraph(): StripProvider {

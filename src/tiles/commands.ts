@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm, { ChoiceMenuMode } from '@/store';
+import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 
 import { menu } from '@/menu';
 import Sizes from '@/menu/sizes';
@@ -15,39 +15,42 @@ function demoPromo() {
   const gift25 = menu.find((i) => i.id === 'gift25');
 
   if (gift25) {
-    vxm.order.addLine({
+    useOrderStore().addLine({
       menuItem: gift25,
     });
-    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+    useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
   }
 }
 
 export default function generateCommandsGraph(): StripProvider {
+  const orderStore = useOrderStore();
+  const uiStore = useUIStore();
+
   return newArrayStrip(new Rectangle(9, 4, 1, 6), [
     newButton(demoPromo, 'Promo Item'),
     newButton(() => {
-      const line = vxm.order.currentLine;
+      const line = orderStore.currentLine;
       if (line) {
         // clear last choice for line.
-        const choice = vxm.order.choices.reverse().find((c) => c.line === line);
+        const choice = orderStore.choices.reverse().find((c) => c.line === line);
         if (choice) {
-          vxm.order.clearChoice(choice);
+          orderStore.clearChoice(choice);
         }
       }
     }, 'Clear Choice'),
     newButton(async () => {
-      await vxm.order.addSmartOrderLine({
+      await orderStore.addSmartOrderLine({
         menuItemID: 'side',
         defaultSize: Sizes.Medium,
       });
-      vxm.ui.setChoiceMenuMode('side');
+      uiStore.setChoiceMenuMode('side');
     }, 'Side Choice'),
     newButton(() => {
-      if (vxm.order.currentLine) {
-        vxm.order.clearLine(vxm.order.currentLine);
-        vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+      if (orderStore.currentLine) {
+        orderStore.clearLine(orderStore.currentLine);
+        uiStore.setChoiceMenuMode(ChoiceMenuMode.Default);
       }
     }, 'Void Line'),
-    { ...newButton(() => vxm.ui.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
+    { ...newButton(() => uiStore.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
   ]);
 }

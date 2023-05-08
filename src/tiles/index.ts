@@ -5,7 +5,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm from '@/store';
+import { useUIStore } from '@/store';
 
 import generateChoiceGraph from './choices';
 import generateSizeGraph from './sizes';
@@ -18,7 +18,9 @@ import generateTotalScreenGraph from './totalScreen';
 
 // Should be cached between state changes.
 export default function generateGraph(): StripProvider {
-  if (vxm.ui.totallingOrder) {
+  const uiStore = useUIStore();
+
+  if (uiStore.totallingOrder) {
     // Running the total and cashing out screen
     return generateTotalScreenGraph();
   }

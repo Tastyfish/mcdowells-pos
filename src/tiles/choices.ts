@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm, { ChoiceMenuMode } from '@/store';
+import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 import { OrderLine, ChoiceItem } from '@/api/order';
@@ -15,7 +15,7 @@ const choiceRect = new Rectangle(0, 0, 10, 2);
 const rowRect = new Rectangle(0, 0, 10, 1);
 
 const choiceModeBack = severeup(newButton(
-  () => vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default),
+  () => useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default),
   'Back', 'pi pi-arrow-left',
 ), Severity.Info);
 
@@ -32,15 +32,17 @@ const mockOrderLine: OrderLine = {
 // A button to retroactively change an item's size.
 function newSizeButton(size: Sizes): Tile {
   return newButton(() => {
-    const line = vxm.order.currentLine;
+    const orderStore = useOrderStore();
+    const line = orderStore.currentLine;
+
     // Make sure the current line is exists and combo size still valid.
     if (line?.menuItem.allowedSizes?.includes(size)) {
       // Change size and repost.
-      vxm.order.replaceLine({ ...line, size });
+      orderStore.replaceLine({ ...line, size });
     }
 
     // Regardless, return to normal choices.
-    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+    useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
   }, size);
 }
 
@@ -61,11 +63,13 @@ function newChoiceButton(choice: ChoiceItem): Tile {
   }
 
   return newButton(() => {
-    const line = vxm.order.currentLine;
+    const orderStore = useOrderStore();
+    const line = orderStore.currentLine;
+
     // Make sure the current line is exists and is a combo.
     if (line) {
       // Update side.
-      vxm.order.addSmartChoice({
+      orderStore.addSmartChoice({
         choiceItemID: choice.id,
         line,
         slot: sideSlot,
@@ -73,7 +77,7 @@ function newChoiceButton(choice: ChoiceItem): Tile {
     }
 
     // Regardless, return to normal choices.
-    vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+    useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
   }, choice.getDisplayName({
     choiceItem: choice,
     line: mockOrderLine,
@@ -91,11 +95,13 @@ function slotName(id: string): string {
 }
 
 /// Generate single row for managing a strip.
-const generateSlotGraph = (slotID: string): StripProvider => (
-  newListStrip(rowRect,
+const generateSlotGraph = (slotID: string): StripProvider => {
+  const uiStore = useUIStore();
+
+  return newListStrip(rowRect,
     generateSlotButtons(slotID),
-    vxm.ui.choicePage, vxm.ui.gotoNextChoicePage)
-);
+    uiStore.choicePage, uiStore.gotoNextChoicePage)
+};
 
 /// Generate a single row of either slot options, or the slot graph if there is only one.
 function generateRemainingSlotsGraph(slots: string[]): StripProvider {
@@ -103,31 +109,36 @@ function generateRemainingSlotsGraph(slots: string[]): StripProvider {
     return generateSlotGraph(slots[0]);
   }
 
-  return newListStrip(rowRect, slots.map((slot) => newButton(() => vxm.ui.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
-    vxm.ui.choicePage, vxm.ui.gotoNextChoicePage);
+  const uiStore = useUIStore();
+
+  return newListStrip(rowRect, slots.map((slot) => newButton(() => uiStore.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
+  uiStore.choicePage, uiStore.gotoNextChoicePage);
 }
 
 export default function generateChoiceGraph(): StripProvider {
-  switch (vxm.ui.choiceMenuMode) {
+  const uiStore = useUIStore();
+  const orderStore = useOrderStore();
+
+  switch (uiStore.choiceMenuMode) {
     case ChoiceMenuMode.ChangeComboSize:
       return newDownwardStrip(choiceRect, [
         newListStrip(rowRect,
-          vxm.order.currentLine ? generateChoiceButtons(vxm.order.currentLine) : [],
-          vxm.ui.choicePage, vxm.ui.gotoNextChoicePage),
+          orderStore.currentLine ? generateChoiceButtons(orderStore.currentLine) : [],
+          uiStore.choicePage, uiStore.gotoNextChoicePage),
         newContainerStrip(rowRect, [
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
       ]);
     case ChoiceMenuMode.ChangeSlot:
       return newDownwardStrip(choiceRect, [
-        generateSlotGraph(vxm.ui.choiceMenuSlotID ?? 'side'),
+        generateSlotGraph(uiStore.choiceMenuSlotID ?? 'side'),
         newContainerStrip(rowRect, [
           newArrayStrip(new Rectangle(9, 0, 1, 1), [choiceModeBack]),
         ]),
       ]);
     default:
     {
-      const line = vxm.order.currentLine;
+      const line = orderStore.currentLine;
       if (!line) {
         return newArrayStrip(choiceRect, []);
       }
@@ -142,12 +153,12 @@ export default function generateChoiceGraph(): StripProvider {
         newArrayStrip(rowRect, [
           canCombo
             ? severeup(newButton(() => {
-              vxm.ui.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
+              uiStore.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize);
             }, line.size ? 'Size' : 'Combo', 'pi pi-arrow-right'), Severity.Info)
             : newLabel(''),
           canHaveSide
             ? severeup(newButton(() => {
-              vxm.ui.setChoiceMenuMode('side');
+              uiStore.setChoiceMenuMode('side');
             }, 'Side', 'pi pi-palette'), Severity.Info)
             : newLabel(''),
         ]),

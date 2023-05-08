@@ -12,7 +12,8 @@ import { ChoiceSlot, OrderLine } from '@/api/order';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
-import vxm, { ChoiceMenuMode } from '@/store';
+import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
+import { SmartOrderPayload } from '@/store/order';
 
 function assertGetSlot(slotID: string) {
   const slot = getChoiceSlot(slotID);
@@ -32,13 +33,15 @@ async function addSeperateDrink(choiceItemID: string) {
     throw new Error('Drink slot missing. This is a serious error.');
   }
 
-  const lines = await vxm.order.addSmartOrderLine({
+  const orderStore = useOrderStore();
+
+  const lines = await orderStore.addSmartOrderLine({
     menuItemID: 'drink',
     defaultSize: Sizes.Medium,
   });
 
   await Promise.all(lines.map((line) => (
-    vxm.order.addSmartChoice({ choiceItemID, line, slot: drink })
+    orderStore.addSmartChoice({ choiceItemID, line, slot: drink })
   )));
 }
 
@@ -47,7 +50,9 @@ async function addDrink(choiceItemID: string): Promise<void> {
     throw new Error('Drink slot missing. This is a serious error.');
   }
 
-  const line = vxm.order.currentLine;
+  const orderStore = useOrderStore();
+
+  const line = orderStore.currentLine;
   if (!line) {
     // Just add a drink to the order.
     await addSeperateDrink(choiceItemID);
@@ -55,7 +60,7 @@ async function addDrink(choiceItemID: string): Promise<void> {
   }
 
   try {
-    await vxm.order.addSmartChoice({
+    await orderStore.addSmartChoice({
       choiceItemID,
       line,
       slot: drink,
@@ -67,67 +72,78 @@ async function addDrink(choiceItemID: string): Promise<void> {
 }
 
 function voidMenu() {
-  vxm.order.lines.forEach((line) => vxm.order.clearLine(line));
+  const orderStore = useOrderStore();
+  orderStore.lines.forEach((line) => orderStore.clearLine(line));
 }
 
 const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
   newArrayStrip(new Rectangle(0, 0, 1, 2), [
-    newLabel(`Total Items: ${vxm.order.lines.length}`),
+    newLabel(`Total Items: ${useOrderStore().lines.length}`),
     newButton(voidMenu, 'Void Order'),
   ]),
 ]);
 
-const generateDrinkStrips = (): StripProvider[] => ([
-  newArrayStrip(new Rectangle(0, 4, 8, 2), [
-    newButton(() => addDrink('coke'), 'Coke'),
-    newButton(() => addDrink('dietcoke'), 'Diet Coke'),
-    newButton(() => addDrink('sprite'), 'Sprite'),
-    newButton(() => addDrink('fantaorange'), 'Fanta Orange'),
-    newButton(() => addDrink('icedtea'), 'Iced Tea'),
-    newButton(() => addDrink('sweettea'), 'Sweet Tea'),
-    newButton(() => addDrink('coffee'), 'Coffee'),
+const generateDrinkStrips = (): StripProvider[] => {
+  const uiStore = useUIStore();
 
-    newToggle(false, () => { /* no */ }, 'Show Product Build'),
+  return [
+    newArrayStrip(new Rectangle(0, 4, 8, 2), [
+      newButton(() => addDrink('coke'), 'Coke'),
+      newButton(() => addDrink('dietcoke'), 'Diet Coke'),
+      newButton(() => addDrink('sprite'), 'Sprite'),
+      newButton(() => addDrink('fantaorange'), 'Fanta Orange'),
+      newButton(() => addDrink('icedtea'), 'Iced Tea'),
+      newButton(() => addDrink('sweettea'), 'Sweet Tea'),
+      newButton(() => addDrink('coffee'), 'Coffee'),
 
-    newToggle(vxm.ui.showingPrices, () => vxm.ui.showPrices(!vxm.ui.showingPrices), 'Show Prices'),
-  ]),
-]);
+      newToggle(false, () => { /* no */ }, 'Show Product Build'),
+
+      newToggle(uiStore.showingPrices, () => uiStore.showPrices(!uiStore.showingPrices), 'Show Prices'),
+    ]),
+  ];
+};
 
 function finishAddLines(): void {
-  vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+  useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
+}
+
+function addMealItem(payload: string | SmartOrderPayload): Promise<void> {
+  return useOrderStore()
+    .addSmartOrderLine(payload)
+    .then(finishAddLines);
 }
 
 const generateLunchViewStrips = (): StripProvider[] => ([
   ...generateDrinkStrips(),
   newArrayStrip(new Rectangle(0, 0, 3, 1), [
     newButton(
-      () => vxm.order.addSmartOrderLine('bigmac').then(finishAddLines),
+      () => addMealItem('bigmac'),
       'Big Mac',
     ),
     newButton(
-      () => vxm.order.addSmartOrderLine('nuggets8').then(finishAddLines),
+      () => addMealItem('nuggets8'),
       'Nuggets',
     ),
   ]),
   newArrayStrip(new Rectangle(2, 2, 3, 1), [
     newButton(
-      () => vxm.order.addSmartOrderLine({
+      () => addMealItem({
         menuItemID: 'drink',
         defaultSize: Sizes.Medium,
-      }).then(finishAddLines),
+      }),
       'Drink',
     ),
     newButton(
       async () => {
-        await vxm.order.addSmartOrderLine({
+        await useOrderStore().addSmartOrderLine({
           menuItemID: 'side',
           defaultSize: Sizes.Medium,
         });
-        vxm.ui.setChoiceMenuMode('side');
+        useUIStore().setChoiceMenuMode('side');
       },
       'Side',
     ),
-    severeup(newLabel(vxm.ui.selectedMenuTab), Severity.Info),
+    severeup(newLabel(useUIStore().selectedMenuTab), Severity.Info),
   ]),
 ]);
 
@@ -141,35 +157,41 @@ const stripButtonDummyLine: OrderLine = {
 };
 
 // For the dedicated drinks and condiments menus
-const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripProvider[] => ([
-  ...generateDrinkStrips(),
-  newArrayStrip(new Rectangle(0, 0, 8, 4),
-    // Automatically generate tiles based on existing sauces
-    getChoicesBySlot(slot.id).map((choice) => (
-      newButton(
-        async () => {
-          // Apply sauce to all of the lines added.
-          const lines = await vxm.order.addSmartOrderLine({
-            menuItemID: menuID ?? slot.id,
-            defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
-          });
-          vxm.ui.setChoiceMenuMode(ChoiceMenuMode.Default);
+const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripProvider[] => {
+  const uiStore = useUIStore();
+  const orderStore = useOrderStore();
 
-          await Promise.all(lines.map((line) => (
-            vxm.order.addSmartChoice({
-              line,
-              choiceItemID: choice.id,
-              slot,
-            })
-          )));
-        },
-        choice.getDisplayName({
-          line: stripButtonDummyLine,
-          choiceItem: choice,
-        }),
-      )
-    ))),
-]);
+  return [
+    ...generateDrinkStrips(),
+    newArrayStrip(new Rectangle(0, 0, 8, 4),
+      // Automatically generate tiles based on existing sauces
+      getChoicesBySlot(slot.id).map((choice) => (
+        newButton(
+          async () => {
+            // Apply sauce to all of the lines added.
+            const lines = await orderStore.addSmartOrderLine({
+              menuItemID: menuID ?? slot.id,
+              defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
+            });
+            uiStore.setChoiceMenuMode(ChoiceMenuMode.Default);
+
+            await Promise.all(lines.map((line) => (
+              orderStore.addSmartChoice({
+                line,
+                choiceItemID: choice.id,
+                slot,
+              })
+            )));
+          },
+          choice.getDisplayName({
+            line: stripButtonDummyLine,
+            choiceItem: choice,
+          }),
+        )
+      ))
+    ),
+  ];
+};
 
 const generateCondimentViewStrips = (): StripProvider[] => generateStandaloneSlotStrips(sauce);
 const generateDrinkViewStrips = (): StripProvider[] => generateStandaloneSlotStrips(drink);
@@ -182,7 +204,7 @@ const tabMap: {[tabKey: string]: () => StripProvider[]} = {
 };
 
 export default function generateTabViewGraph(): StripProvider {
-  const currentTab = vxm.ui.selectedMenuTab;
+  const currentTab = useUIStore().selectedMenuTab;
 
   return newContainerStrip(new Rectangle(1, 4, 8, 6),
     tabMap[currentTab]?.() ?? generateDrinkStrips());

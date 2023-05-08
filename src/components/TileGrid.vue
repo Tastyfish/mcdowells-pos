@@ -9,44 +9,51 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { StripProvider, emptyStrip } from '@/api/strip';
-import TileView from './TileView.vue';
 
-@Component({
+import { defineComponent, PropType } from 'vue'
+import { StripProvider, emptyStrip } from '@/api/strip'
+import TileView from './TileView.vue'
+
+export default defineComponent({
   components: {
-    TileView,
+    TileView
   },
+  props: {
+    strip: {
+      type: Object as PropType<StripProvider>,
+      default: () => emptyStrip,
+    }
+  }
 })
-export default class TileGrid extends Vue {
-  @Prop({ default: () => emptyStrip }) readonly strip!: StripProvider
-}
+
 </script>
 
 <style scoped lang='scss'>
-  .grid {
-    display: flex;
-    flex-direction: column;
-  }
 
-  .row {
-    min-height: 10%;
-    max-height: 10%;
-    display: flex;
-    align-items: stretch;
-    padding: 0.25em 0;
-  }
+.grid {
+  display: flex;
+  flex-direction: column;
+}
 
-  .cell {
-    min-width: 10%;
-    max-width: 10%;
-    padding: 0em 0.25em;
+.row {
+  min-height: 10%;
+  max-height: 10%;
+  display: flex;
+  align-items: stretch;
+  padding: 0.25em 0;
+}
 
-    * {
-      min-width: 100%;
-      max-width: 100%;
-      min-height: 100%;
-      max-height: 100%;
-    }
+.cell {
+  min-width: 10%;
+  max-width: 10%;
+  padding: 0em 0.25em;
+
+  * {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    max-height: 100%;
   }
+}
+
 </style>

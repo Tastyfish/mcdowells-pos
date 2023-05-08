@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm from '@/store';
+import { useOrderStore } from '@/store';
 import Sizes from '@/menu/sizes';
 
 interface SizeInfo {
@@ -25,16 +25,17 @@ const sizeInfo: { [key in Sizes]: SizeInfo } = {
 
 function newSizeToggle(size: Sizes) {
   const { name, icon } = sizeInfo[size];
+  const orderStore = useOrderStore();
 
   return newToggle(
-    vxm.order.sizeSelection === size,
+    orderStore.sizeSelection === size,
     () => {
-      if (vxm.order.sizeSelection === size) {
+      if (orderStore.sizeSelection === size) {
         // Turn off selection.
-        vxm.order.startSizeSelection(null);
+        orderStore.startSizeSelection(null);
       } else {
         // Select.
-        vxm.order.startSizeSelection(size);
+        orderStore.startSizeSelection(size);
       }
     },
     name,

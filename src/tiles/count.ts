@@ -8,17 +8,19 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import vxm, { OrderCount } from '@/store';
+import { OrderCount, useOrderStore } from '@/store';
 
 export default function generateCountGraph(): StripProvider {
+  const orderStore = useOrderStore();
+
   return newArrayStrip(new Rectangle(0, 2, 10, 1), Array(10).fill(0).map(
     (_item, index) => classup(newToggle(
-      vxm.order.countSelection === index + 1,
+      orderStore.countSelection === index + 1,
       () => {
-        if (vxm.order.countSelection === index + 1) {
-          vxm.order.startCountSelection(1);
+        if (orderStore.countSelection === index + 1) {
+          orderStore.startCountSelection(1);
         } else {
-          vxm.order.startCountSelection((index + 1) as OrderCount);
+          orderStore.startCountSelection((index + 1) as OrderCount);
         }
       },
       (index + 1).toString(),
