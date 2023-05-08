@@ -3,20 +3,9 @@
   See: https://primefaces.org/primevue/showcase/#/tree
 * */
 
-import { OrderLine, OrderChoice, ChoiceSlot } from './order';
+import { TreeNode } from 'primevue/tree';
 
-export interface TreeNode {
-  key: string | number
-  label: string
-  data?: unknown
-  type?: string
-  icon?: string
-  children?: TreeNode[]
-  style?: string
-  styleClass?: string
-  selectable?: boolean
-  leaf?: boolean
-}
+import { OrderLine, OrderChoice, ChoiceSlot } from './order';
 
 const selectedStyle = 'background-color: var(--primary-color); color: var(--primary-color-text);';
 const emptySlotStyle = 'color: var(--orange-400);';
