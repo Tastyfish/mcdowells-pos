@@ -1,16 +1,15 @@
-import Vue from 'vue';
+import { createApp } from 'vue'
+import { createPinia } from 'pinia';
 import App from './App.vue';
-import './registerServiceWorker';
-import './prime';
-import { store } from './store';
+import { setupPrime } from './prime';
 
 import 'primevue/resources/themes/arya-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 
-Vue.config.productionTip = false;
+const app = createApp(App)
+    .use(createPinia())
 
-new Vue({
-  render: (h) => h(App),
-  store,
-}).$mount('#app');
+setupPrime(app)
+
+app.mount('#app')

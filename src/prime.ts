@@ -1,13 +1,18 @@
-import Vue from 'vue';
+import { App } from 'vue';
+
 import PrimeVue from 'primevue/config';
 import Button from 'primevue/button';
 import ToggleButton from 'primevue/togglebutton';
 import Tree from 'primevue/tree';
 import Divider from 'primevue/divider';
+import ProgressSpinner from 'primevue/progressspinner';
 
-Vue.use(PrimeVue, { ripple: true });
+export function setupPrime(app: App<Element>) {
+  app.use(PrimeVue, { ripple: true });
 
-Vue.component('Button', Button);
-Vue.component('ToggleButton', ToggleButton);
-Vue.component('Tree', Tree);
-Vue.component('Divider', Divider);
+  app.component('Button', Button);
+  app.component('ToggleButton', ToggleButton);
+  app.component('Tree', Tree);
+  app.component('Divider', Divider);
+  app.component('ProgressSpinner', ProgressSpinner);
+}
