@@ -13,11 +13,9 @@
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
     :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
     @click="splitTile?.onPress">
-    <b v-if="splitTile?.state == 'top'" class="stogsel">{{ splitTile?.topLabel }}</b>
-    <span v-else>{{ splitTile?.topLabel }}</span>
+    <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'top'}]">{{ splitTile?.topLabel }}</span>
     <div class="stogdiv"></div>
-    <b v-if="splitTile?.state == 'bottom'" class="stogsel">{{ splitTile?.bottomLabel }}</b>
-    <span v-else>{{ splitTile?.bottomLabel }}</span>
+    <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'bottom'}]">{{ splitTile?.bottomLabel }}</span>
   </Button>
   <div v-else
     :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]">
@@ -71,8 +69,8 @@ export default defineComponent({
     extraClasses() {
       return [
         this.severityClass,
-        this.tile.xSpan === 2 ? 'doublex' : undefined,
-        this.tile.ySpan === 2 ? 'doubley' : undefined,
+        this.tile.xSpan === 2 ? 'doublex' : this.tile.xSpan === 3 ? 'triplex' : undefined,
+        this.tile.ySpan === 2 ? 'doubley' : this.tile.ySpan === 3 ? 'tripley' : undefined,
       ]
     },
 
@@ -95,6 +93,12 @@ export default defineComponent({
 }
 .doubley {
   min-height: calc(200% + .5em) !important;
+}
+.triplex {
+  min-width: calc(300% + 1em) !important;
+}
+.tripley {
+  min-height: calc(300% + 1em) !important;
 }
 .label {
   display: flex;
@@ -125,6 +129,10 @@ export default defineComponent({
 
 .circle {
   border-radius: 100vh;
+}
+
+.small-text-button {
+  font-size: 0.75rem !important;
 }
 
 </style>

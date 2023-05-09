@@ -73,6 +73,6 @@ body {
 
 <style scoped>
 .tile-grid {
-  flex: 2 2 0%;
+  flex: 3 3 0%;
 }
 </style>
