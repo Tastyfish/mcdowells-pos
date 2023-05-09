@@ -286,11 +286,6 @@ export const useOrderStore = defineStore('order', {
           0,
         );
 
-      console.log(this.getLineChoices(line));
-      console.log(getChoiceSlot('side'));
-
-      console.log(`For ${line.size} ${line.menuItem.id}: ${mainPrice}, ${comboOffset}, ${slotPrices}`)
-
       return mainPrice + comboOffset + slotPrices;
     },
   }
