@@ -31,7 +31,7 @@ import { defineComponent, PropType } from 'vue'
 
 import {
   Tile, TileType, emptyTile,
-  isLabel, isButton, isToggle, isSplitToggle,
+  isLabel, isButton, isToggle, isSplitToggle, Severity,
 } from '@/api/tile';
 
 export default defineComponent({
@@ -51,7 +51,16 @@ export default defineComponent({
           return `p-button-${this.tile.severity ?? 'warning'}`;
         case TileType.Label:
           if (this.tile.severity) {
-            return `p-inline-message p-inline-message-${this.tile.severity}`;
+            const severity = this.tile.severity;
+
+            // For some ungodly reason, inline messages use slightly different severities.
+
+            const actualSeverity =
+              severity === Severity.Warning ? 'warn' :
+              severity === Severity.Danger ? 'error' :
+              severity;
+
+            return `p-inline-message p-inline-message-${actualSeverity}`;
           }
           return '';
         default:
