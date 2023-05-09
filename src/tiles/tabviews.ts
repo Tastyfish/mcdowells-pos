@@ -121,7 +121,7 @@ const generateLunchViewStrips = (): StripProvider[] => ([
       'Big Mac',
     ),
     newButton(
-      () => addMealItem('nuggets8'),
+      () => addMealItem('nuggets10'),
       'Nuggets',
     ),
   ]),

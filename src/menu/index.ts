@@ -30,8 +30,8 @@ export const menu: MenuItem[] = [
     allowedSizes: baseSizesAndHMAndSr,
   },
   {
-    id: 'nuggets8',
-    getDisplayName: (line) => displayComboName(line, '8pc Nuggets'),
+    id: 'nuggets10',
+    getDisplayName: (line) => displayComboName(line, '10pc Nuggets'),
     choiceSlots: {
       sauce: null,
       side: 'fries',
