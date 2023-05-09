@@ -12,9 +12,8 @@
 import { defineComponent } from 'vue';
 import { generateLineTree } from '@/api/tree';
 import TileGrid from '@/components/TileGrid.vue';
-import OrderTree from '@/OrderTree.vue';
+import OrderTree from '@/components/OrderTree.vue';
 import generateTiles from '@/tiles';
-import { choiceSlots } from '@/menu';
 
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 import { mapStores } from 'pinia';
@@ -31,8 +30,6 @@ export default defineComponent({
     nodes() {
       return generateLineTree(
         this.orderStore.lines,
-        this.orderStore.choices,
-        choiceSlots,
         this.orderStore.currentLineID,
       );
     },

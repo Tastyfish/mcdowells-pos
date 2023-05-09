@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 
+import { getItemPrice, hasPrice } from '@/api/menu';
 import {
   NewOrderLine, OrderLine, NewOrderChoice, OrderChoice, ChoiceSlot,
 } from '@/api/order';
-import { getMenuItem, getChoiceSlot, getChoiceItem } from '@/menu';
+import { getMenuItem, getChoiceSlot, getChoiceItem, COMBO_OFFSETS } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 export const NO_CURRENT_LINE = -1;
@@ -268,6 +269,29 @@ export const useOrderStore = defineStore('order', {
           // It's good.
           return { slotID: s.slotID, slot: s.slot, choice };
         });
+    },
+
+    getLinePrice(line: OrderLine): number {
+      const mainPrice = getItemPrice(line.menuItem, line.size);
+      const comboOffset = line.size === undefined ? 0 : COMBO_OFFSETS[line.size];
+
+      // Add together choice prices, or if they don't have a price, use slot price.
+      const slotPrices = this.getLineChoices(line)
+        .reduce(
+          (total, choiceInfo) => total + (
+            choiceInfo.choice && hasPrice(choiceInfo.choice.choiceItem)
+              ? getItemPrice(choiceInfo.choice.choiceItem, line.size)
+              : getItemPrice(choiceInfo.slot ?? { price: 0.00 }, line.size)
+          ),
+          0,
+        );
+
+      console.log(this.getLineChoices(line));
+      console.log(getChoiceSlot('side'));
+
+      console.log(`For ${line.size} ${line.menuItem.id}: ${mainPrice}, ${comboOffset}, ${slotPrices}`)
+
+      return mainPrice + comboOffset + slotPrices;
     },
   }
 })

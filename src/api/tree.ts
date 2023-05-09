@@ -6,6 +6,7 @@
 import { TreeNode } from 'primevue/tree';
 
 import { OrderLine, OrderChoice, ChoiceSlot } from './order';
+import { useOrderStore } from '@/store';
 
 const selectedStyle = 'background-color: var(--primary-color); color: var(--primary-color-text);';
 const emptySlotStyle = 'color: var(--orange-400);';
@@ -22,6 +23,8 @@ export function convertLineToTreeNode(line: OrderLine, selected: boolean): TreeN
     key: line.uid.toString(),
     label: line.menuItem.getDisplayName(line),
     style: selected ? selectedStyle : undefined,
+    type: "priced",
+    data: useOrderStore().getLinePrice(line),
   };
 }
 
@@ -52,32 +55,20 @@ export function convertSlotToTreeNode(
   Generate full order tree.
 */
 export function generateLineTree(
-  lines: OrderLine[], choices: OrderChoice[], slots: ChoiceSlot[], currentLineID: number,
+  lines: OrderLine[], currentLineID: number,
 ): TreeNode[] {
   // Generate receipt tree based on provided order.
   return lines.map(
     (line) => ({
       ...convertLineToTreeNode(line, currentLineID === line.uid),
-      children: Object.keys(line.menuItem.choiceSlots)
-        .map((slotID) => ({ slotID, slot: slots.find((s) => s.id === slotID) }))
-        // Undefined slots always show up for debugging.
-        // Otherwise, require it be a listed slot and:
-        //   Either this is a combo, or the slot still exists on non-combo items.
-        .filter((s) => s.slot === undefined
-          || (s.slot.isListed && (line.size !== undefined || !s.slot.isComboOnly)))
-        .map((s) => {
-          // Get actual slot object.
-          if (!s.slot) {
-            // Invalid slot, just make placeholder item.
-            return { key: s.slotID, label: s.slotID };
-          }
-          // Get the order's choice, or null.
-          const choice = choices.find(
-            (c) => c.line === line && c.choiceItem.slot === s.slotID,
-          ) ?? null;
-          // Convert.
-          return convertSlotToTreeNode(line, s.slot, choice, currentLineID === line.uid);
-        }),
+      children: useOrderStore().getLineChoices(line).map(choiceInfo => {
+        if(choiceInfo.choice !== undefined && choiceInfo.slot) {
+          return convertSlotToTreeNode(line, choiceInfo.slot, choiceInfo.choice, currentLineID === line.uid)
+        } else {
+          // Invalid slot, just make placeholder item.
+          return { key: choiceInfo.slotID, label: choiceInfo.slotID };
+        }
+      })
     }),
   );
 }

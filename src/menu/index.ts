@@ -3,7 +3,7 @@ import {
   NewOrderLine,
   ChoiceSlotMetaInfo,
 } from '@/api/order';
-import { baseSizesAndHMAndSr, baseSizesAndSr } from './sizes';
+import Sizes, { baseSizesAndHMAndSr, baseSizesAndSr } from './sizes';
 
 /** Generic combo name generator * */
 function displayComboName(line: NewOrderLine, name: string): string {
@@ -18,6 +18,22 @@ function displaySlot(info: ChoiceSlotMetaInfo, name: string): string {
   return info.choice?.choiceItem.getDisplayName(info.choice) ?? `Missing: ${name}`;
 }
 
+type ComboOffset = {
+  [size in Sizes]: number;
+};
+
+/**
+ * How much to add to a combo after totalling the contents.
+ */
+export const COMBO_OFFSETS: ComboOffset = {
+  [Sizes.HappyMeal]: -1.08,
+  [Sizes.XSmall]: -1.58,
+  [Sizes.Small]: -1.08,
+  [Sizes.Medium]: -1.08,
+  [Sizes.Large]: -1.08,
+  [Sizes.Senior]: -2.08,
+}
+
 export const menu: MenuItem[] = [
   {
     id: 'bigmac',
@@ -28,6 +44,7 @@ export const menu: MenuItem[] = [
       drink: null,
     },
     allowedSizes: baseSizesAndHMAndSr,
+    price: 3.99,
   },
   {
     id: 'nuggets10',
@@ -38,6 +55,7 @@ export const menu: MenuItem[] = [
       drink: null,
     },
     allowedSizes: baseSizesAndHMAndSr,
+    price: 4.19, // sauce discounted.
   },
 
   {
@@ -45,23 +63,27 @@ export const menu: MenuItem[] = [
     getDisplayName: (line) => displayComboName(line, 'Drink'),
     choiceSlots: { drink: null },
     allowedSizes: baseSizesAndSr,
+    price: 1.00,
   },
   {
     id: 'side',
     getDisplayName: (line) => displayComboName(line, 'Side'),
     choiceSlots: { side: null },
     allowedSizes: baseSizesAndSr,
+    price: 1.00,
   },
   {
     id: 'sauce',
     getDisplayName: () => 'Condiment',
     choiceSlots: { sauce: null },
+    price: 1.00,
   },
 
   {
     id: 'gift25',
     getDisplayName: () => '$25 Gift Card',
     choiceSlots: { },
+    price: 25.00,
   },
 ];
 
@@ -111,6 +133,7 @@ export const choices: ChoiceItem[] = [
     id: 'apples',
     getDisplayName: (choice) => displayComboName(choice.line, 'Apple Slices'),
     slot: 'side',
+    price: 1.00,
   },
 
   {
@@ -141,24 +164,28 @@ export const choiceSlots: ChoiceSlot[] = [
     getDisplayName: (info) => displaySlot(info, 'Drink'),
     isListed: true,
     isComboOnly: true,
+    price: [1.00, 1.29, 1.49],
   },
   {
     id: 'side',
     getDisplayName: (info) => displaySlot(info, 'Side'),
     isListed: true,
     isComboOnly: true,
+    price: [1.39, 1.79, 1.89],
   },
   {
     id: 'grill',
     getDisplayName: (info) => displaySlot(info, 'Toppings'),
     isListed: true,
     grillLabel: 'Grill',
+    price: 0.00,
   },
   {
     id: 'sauce',
     getDisplayName: (info) => displaySlot(info, 'Sauce'),
     isListed: true,
     grillLabel: 'Sauce',
+    price: 0.30,
   },
 ];
 
