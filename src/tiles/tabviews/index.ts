@@ -1,19 +1,21 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
-import {
-  newLabel, newButton, newToggle, severeup, Severity,
-} from '@/api/tile';
+import { newLabel, newButton, ButtonTile } from '@/api/tile';
 import {
   StripProvider, newArrayStrip, newContainerStrip,
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
 import { ChoiceSlot, OrderLine } from '@/api/order';
-import { getChoiceSlot, getChoicesBySlot } from '@/menu';
+import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 import { SmartOrderPayload } from '@/store/order';
+
+import { generateLunchViewStrips } from './lunch';
+import { generateDrinkStrips } from './drinks';
+import { getItemPrice } from '@/api/menu';
 
 function assertGetSlot(slotID: string) {
   const slot = getChoiceSlot(slotID);
@@ -45,7 +47,7 @@ async function addSeperateDrink(choiceItemID: string) {
   )));
 }
 
-async function addDrink(choiceItemID: string): Promise<void> {
+export async function addDrink(choiceItemID: string): Promise<void> {
   if (!drink) {
     throw new Error('Drink slot missing. This is a serious error.');
   }
@@ -83,69 +85,33 @@ const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
   ]),
 ]);
 
-const generateDrinkStrips = (): StripProvider[] => {
-  const uiStore = useUIStore();
-
-  return [
-    newArrayStrip(new Rectangle(0, 4, 8, 2), [
-      newButton(() => addDrink('coke'), 'Coke'),
-      newButton(() => addDrink('dietcoke'), 'Diet Coke'),
-      newButton(() => addDrink('sprite'), 'Sprite'),
-      newButton(() => addDrink('fantaorange'), 'Fanta Orange'),
-      newButton(() => addDrink('icedtea'), 'Iced Tea'),
-      newButton(() => addDrink('sweettea'), 'Sweet Tea'),
-      newButton(() => addDrink('coffee'), 'Coffee'),
-
-      newToggle(false, () => { /* no */ }, 'Show Product Build'),
-
-      newToggle(uiStore.showingPrices, () => uiStore.showPrices(!uiStore.showingPrices), 'Show Prices'),
-    ]),
-  ];
-};
-
-function finishAddLines(): void {
+export function finishAddLines(): void {
   useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
 }
 
-function addMealItem(payload: string | SmartOrderPayload): Promise<void> {
+export function addMealItem(payload: string | SmartOrderPayload): Promise<void> {
   return useOrderStore()
     .addSmartOrderLine(payload)
     .then(finishAddLines);
 }
 
-const generateLunchViewStrips = (): StripProvider[] => ([
-  ...generateDrinkStrips(),
-  newArrayStrip(new Rectangle(0, 0, 3, 1), [
-    newButton(
-      () => addMealItem('bigmac'),
-      'Big Mac',
+export function newMealButton(mealID: string): ButtonTile {
+  const menuItem = getMenuItem(mealID);
+
+  if(!menuItem) {
+    return newButton(() => {}, mealID);
+  }
+
+  const price = getItemPrice(menuItem, undefined);
+
+  return {
+    ...newButton(
+      () => addMealItem(mealID),
+      `${menuItem.getDisplayName({ menuItem })}${useUIStore().showingPrices ? ` ($${price.toFixed(2)})` : ''}`,
     ),
-    newButton(
-      () => addMealItem('nuggets10'),
-      'Nuggets',
-    ),
-  ]),
-  newArrayStrip(new Rectangle(2, 2, 3, 1), [
-    newButton(
-      () => addMealItem({
-        menuItemID: 'drink',
-        defaultSize: Sizes.Medium,
-      }),
-      'Drink',
-    ),
-    newButton(
-      async () => {
-        await useOrderStore().addSmartOrderLine({
-          menuItemID: 'side',
-          defaultSize: Sizes.Medium,
-        });
-        useUIStore().setChoiceMenuMode('side');
-      },
-      'Side',
-    ),
-    severeup(newLabel(useUIStore().selectedMenuTab), Severity.Info),
-  ]),
-]);
+    classes: [ 'small-text-button' ],
+  };
+}
 
 const stripButtonDummyLine: OrderLine = {
   uid: -1,

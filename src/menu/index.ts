@@ -50,6 +50,50 @@ export const menu: MenuItem[] = [
     price: 3.99,
   },
   {
+    id: '2cheeseburgers',
+    getDisplayName: (line) => displayComboName(line, '2 Cheeseburgers'),
+    choiceSlots: {
+      grill: null,
+      side: 'fries',
+      drink: null,
+    },
+    allowedSizes: baseSizesAndHMAndSr,
+    price: 2.00,
+  },
+  {
+    id: 'quarterpounder',
+    getDisplayName: (line) => displayComboName(line, '¼ Pounder w/ Cheese'),
+    choiceSlots: {
+      grill: null,
+      side: 'fries',
+      drink: null,
+    },
+    allowedSizes: baseSizesAndHMAndSr,
+    price: 3.79,
+  },
+  {
+    id: 'DBLquarterpounder',
+    getDisplayName: (line) => displayComboName(line, 'Double ¼ Pounder w/ Cheese'),
+    choiceSlots: {
+      grill: null,
+      side: 'fries',
+      drink: null,
+    },
+    allowedSizes: baseSizesAndHMAndSr,
+    price: 4.79,
+  },
+  {
+    id: 'BCNclubhouseburger',
+    getDisplayName: (line) => displayComboName(line, 'Bacon Clubhouse Burger'),
+    choiceSlots: {
+      grill: null,
+      side: 'fries',
+      drink: null,
+    },
+    allowedSizes: baseSizesAndHMAndSr,
+    price: 4.49,
+  },
+  {
     id: 'nuggets10',
     getDisplayName: (line) => displayComboName(line, '10pc Nuggets'),
     choiceSlots: {
