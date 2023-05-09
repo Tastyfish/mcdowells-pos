@@ -240,6 +240,34 @@ export const useOrderStore = defineStore('order', {
 
       this.startSizeSelection(null);
       this.startCountSelection(1);
-    }
+    },
+
+    /**
+     * Relatively expensive function to get fully selected choices for order line. Considers combo, etc.
+     * @param line The line to get choices from.
+     */
+    getLineChoices(line: OrderLine): { slotID: string, slot?: ChoiceSlot, choice?: OrderChoice | null }[] {
+      return Object.keys(line.menuItem.choiceSlots)
+        .map((slotID) => ({ slotID, slot: getChoiceSlot(slotID) }))
+        // Undefined slots always show up for debugging.
+        // Otherwise, require it be a listed slot and:
+        //   Either this is a combo, or the slot still exists on non-combo items.
+        .filter((s) => s.slot === undefined
+          || (s.slot.isListed && (line.size !== undefined || !s.slot.isComboOnly)))
+        .map((s) => {
+          // Get actual slot object.
+          if (!s.slot) {
+            // Invalid slot, just return as-is.
+            return { slotID: s.slotID };
+          }
+
+          // Get the order's choice, or null.
+          const choice = this.choices.find(
+            (c) => c.line === line && c.choiceItem.slot === s.slotID,
+          ) ?? null;
+          // It's good.
+          return { slotID: s.slotID, slot: s.slot, choice };
+        });
+    },
   }
 })

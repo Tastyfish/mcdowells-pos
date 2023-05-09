@@ -1,7 +1,7 @@
 <template>
-  <div class="grid">
-    <div class="row" v-for="y in strip.bounds.height" :key="y">
-      <div class="cell" v-for="x in strip.bounds.width" :key="x">
+  <div class="tile-grid">
+    <div class="tile-row" v-for="y in strip.bounds.height" :key="y">
+      <div class="tile-cell" v-for="x in strip.bounds.width" :key="x">
         <TileView :tile="strip.getTile(x - 1, y - 1)" />
       </div>
     </div>
@@ -30,12 +30,12 @@ export default defineComponent({
 
 <style scoped lang='scss'>
 
-.grid {
+.tile-grid {
   display: flex;
   flex-direction: column;
 }
 
-.row {
+.tile-row {
   min-height: 10%;
   max-height: 10%;
   display: flex;
@@ -43,7 +43,7 @@ export default defineComponent({
   padding: 0.25em 0;
 }
 
-.cell {
+.tile-cell {
   min-width: 10%;
   max-width: 10%;
   padding: 0em 0.25em;

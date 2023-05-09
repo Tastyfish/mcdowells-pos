@@ -1,6 +1,16 @@
 <template>
-  <Tree ref="tree" class="tree" :value="nodes" :expandedKeys="expandedNodes"
-  selectionMode="single" :selectionKeys="selectedKeys" @node-select="select" />
+  <Tree ref="tree" :value="nodes" :expandedKeys="expandedNodes"
+  selectionMode="single" :selectionKeys="selectedKeys" @node-select="select">
+    <template #default="slotProps">
+      {{ slotProps.node.label }}
+    </template>
+    <template #priced="slotProps">
+      <div class="w-full flex flex-row">
+        <span class="flex-auto">{{ slotProps.node.label }}</span>
+        <b>${{ (slotProps.node.data as number).toFixed(2) }}</b>
+      </div>
+    </template>
+  </Tree>
 </template>
 
 <script lang="ts">
@@ -45,12 +55,10 @@ export default defineComponent({
 
 </script>
 
-<style scoped>
+<style>
 
-.tree {
-  width: 33.33%;
-  margin: 0.5em;
-  overflow-y: auto;
+.p-treenode-label {
+  width: 100%;
 }
 
 </style>

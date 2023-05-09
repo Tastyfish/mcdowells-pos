@@ -1,10 +1,9 @@
 <template>
-  <div id="app">
-    <OrderTree :nodes="nodes" :scrollOrderCounter="scrollOrderCounter" @select="select" />
-    <TileGrid :strip="root" class="grid" />
-    <div id="app-loading" v-if="isLoading">
-      <ProgressSpinner />
-    </div>
+  <OrderTree :nodes="nodes" :scrollOrderCounter="scrollOrderCounter" @select="select"
+    class="flex-1 m-2 overflow-y-auto" />
+  <TileGrid :strip="root" class="flex-2" />
+  <div id="app-loading" class="absolute w-screen h-screen flex align-items-center justify-content-center bg-black-alpha-80" v-if="isLoading">
+    <ProgressSpinner />
   </div>
 </template>
 
@@ -61,6 +60,7 @@ body {
   background-color: var(--surface-b);
   color: var(--text-color);
   font-family: var(--font-family);
+  overflow: hidden;
 }
 #app {
   width: 100vw;
@@ -69,19 +69,10 @@ body {
   flex-direction: row;
   align-items: stretch;
 }
-#app-loading {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  background-color: #000C;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 </style>
 
 <style scoped>
-.grid {
-  width: 66.67%;
+.tile-grid {
+  flex: 2 2 0%;
 }
 </style>
