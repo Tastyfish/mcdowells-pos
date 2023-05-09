@@ -27,10 +27,18 @@ async function cashOut() {
 }
 
 export default function generateTotalScreenGraph(): StripProvider {
+  const orderStore = useOrderStore();
+
+  const subtotal = orderStore.lines.map((line) => orderStore.getLinePrice(line)).reduce((a, b) => a + b, 0);
+  const tax = subtotal * 0.15;
+  const grandTotal = subtotal + tax;
+
   return newContainerStrip(new Rectangle(0, 0, 10, 10), [
-    newArrayStrip(new Rectangle(0, 0, 3, 1), [
-      newLabel(`Total Items: ${useOrderStore().lines.length}`),
-      severeup(newLabel('Total: 0'), Severity.Info),
+    newArrayStrip(new Rectangle(0, 0, 1, 4), [
+      { ...newLabel(`Total Items: ${orderStore.lines.length}`), xSpan: 2 },
+      { ...newLabel(`Subtotal: $${subtotal.toFixed(2)}`), xSpan: 2 },
+      { ...newLabel(`Tax: $${tax.toFixed(2)}`), xSpan: 2 },
+      { ...newLabel(`Final Total: $${grandTotal.toFixed(2)}`), xSpan: 2, severity: Severity.Success },
     ]),
     newArrayStrip(new Rectangle(9, 0, 1, 1), [
       severeup(newButton(backOut, 'Back'), Severity.Info),
