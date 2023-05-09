@@ -1,6 +1,6 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
-import { newLabel, newButton, ButtonTile } from '@/api/tile';
+import { newLabel, newButton, ButtonTile, Severity, severeup } from '@/api/tile';
 import {
   StripProvider, newArrayStrip, newContainerStrip,
 } from '@/api/strip';
@@ -78,10 +78,17 @@ function voidMenu() {
   orderStore.lines.forEach((line) => orderStore.clearLine(line));
 }
 
+function managerAddItemManually() {
+  const orderStore = useOrderStore();
+
+  orderStore.addSmartOrderLine('discount100');
+}
+
 const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
-  newArrayStrip(new Rectangle(0, 0, 1, 2), [
+  newArrayStrip(new Rectangle(0, 0, 1, 6), [
     newLabel(`Total Items: ${useOrderStore().lines.length}`),
-    newButton(voidMenu, 'Void Order'),
+    severeup(newButton(voidMenu, 'Void Order'), Severity.Danger),
+    severeup(newButton(managerAddItemManually, 'MGR AIM'), Severity.Help),
   ]),
 ]);
 

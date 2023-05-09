@@ -8,11 +8,11 @@ import Rectangle from '@/api/rectangle';
 
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 
-import { menu } from '@/menu';
+import { getMenuItem } from '@/menu';
 import Sizes from '@/menu/sizes';
 
 function demoPromo() {
-  const gift25 = menu.find((i) => i.id === 'gift25');
+  const gift25 = getMenuItem('gift25');
 
   if (gift25) {
     useOrderStore().addLine({
