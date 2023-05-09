@@ -3,7 +3,10 @@
     class="flex-1 m-2 overflow-y-auto" />
   <TileGrid :strip="root" class="flex-2" />
   <div id="app-loading" class="absolute w-screen h-screen flex align-items-center justify-content-center bg-black-alpha-80" v-if="isLoading">
-    <ProgressSpinner />
+    <ProgressSpinner :pt="{
+      spinner: { },
+      circle: { style: { stroke: 'var(--primary-color !important' } },
+    }" />
   </div>
 </template>
 
