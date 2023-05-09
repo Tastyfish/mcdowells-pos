@@ -22,15 +22,18 @@ type ComboOffset = {
   [size in Sizes]: number;
 };
 
+// Default offset. Also used for stand-alone drinks and sides to counter the built-in discount.
+const COMBO_BASE_MOD = 1.08;
+
 /**
  * How much to add to a combo after totalling the contents.
  */
 export const COMBO_OFFSETS: ComboOffset = {
-  [Sizes.HappyMeal]: -1.08,
-  [Sizes.XSmall]: -1.58,
-  [Sizes.Small]: -1.08,
-  [Sizes.Medium]: -1.08,
-  [Sizes.Large]: -1.08,
+  [Sizes.HappyMeal]: -1.58,
+  [Sizes.XSmall]: -3.08,
+  [Sizes.Small]: -COMBO_BASE_MOD,
+  [Sizes.Medium]: -COMBO_BASE_MOD,
+  [Sizes.Large]: -COMBO_BASE_MOD,
   [Sizes.Senior]: -2.08,
 }
 
@@ -63,20 +66,20 @@ export const menu: MenuItem[] = [
     getDisplayName: (line) => displayComboName(line, 'Drink'),
     choiceSlots: { drink: null },
     allowedSizes: baseSizesAndSr,
-    price: 1.00,
+    price: COMBO_BASE_MOD,
   },
   {
     id: 'side',
     getDisplayName: (line) => displayComboName(line, 'Side'),
     choiceSlots: { side: null },
     allowedSizes: baseSizesAndSr,
-    price: 1.00,
+    price: COMBO_BASE_MOD,
   },
   {
     id: 'sauce',
     getDisplayName: () => 'Condiment',
     choiceSlots: { sauce: null },
-    price: 1.00,
+    price: 0.00, // Since this doesn't have sizes, we don't have to do weird incantations.
   },
 
   {
