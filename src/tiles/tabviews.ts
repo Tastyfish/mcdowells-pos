@@ -153,6 +153,7 @@ const stripButtonDummyLine: OrderLine = {
     choiceSlots: {},
     id: 'dummy',
     getDisplayName: () => { throw new Error('This shouldn\'t be called.'); },
+    price: 0.00,
   },
 };
 

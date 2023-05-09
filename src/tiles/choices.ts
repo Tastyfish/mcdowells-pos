@@ -26,6 +26,7 @@ const mockOrderLine: OrderLine = {
     choiceSlots: { side: null },
     id: 'mock',
     getDisplayName: () => 'na',
+    price: 0.00,
   },
 };
 
