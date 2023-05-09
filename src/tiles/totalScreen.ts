@@ -35,13 +35,13 @@ export default function generateTotalScreenGraph(): StripProvider {
 
   return newContainerStrip(new Rectangle(0, 0, 10, 10), [
     newArrayStrip(new Rectangle(0, 0, 1, 4), [
-      { ...newLabel(`Total Items: ${orderStore.lines.length}`), xSpan: 2 },
-      { ...newLabel(`Subtotal: $${subtotal.toFixed(2)}`), xSpan: 2 },
-      { ...newLabel(`Tax: $${tax.toFixed(2)}`), xSpan: 2 },
-      { ...newLabel(`Final Total: $${grandTotal.toFixed(2)}`), xSpan: 2, severity: Severity.Success },
+      { ...newLabel(`Total Items: ${orderStore.lines.length}`), xSpan: 3 },
+      { ...newLabel(`Subtotal: $${subtotal.toFixed(2)}`), xSpan: 3 },
+      { ...newLabel(`Tax: $${tax.toFixed(2)}`), xSpan: 3 },
+      { ...newLabel(`Final Total: $${grandTotal.toFixed(2)}`), xSpan: 3, severity: Severity.Success },
     ]),
     newArrayStrip(new Rectangle(9, 0, 1, 1), [
-      severeup(newButton(backOut, 'Back'), Severity.Info),
+      severeup(newButton(backOut, 'Back', 'pi pi-arrow-left'), Severity.Info),
     ]),
     newArrayStrip(new Rectangle(9, 4, 1, 2), [
       { ...newButton(cashOut, 'Card', 'pi pi-credit-card'), ySpan: 2, severity: Severity.Primary },

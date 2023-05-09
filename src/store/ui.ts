@@ -16,6 +16,9 @@ export const useUIStore = defineStore('ui', {
     // Show prices on buttons.
     showingPrices: false,
 
+    // Reveal product build
+    showingProductBuild: false,
+
     // Current page on listed choice.
     choicePage: 0,
 
@@ -38,6 +41,10 @@ export const useUIStore = defineStore('ui', {
 
     showPrices(show: boolean): void {
       this.showingPrices = show;
+    },
+
+    showProductBuild(show: boolean): void {
+      this.showingProductBuild = show;
     },
 
     setChoicePage(page: number): void {
