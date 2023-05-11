@@ -1,24 +1,28 @@
 <template>
   <Button v-if="tile.type === 'BUTTON'"
     :class="['base', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
+    :style="extraStyles"
     @click="buttonTile?.onPress"
     :label="buttonTile?.label"
     :icon="buttonTile?.icon" />
   <Button v-else-if="tile.type === 'TOGGLE'"
     :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
       { ['p-button-outlined']: toggleTile?.state}, ...(tile.classes || [])]"
+    :style="extraStyles"
     @click="toggleTile?.onPress"
     :label="toggleTile?.label"
     :icon="toggleTile?.icon" />
   <Button v-else-if="tile.type === 'SPLITTOGGLE'"
     :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
-    @click="splitTile?.onPress">
+    @click="splitTile?.onPress"
+    :style="extraStyles">
     <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'top'}]">{{ splitTile?.topLabel }}</span>
     <div class="stogdiv"></div>
     <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'bottom'}]">{{ splitTile?.bottomLabel }}</span>
   </Button>
   <div v-else
-    :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]">
+    :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]"
+    :style="extraStyles">
     <span>{{ labelTile?.label }}</span>
   </div>
 </template>
@@ -69,9 +73,17 @@ export default defineComponent({
     extraClasses() {
       return [
         this.severityClass,
-        this.tile.xSpan === 2 ? 'doublex' : this.tile.xSpan === 3 ? 'triplex' : undefined,
-        this.tile.ySpan === 2 ? 'doubley' : this.tile.ySpan === 3 ? 'tripley' : undefined,
       ]
+    },
+
+    extraStyles() {
+      const xSpan = this.tile.xSpan ? Math.floor(this.tile.xSpan) : undefined
+      const ySpan = this.tile.ySpan ? Math.floor(this.tile.ySpan) : undefined
+
+      return {
+        minWidth: xSpan ? `calc(${xSpan}00% + ${xSpan * 0.25}em) !important` : undefined,
+        minHeight: ySpan ? `calc(${ySpan}00% + ${ySpan * 0.25}em) !important` : undefined,
+      }
     },
 
     buttonTile() { return isButton(this.tile) ? this.tile : undefined },
@@ -87,18 +99,6 @@ export default defineComponent({
 
 .base {
   display: block;
-}
-.doublex {
-  min-width: calc(200% + .5em) !important;
-}
-.doubley {
-  min-height: calc(200% + .5em) !important;
-}
-.triplex {
-  min-width: calc(300% + 1em) !important;
-}
-.tripley {
-  min-height: calc(300% + 1em) !important;
 }
 .label {
   display: flex;
