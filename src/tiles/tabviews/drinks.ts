@@ -23,10 +23,8 @@ export const generateDrinkStrips = (): StripProvider[] => {
       newToggle(uiStore.showingPrices, () => uiStore.showPrices(!uiStore.showingPrices), 'Show Prices'),
     ]),
   ].concat(uiStore.showingProductBuild ? [
-    newArrayStrip(new Rectangle(1, 5, 3, 1), [
+    newArrayStrip(new Rectangle(1, 5, 6, 1), [
       { ...newLabel(`Software build: ${APP_VERSION}`), xSpan: 3 },
-    ]),
-    newArrayStrip(new Rectangle(4, 5, 3, 1), [
       { ...newLabel(`Menu build: ${4}`), xSpan: 3 },
     ]),
   ] : [] );

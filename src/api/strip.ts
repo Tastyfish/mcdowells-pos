@@ -18,6 +18,41 @@ export interface StripProvider {
   @return {StripProvider} The resulting provider.
 * */
 export function newArrayStrip(bounds: Rectangle, tiles: Tile[]): StripProvider {
+  // Adjust list to account for xSpan and ySpan.
+  const realTiles: (Tile | undefined)[] = new Array(bounds.width * bounds.height);
+
+  let tileIndex = 0;
+  for(let y = 0; y < bounds.height; y++) {
+    for(let x = 0; x < bounds.width;) {
+      const tile = tiles[tileIndex] ?? emptyTile;
+
+      if(realTiles[x + y * bounds.width]) {
+        console.log(`Skipping blocked (${x}, ${y})`)
+        x++;
+        continue;
+      }
+
+      realTiles[x + y * bounds.width] = tile;
+
+      for(let subY = 1; subY < (tile.ySpan ?? 1); subY++) {
+        console.log(`Blocking out lower (${x}, ${y}+${subY}) for ${tile.type}`)
+        realTiles[x + (y + subY) * bounds.width] = emptyTile;
+      }
+
+      x++;
+
+      for(let subX = 1; subX < (tile.xSpan ?? 1); subX++, x++) {
+        realTiles[x + y * bounds.width] = emptyTile;
+
+        for(let subY = 1; subY < (tile.ySpan ?? 1); subY++) {
+          realTiles[x + (y + subY) * bounds.width] = emptyTile;
+        }
+      }
+
+      tileIndex++;
+    }
+  }
+
   return {
     bounds,
     getTile: (x, y) => {
@@ -26,11 +61,7 @@ export function newArrayStrip(bounds: Rectangle, tiles: Tile[]): StripProvider {
       const ry = Math.max(0, Math.min(bounds.height - 1, y));
       const idx = rx + ry * bounds.width;
 
-      if (idx < tiles.length) {
-        return tiles[idx];
-      }
-      // Give emptyTile if we run off the end of the array
-      return emptyTile;
+      return realTiles[idx] ?? emptyTile;
     },
   };
 }
