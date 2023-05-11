@@ -9,6 +9,7 @@ export enum Severity {
 }
 
 export enum TileType {
+  Empty = 'EMPTY', // nothing.
   Label = 'LABEL', // A text span
   Button = 'BUTTON', // A button with optional label and icon
   Toggle = 'TOGGLE', // A toggle button with the added state for pressed or not.
@@ -126,9 +127,8 @@ export function isSplitToggle(t: Tile): t is SplitToggleTile {
   return t.type === TileType.SplitToggle;
 }
 
-export const emptyTile: LabelTile = {
-  type: TileType.Label,
-  label: '',
+export const emptyTile: Tile = {
+  type: TileType.Empty,
 };
 
 /**

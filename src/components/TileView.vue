@@ -20,7 +20,7 @@
     <div class="stogdiv"></div>
     <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'bottom'}]">{{ splitTile?.bottomLabel }}</span>
   </Button>
-  <div v-else
+  <div v-else-if="tile.type === 'LABEL'"
     :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]"
     :style="extraStyles">
     <span>{{ labelTile?.label }}</span>
