@@ -123,8 +123,8 @@ export default defineComponent({
 .stogsel {
   background-color: var(--primary-color-text);
   color: var(--primary-color);
-  margin: -.125rem;
-  padding: .125rem;
+  margin: -.25rem;
+  padding: .25rem;
 }
 
 .circle {
