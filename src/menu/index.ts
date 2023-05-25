@@ -1,22 +1,5 @@
-import {
-  MenuItem, ChoiceItem, ChoiceSlot,
-  NewOrderLine,
-  ChoiceSlotMetaInfo,
-} from '@/api/order';
+import { MenuItem, ChoiceItem, ChoiceSlot } from '@/api/menu';
 import Sizes, { baseSizesAndHMAndSr, baseSizesAndSr } from './sizes';
-
-/** Generic combo name generator * */
-function displayComboName(line: NewOrderLine, name: string): string {
-  if (line.size) {
-    return `${line.size} ${name}`;
-  }
-  return name;
-}
-
-/** choice-specific line. */
-function displaySlot(info: ChoiceSlotMetaInfo, name: string): string {
-  return info.choice?.choiceItem.getDisplayName(info.choice) ?? `Missing: ${name}`;
-}
 
 type ComboOffset = {
   [size in Sizes]: number;
@@ -40,7 +23,7 @@ export const COMBO_OFFSETS: ComboOffset = {
 export const menu: MenuItem[] = [
   {
     id: 'bigmac',
-    getDisplayName: (line) => displayComboName(line, 'Big Mac'),
+    displayName: 'Big Mac',
     choiceSlots: {
       grill: null,
       side: 'fries',
@@ -51,7 +34,7 @@ export const menu: MenuItem[] = [
   },
   {
     id: '2cheeseburgers',
-    getDisplayName: (line) => displayComboName(line, '2 Cheeseburgers'),
+    displayName: '2 Cheeseburgers',
     choiceSlots: {
       grill: null,
       side: 'fries',
@@ -62,7 +45,7 @@ export const menu: MenuItem[] = [
   },
   {
     id: 'quarterpounder',
-    getDisplayName: (line) => displayComboName(line, '¼ Pounder w/ Cheese'),
+    displayName: '¼ Pounder w/ Cheese',
     choiceSlots: {
       grill: null,
       side: 'fries',
@@ -73,7 +56,7 @@ export const menu: MenuItem[] = [
   },
   {
     id: 'DBLquarterpounder',
-    getDisplayName: (line) => displayComboName(line, 'Double ¼ Pounder w/ Cheese'),
+    displayName: 'Double ¼ Pounder w/ Cheese',
     choiceSlots: {
       grill: null,
       side: 'fries',
@@ -84,7 +67,7 @@ export const menu: MenuItem[] = [
   },
   {
     id: 'BCNclubhouseburger',
-    getDisplayName: (line) => displayComboName(line, 'Bacon Clubhouse Burger'),
+    displayName: 'Bacon Clubhouse Burger',
     choiceSlots: {
       grill: null,
       side: 'fries',
@@ -95,7 +78,7 @@ export const menu: MenuItem[] = [
   },
   {
     id: 'nuggets10',
-    getDisplayName: (line) => displayComboName(line, '10pc Nuggets'),
+    displayName: '10pc Nuggets',
     choiceSlots: {
       sauce: null,
       side: 'fries',
@@ -107,34 +90,37 @@ export const menu: MenuItem[] = [
 
   {
     id: 'drink',
-    getDisplayName: (line) => displayComboName(line, 'Drink'),
+    displayName: 'Drink',
     choiceSlots: { drink: null },
     allowedSizes: baseSizesAndSr,
     price: COMBO_BASE_MOD,
   },
   {
     id: 'side',
-    getDisplayName: (line) => displayComboName(line, 'Side'),
+    displayName: 'Side',
     choiceSlots: { side: null },
     allowedSizes: baseSizesAndSr,
     price: COMBO_BASE_MOD,
   },
   {
     id: 'sauce',
-    getDisplayName: () => 'Condiment',
+    displayName: 'Condiment',
+    simpleDisplayName: true,
     choiceSlots: { sauce: null },
     price: 0.00, // Since this doesn't have sizes, we don't have to do weird incantations.
   },
 
   {
     id: 'gift25',
-    getDisplayName: () => '$25 Gift Card',
+    displayName: '$25 Gift Card',
+    simpleDisplayName: true,
     choiceSlots: { },
     price: 25.00,
   },
   {
     id: 'discount100', // Todo: Make a better way of doing gift cards and discounts - special slot type?
-    getDisplayName: () => '** $1 Discount **',
+    displayName: '** $1 Discount **',
+    simpleDisplayName: true,
     choiceSlots: { },
     price: -1.00,
   }
@@ -143,70 +129,74 @@ export const menu: MenuItem[] = [
 export const choices: ChoiceItem[] = [
   {
     id: 'coke',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Coca-Cola'),
+    displayName: 'Coca-Cola',
     slot: 'drink',
   },
   {
     id: 'dietcoke',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Diet Coke'),
+    displayName: 'Diet Coke',
     slot: 'drink',
   },
   {
     id: 'sprite',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Sprite'),
+    displayName: 'Sprite',
     slot: 'drink',
   },
   {
     id: 'fantaorange',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Fanta Orange'),
+    displayName: 'Fanta Orange',
     slot: 'drink',
   },
   {
     id: 'icedtea',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Iced Tea'),
+    displayName: 'Iced Tea',
     slot: 'drink',
   },
   {
     id: 'sweettea',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Sweet Tea'),
+    displayName: 'Sweet Tea',
     slot: 'drink',
   },
   {
     id: 'coffee',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Coffee'),
+    displayName: 'Coffee',
     slot: 'drink',
   },
 
   {
     id: 'fries',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Fries'),
+    displayName: 'Fries',
     slot: 'side',
   },
   {
     id: 'apples',
-    getDisplayName: (choice) => displayComboName(choice.line, 'Apple Slices'),
+    displayName: 'Apple Slices',
     slot: 'side',
     price: 1.00,
   },
 
   {
     id: 'no_sauce',
-    getDisplayName: () => 'No Sauce',
+    displayName: 'No Sauce',
+    simpleDisplayName: true,
     slot: 'sauce',
   },
   {
     id: 'ketchup',
-    getDisplayName: () => 'Ketchup',
+    displayName: 'Ketchup',
+    simpleDisplayName: true,
     slot: 'sauce',
   },
   {
     id: 'honey_mustard',
-    getDisplayName: () => 'Honey Mustard',
+    displayName: 'Honey Mustard',
+    simpleDisplayName: true,
     slot: 'sauce',
   },
   {
     id: 'bbq',
-    getDisplayName: () => 'BBQ Sauce',
+    displayName: 'BBQ Sauce',
+    simpleDisplayName: true,
     slot: 'sauce',
   },
 ];
@@ -214,28 +204,28 @@ export const choices: ChoiceItem[] = [
 export const choiceSlots: ChoiceSlot[] = [
   {
     id: 'drink',
-    getDisplayName: (info) => displaySlot(info, 'Drink'),
+    displayName: 'Drink',
     isListed: true,
     isComboOnly: true,
     price: [1.00, 1.29, 1.49],
   },
   {
     id: 'side',
-    getDisplayName: (info) => displaySlot(info, 'Side'),
+    displayName: 'Side',
     isListed: true,
     isComboOnly: true,
     price: [1.39, 1.79, 1.89],
   },
   {
     id: 'grill',
-    getDisplayName: (info) => displaySlot(info, 'Toppings'),
+    displayName: 'Toppings',
     isListed: true,
     grillLabel: 'Grill',
     price: 0.00,
   },
   {
     id: 'sauce',
-    getDisplayName: (info) => displaySlot(info, 'Sauce'),
+    displayName: 'Sauce',
     isListed: true,
     grillLabel: 'Sauce',
     price: 0.30,

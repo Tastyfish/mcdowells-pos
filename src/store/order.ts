@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 
-import { getItemPrice, hasPrice } from '@/api/menu';
+import { ChoiceSlot, getItemPrice, hasPrice } from '@/api/menu';
 import {
-  NewOrderLine, OrderLine, NewOrderChoice, OrderChoice, ChoiceSlot,
+  NewOrderLine, OrderLine, NewOrderChoice, OrderChoice,
 } from '@/api/order';
 import { getMenuItem, getChoiceSlot, getChoiceItem, COMBO_OFFSETS } from '@/menu';
 import Sizes from '@/menu/sizes';

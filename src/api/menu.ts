@@ -12,12 +12,15 @@ interface ChoiceSlotInfo {
   [slot: string]: string | null;
 }
 
-interface ItemBase<MetaInfo> {
+interface ItemBase {
   /** Internal unique identifier */
   readonly id: string
 
-  /** Generator for user-friendly display name. */
-  readonly getDisplayName: (info: MetaInfo) => string
+  readonly displayName: string
+
+  /// Normally extra terms are added to the display name, such as size and quantity.
+  /// Setting this to true will only show the display name.
+  readonly simpleDisplayName?: boolean
 }
 
 export interface PricedItem {
@@ -53,7 +56,7 @@ export function getItemPrice(item: PricedItem, size?: Sizes): number {
 /**
   Info about a menu item.
 */
-export interface MenuItemM<M> extends ItemBase<M>, PricedItem {
+export interface MenuItem extends ItemBase, PricedItem {
   /** Slot names and default values for choices */
   readonly choiceSlots: ChoiceSlotInfo
 
@@ -64,7 +67,7 @@ export interface MenuItemM<M> extends ItemBase<M>, PricedItem {
 /**
   Info about a specific choice of a menu item.
 */
-export interface ChoiceItemM<M> extends ItemBase<M>, Partial<PricedItem> {
+export interface ChoiceItem extends ItemBase, Partial<PricedItem> {
   /** Which slots it can fit into. */
   readonly slot: string
 }
@@ -72,7 +75,7 @@ export interface ChoiceItemM<M> extends ItemBase<M>, Partial<PricedItem> {
 /**
   Info about a choice slot.
 */
-export interface ChoiceSlotM<M> extends ItemBase<M>, PricedItem {
+export interface ChoiceSlot extends ItemBase, PricedItem {
   /** True if listed in a receipt as its own line. */
   readonly isListed?: boolean
   /** This choice is specific to combos. */

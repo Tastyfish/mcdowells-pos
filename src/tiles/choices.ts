@@ -9,7 +9,8 @@ import Rectangle from '@/api/rectangle';
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 import { getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
-import { OrderLine, ChoiceItem } from '@/api/order';
+import { ChoiceItem } from '@/api/menu';
+import { OrderLine } from '@/api/order';
 
 const choiceRect = new Rectangle(0, 0, 10, 2);
 const rowRect = new Rectangle(0, 0, 10, 1);
@@ -18,17 +19,6 @@ const choiceModeBack = severeup(newButton(
   () => useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default),
   'Back', 'pi pi-arrow-left',
 ), Severity.Info);
-
-// A mock order line for generating the side buttons.
-const mockOrderLine: OrderLine = {
-  uid: 0,
-  menuItem: {
-    choiceSlots: { side: null },
-    id: 'mock',
-    getDisplayName: () => 'na',
-    price: 0.00,
-  },
-};
 
 // A button to retroactively change an item's size.
 function newSizeButton(size: Sizes): Tile {
@@ -79,10 +69,7 @@ function newChoiceButton(choice: ChoiceItem): Tile {
 
     // Regardless, return to normal choices.
     useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
-  }, choice.getDisplayName({
-    choiceItem: choice,
-    line: mockOrderLine,
-  }));
+  }, choice.displayName);
 }
 
 function generateSlotButtons(slotID: string): Tile[] {

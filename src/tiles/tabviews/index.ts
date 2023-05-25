@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import { ChoiceSlot, OrderLine } from '@/api/order';
+import { ChoiceSlot } from '@/api/menu';
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
@@ -114,21 +114,11 @@ export function newMealButton(mealID: string): ButtonTile {
   return {
     ...newButton(
       () => addMealItem(mealID),
-      `${menuItem.getDisplayName({ menuItem })}${useUIStore().showingPrices ? ` ($${price.toFixed(2)})` : ''}`,
+      `${menuItem.displayName}${useUIStore().showingPrices ? ` ($${price.toFixed(2)})` : ''}`,
     ),
     classes: [ 'small-text-button' ],
   };
 }
-
-const stripButtonDummyLine: OrderLine = {
-  uid: -1,
-  menuItem: {
-    choiceSlots: {},
-    id: 'dummy',
-    getDisplayName: () => { throw new Error('This shouldn\'t be called.'); },
-    price: 0.00,
-  },
-};
 
 // For the dedicated drinks and condiments menus
 const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripProvider[] => {
@@ -157,10 +147,7 @@ const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripP
               })
             )));
           },
-          choice.getDisplayName({
-            line: stripButtonDummyLine,
-            choiceItem: choice,
-          }),
+          choice.displayName,
         )
       ))
     ),

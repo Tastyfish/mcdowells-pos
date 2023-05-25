@@ -5,7 +5,9 @@
 
 import { TreeNode } from 'primevue/tree';
 
-import { OrderLine, OrderChoice, ChoiceSlot } from './order';
+import { ChoiceSlot } from './menu';
+import { OrderLine, OrderChoice } from './order';
+import { getMenuItemDisplayName, getChoiceSlotDisplayName } from './displayname';
 import { useOrderStore } from '@/store';
 
 const selectedStyle = 'background-color: var(--primary-color); color: var(--primary-color-text);';
@@ -21,7 +23,7 @@ const emptySelectedSlotStyle = 'background-color: var(--orange-400); color: var(
 export function convertLineToTreeNode(line: OrderLine, selected: boolean): TreeNode {
   return {
     key: line.uid.toString(),
-    label: line.menuItem.getDisplayName(line),
+    label: getMenuItemDisplayName(line),
     style: selected ? selectedStyle : undefined,
     type: "priced",
     data: useOrderStore().getLinePrice(line),
@@ -46,7 +48,7 @@ export function convertSlotToTreeNode(
 ): TreeNode {
   return {
     key: `${line.uid}:${slot.id}`,
-    label: slot.getDisplayName({ slot, choice: choice ?? undefined }),
+    label: getChoiceSlotDisplayName(slot, choice ?? undefined),
     style: getSlotStyle(selected, choice === null),
   };
 }
