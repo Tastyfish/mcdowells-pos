@@ -87,7 +87,7 @@ export const useOrderStore = defineStore('order', () => {
       throw new RangeError('No existing order with ID.');
     }
 
-    lines.value.splice(idx, 1);
+    lines.value[idx] = line;
 
     // And now also update all choices.
     choices.value = choices.value.map((c) => {
