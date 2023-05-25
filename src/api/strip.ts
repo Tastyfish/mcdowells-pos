@@ -27,7 +27,6 @@ export function newArrayStrip(bounds: Rectangle, tiles: Tile[]): StripProvider {
       const tile = tiles[tileIndex] ?? emptyTile;
 
       if(realTiles[x + y * bounds.width]) {
-        console.log(`Skipping blocked (${x}, ${y})`)
         x++;
         continue;
       }
@@ -35,7 +34,6 @@ export function newArrayStrip(bounds: Rectangle, tiles: Tile[]): StripProvider {
       realTiles[x + y * bounds.width] = tile;
 
       for(let subY = 1; subY < (tile.ySpan ?? 1); subY++) {
-        console.log(`Blocking out lower (${x}, ${y}+${subY}) for ${tile.type}`)
         realTiles[x + (y + subY) * bounds.width] = emptyTile;
       }
 
