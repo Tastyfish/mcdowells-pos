@@ -1,3 +1,16 @@
+<script setup lang='ts'>
+
+import { StripProvider, emptyStrip } from '@/api/strip'
+import TileView from './TileView.vue'
+
+withDefaults(defineProps<{
+  strip: StripProvider
+}>(), {
+  strip: () => emptyStrip,
+})
+
+</script>
+
 <template>
   <div class="tile-grid">
     <div class="tile-row" v-for="y in strip.bounds.height" :key="y">
@@ -7,26 +20,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-
-import { defineComponent, PropType } from 'vue'
-import { StripProvider, emptyStrip } from '@/api/strip'
-import TileView from './TileView.vue'
-
-export default defineComponent({
-  components: {
-    TileView
-  },
-  props: {
-    strip: {
-      type: Object as PropType<StripProvider>,
-      default: () => emptyStrip,
-    }
-  }
-})
-
-</script>
 
 <style scoped lang='scss'>
 

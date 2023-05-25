@@ -1,5 +1,46 @@
+<script setup lang="ts">
+
+import { ComponentPublicInstance, computed, watch, nextTick, ref } from 'vue'
+import Tree, { TreeExpandedKeys, TreeNode } from 'primevue/tree';
+
+const props = defineProps<{
+  nodes: TreeNode[]
+  scrollOrderCounter: number
+}>();
+
+const emits = defineEmits<{
+  (e: 'select', lineID: number): void
+}>();
+
+const treeComponent = ref(null as Tree | null);
+
+const selectedKeys = computed(() => [] as (string | number)[]);
+
+// Expand every branch always.
+const expandedNodes = computed((): TreeExpandedKeys => props.nodes.reduce((dict, node) => ({ ...dict, [node.key as string]: true }), {}))
+
+// On node selection
+function select(node: TreeNode) {
+  // Number before : in a node key is always the order line ID.
+  emits('select', parseInt((node.key as string).split(':')[0], 10))
+}
+
+watch(
+  () => props.scrollOrderCounter,
+  async () => {
+    // Scroll to bottom after rendering.
+    await nextTick();
+
+    const treeInstance = treeComponent.value as Partial<ComponentPublicInstance>
+
+    treeInstance.$el.scrollTop = treeInstance.$el.scrollHeight
+  }
+);
+
+</script>
+
 <template>
-  <Tree ref="tree" :value="nodes" :expandedKeys="expandedNodes"
+  <Tree class="order-tree" ref="treeComponent" :value="nodes" :expandedKeys="expandedNodes"
   selectionMode="single" :selectionKeys="selectedKeys" @node-select="select">
     <template #default="slotProps">
       {{ slotProps.node.label }}
@@ -13,51 +54,9 @@
   </Tree>
 </template>
 
-<script lang="ts">
+<style scoped>
 
-import { defineComponent, PropType, ComponentPublicInstance } from 'vue'
-import Tree, { TreeExpandedKeys, TreeNode } from 'primevue/tree';
-
-export default defineComponent({
-  props: {
-    nodes: {
-      type: Array as PropType<TreeNode[]>,
-      required: true as true,
-    },
-    scrollOrderCounter: Number,
-  },
-  emits: ['select'],
-  computed: {
-    treeComponent() { return this.$refs.tree as Tree },
-    selectedKeys() { return [] as (string | number)[] },
-    expandedNodes(): TreeExpandedKeys {
-      return this.$props.nodes.reduce((dict, node) => ({ ...dict, [node.key as string]: true }), {})
-    },
-  },
-  methods: {
-    // On node selection
-    select(node: TreeNode) {
-      // Number before : in a node key is always the order line ID.
-      this.$emit('select', parseInt((node.key as string).split(':')[0], 10))
-    }
-  },
-  watch: {
-    scrollOrderCounter() {
-      // Scroll to bottom after rendering.
-      this.$nextTick(() => {
-        const treeInstance = this.treeComponent as Partial<ComponentPublicInstance>
-
-        treeInstance.$el.scrollTop = treeInstance.$el.scrollHeight
-      });
-    }
-  }
-})
-
-</script>
-
-<style>
-
-.p-treenode-label {
+.order-tree:deep(.p-treenode-label) {
   width: 100%;
 }
 

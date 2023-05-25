@@ -1,99 +1,86 @@
-<template>
-  <Button v-if="tile.type === 'BUTTON'"
-    :class="['base', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
-    :style="extraStyles"
-    @click="buttonTile?.onPress"
-    :label="buttonTile?.label"
-    :icon="buttonTile?.icon" />
-  <Button v-else-if="tile.type === 'TOGGLE'"
-    :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
-      { ['p-button-outlined']: toggleTile?.state}, ...(tile.classes || [])]"
-    :style="extraStyles"
-    @click="toggleTile?.onPress"
-    :label="toggleTile?.label"
-    :icon="toggleTile?.icon" />
-  <Button v-else-if="tile.type === 'SPLITTOGGLE'"
-    :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
-    @click="splitTile?.onPress"
-    :style="extraStyles">
-    <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'top'}]">{{ splitTile?.topLabel }}</span>
-    <div class="stogdiv"></div>
-    <span :class="['p-button-label', 'flex-none', {stogsel: splitTile?.state == 'bottom'}]">{{ splitTile?.bottomLabel }}</span>
-  </Button>
-  <div v-else-if="tile.type === 'LABEL'"
-    :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]"
-    :style="extraStyles">
-    <span>{{ labelTile?.label }}</span>
-  </div>
-</template>
+<script setup lang="ts">
 
-<script lang="ts">
-
-import { defineComponent, PropType } from 'vue'
+import { computed } from 'vue'
 
 import {
   Tile, TileType, emptyTile,
-  isLabel, isButton, isToggle, isSplitToggle, Severity,
+  isLabel, isButton, isToggle, isSplitToggle, Severity, ButtonTile, ToggleTile, SplitToggleTile,
 } from '@/api/tile';
 
-export default defineComponent({
-  props: {
-    tile: {
-      type: Object as PropType<Tile>,
-      default: () => emptyTile,
-    },
-  },
-  computed: {
-    severityClass() {
-      switch (this.tile.type) {
-        case TileType.Button:
-          return `p-button-${this.tile.severity ?? 'primary'}`;
-        case TileType.Toggle:
-        case TileType.SplitToggle:
-          return `p-button-${this.tile.severity ?? 'warning'}`;
-        case TileType.Label:
-          if (this.tile.severity) {
-            const severity = this.tile.severity;
-
-            // For some ungodly reason, inline messages use slightly different severities.
-
-            const actualSeverity =
-              severity === Severity.Warning ? 'warn' :
-              severity === Severity.Danger ? 'error' :
-              severity;
-
-            return `p-inline-message p-inline-message-${actualSeverity}`;
-          }
-          return '';
-        default:
-          return '';
-      }
-    },
-
-    extraClasses() {
-      return [
-        this.severityClass,
-      ]
-    },
-
-    extraStyles() {
-      const xSpan = this.tile.xSpan ? Math.floor(this.tile.xSpan) : undefined
-      const ySpan = this.tile.ySpan ? Math.floor(this.tile.ySpan) : undefined
-
-      return {
-        minWidth: xSpan ? `calc(${xSpan}00% + ${xSpan * 0.25}em) !important` : undefined,
-        minHeight: ySpan ? `calc(${ySpan}00% + ${ySpan * 0.25}em) !important` : undefined,
-      }
-    },
-
-    buttonTile() { return isButton(this.tile) ? this.tile : undefined },
-    toggleTile() { return isToggle(this.tile) ? this.tile : undefined },
-    splitTile() { return isSplitToggle(this.tile) ? this.tile : undefined },
-    labelTile() { return isLabel(this.tile) ? this.tile : undefined },
-  },
+const props = withDefaults(defineProps<{
+  tile: Tile,
+}>(), {
+  tile: () => emptyTile,
 })
 
+const severityClass = computed(() => {
+  switch (props.tile.type) {
+    case TileType.Button:
+      return `p-button-${props.tile.severity ?? 'primary'}`;
+    case TileType.Toggle:
+    case TileType.SplitToggle:
+      return `p-button-${props.tile.severity ?? 'warning'}`;
+    case TileType.Label:
+      if (props.tile.severity) {
+        const severity = props.tile.severity;
+
+        // For some ungodly reason, inline messages use slightly different severities.
+
+        const actualSeverity =
+          severity === Severity.Warning ? 'warn' :
+          severity === Severity.Danger ? 'error' :
+          severity;
+
+        return `p-inline-message p-inline-message-${actualSeverity}`;
+      }
+      return '';
+    default:
+      return '';
+  }
+});
+
+const extraClasses = computed(() => ([severityClass.value]));
+
+const extraStyles = computed(() => {
+  const xSpan = props.tile.xSpan ? Math.floor(props.tile.xSpan) : undefined
+  const ySpan = props.tile.ySpan ? Math.floor(props.tile.ySpan) : undefined
+
+  return {
+    minWidth: xSpan ? `calc(${xSpan}00% + ${xSpan * 0.25}em) !important` : undefined,
+    minHeight: ySpan ? `calc(${ySpan}00% + ${ySpan * 0.25}em) !important` : undefined,
+  }
+});
+
 </script>
+
+<template>
+  <Button v-if="isButton(tile)"
+    :class="['base', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
+    :style="extraStyles"
+    @click="(tile as ButtonTile).onPress"
+    :label="tile.label"
+    :icon="tile.icon" />
+  <Button v-else-if="isToggle(tile)"
+    :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
+      { ['p-button-outlined']: tile.state}, ...(tile.classes || [])]"
+    :style="extraStyles"
+    @click="(tile as ToggleTile).onPress"
+    :label="tile.label"
+    :icon="tile.icon" />
+  <Button v-else-if="isSplitToggle(tile)"
+    :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
+    @click="(tile as SplitToggleTile).onPress"
+    :style="extraStyles">
+    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'top'}]">{{ tile.topLabel }}</span>
+    <div class="stogdiv"></div>
+    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'bottom'}]">{{ tile.bottomLabel }}</span>
+  </Button>
+  <div v-else-if="isLabel(tile)"
+    :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]"
+    :style="extraStyles">
+    <span>{{ tile.label }}</span>
+  </div>
+</template>
 
 <style scoped>
 
