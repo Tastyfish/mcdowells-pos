@@ -15,6 +15,7 @@ import { SmartOrderPayload } from '@/store/order';
 
 import { generateLunchViewStrips } from './lunch';
 import { generateDrinkStrips } from './drinks';
+import { generateGiftStrips } from './gifts';
 import { getItemPrice } from '@/api/menu';
 
 function assertGetSlot(slotID: string) {
@@ -160,8 +161,9 @@ const generateDrinkViewStrips = (): StripProvider[] => generateStandaloneSlotStr
 const tabMap: {[tabKey: string]: () => StripProvider[]} = {
   special: generateSpecialFunctionsViewStrips,
   lu0: generateLunchViewStrips,
-  co0: generateCondimentViewStrips,
   dr: generateDrinkViewStrips,
+  co0: generateCondimentViewStrips,
+  co1: generateGiftStrips,
 };
 
 export default function generateTabViewGraph(): StripProvider {

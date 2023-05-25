@@ -111,6 +111,20 @@ export const menu: MenuItem[] = [
   },
 
   {
+    id: 'gift05',
+    displayName: '$5 Gift Card',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: 5.00,
+  },
+  {
+    id: 'gift10',
+    displayName: '$10 Gift Card',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: 10.00,
+  },
+  {
     id: 'gift25',
     displayName: '$25 Gift Card',
     simpleDisplayName: true,
