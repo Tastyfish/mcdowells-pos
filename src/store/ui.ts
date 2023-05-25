@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 // Alternative "choice" menus to show
 export enum ChoiceMenuMode {
@@ -7,71 +8,61 @@ export enum ChoiceMenuMode {
   ChangeSlot,
 }
 
-/// Store module for client UI state. Is not replicated and should not have ledger side-effects.
-export const useUIStore = defineStore('ui', {
-  state: () => ({
-    // Showing the total screen, and also sealing order.
-    totallingOrder: false,
+export const useUIStore = defineStore('ui', () => {
+  // Showing the total screen, and also sealing order.
+  const totallingOrder = ref(false)
 
-    // Show prices on buttons.
-    showingPrices: false,
+  // Show prices on buttons.
+  const showingPrices = ref(false)
 
-    // Reveal product build
-    showingProductBuild: false,
+  // Reveal product build
+  const showingProductBuild = ref(false)
 
-    // Current page on listed choice.
-    choicePage: 0,
+  // Current page on listed choice.
+  const choicePage = ref(0)
 
-    // Change to special choice menus.
-    choiceMenuMode: ChoiceMenuMode.Default,
+  // Change to special choice menus.
+  const choiceMenuMode = ref(ChoiceMenuMode.Default)
 
-    // What is the slot ID for choiceMenuMode.ChangeSlot?
-    choiceMenuSlotID: null as string | null,
+  // What is the slot ID for choiceMenuMode.ChangeSlot?
+  const choiceMenuSlotID = ref(null as string | null)
 
-    // Selected menu tab for the lower 4/5 area.
-    selectedMenuTab: 'lu0',
+  // Selected menu tab for the lower 4/5 area.
+  const selectedMenuTab = ref('lu0')
 
-    // Doing an intensive loading operation - block the screen.
-    isLoading: false,
-  }),
-  actions: {
-    setTotallingOrder(totalling: boolean): void {
-      this.totallingOrder = totalling;
-    },
+  // Doing an intensive loading operation - block the screen.
+  const isLoading = ref(false)
 
-    showPrices(show: boolean): void {
-      this.showingPrices = show;
-    },
+  function gotoNextChoicePage(): void {
+    choicePage.value += 1
+  }
 
-    showProductBuild(show: boolean): void {
-      this.showingProductBuild = show;
-    },
+  function setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
+    if (typeof modeOrSlotID === 'number') {
+      choiceMenuMode.value = modeOrSlotID;
+      choiceMenuSlotID.value = null;
+    } else {
+      choiceMenuMode.value = ChoiceMenuMode.ChangeSlot;
+      choiceMenuSlotID.value = modeOrSlotID;
+    }
+    choicePage.value = 0;
+  }
 
-    setChoicePage(page: number): void {
-      this.choicePage = page;
-    },
+  /**
+   * Reset relevent fields for a new order.
+   */
+  function resetToNewOrder() {
+    totallingOrder.value = false
+    choicePage.value = 0
+    choiceMenuMode.value = ChoiceMenuMode.Default
+    choiceMenuSlotID.value = null
+    selectedMenuTab.value = 'lu0'
+    isLoading.value = false
+  }
 
-    gotoNextChoicePage(): void {
-      this.choicePage += 1;
-    },
+  return {
+    totallingOrder, showingPrices, showingProductBuild, choicePage, choiceMenuMode, choiceMenuSlotID, selectedMenuTab, isLoading,
 
-    setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
-      if (typeof modeOrSlotID === 'number') {
-        this.choiceMenuMode = modeOrSlotID;
-        this.choiceMenuSlotID = null;
-      } else {
-        this.choiceMenuMode = ChoiceMenuMode.ChangeSlot;
-        this.choiceMenuSlotID = modeOrSlotID;
-      }
-      this.choicePage = 0;
-    },
-
-    setSelectedMenuTab(tab: string): void {
-      this.selectedMenuTab = tab;
-    },
-
-    setLoading(loading: boolean): void {
-      this.isLoading = loading;
-    },
-  },
+    gotoNextChoicePage, setChoiceMenuMode, resetToNewOrder,
+  }
 })

@@ -12,18 +12,18 @@ import { useOrderStore, useUIStore } from '@/store';
 
 function backOut() {
   // Leave the screen and go back.
-  useUIStore().setTotallingOrder(false);
+  useUIStore().totallingOrder = false;
 }
 
 async function cashOut() {
   const uiStore = useUIStore();
 
-  uiStore.setLoading(true);
+  uiStore.isLoading = true;
 
   await useOrderStore().cashOut();
 
   // Finish up.
-  uiStore.$reset();
+  uiStore.resetToNewOrder()
 }
 
 export default function generateTotalScreenGraph(): StripProvider {

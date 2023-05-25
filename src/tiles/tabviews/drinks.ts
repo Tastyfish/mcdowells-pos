@@ -17,10 +17,10 @@ export const generateDrinkStrips = (): StripProvider[] => {
       newButton(() => addDrink('sweettea'), 'Sweet Tea'),
       newButton(() => addDrink('coffee'), 'Coffee'),
 
-      newToggle(uiStore.showingProductBuild, () => uiStore.showProductBuild(!uiStore.showingProductBuild), 'Show Product Build'),
+      newToggle(uiStore.showingProductBuild, () => uiStore.showingProductBuild = !uiStore.showingProductBuild, 'Show Product Build'),
     ]),
     newArrayStrip(new Rectangle(0, 5, 1, 1), [
-      newToggle(uiStore.showingPrices, () => uiStore.showPrices(!uiStore.showingPrices), 'Show Prices'),
+      newToggle(uiStore.showingPrices, () => uiStore.showingPrices = !uiStore.showingPrices, 'Show Prices'),
     ]),
   ].concat(uiStore.showingProductBuild ? [
     newArrayStrip(new Rectangle(1, 5, 6, 1), [

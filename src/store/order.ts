@@ -1,11 +1,12 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
-import { ChoiceSlot, getItemPrice, hasPrice } from '@/api/menu';
+import { ChoiceSlot, getItemPrice, hasPrice } from '@/api/menu'
 import {
   NewOrderLine, OrderLine, NewOrderChoice, OrderChoice,
-} from '@/api/order';
-import { getMenuItem, getChoiceSlot, getChoiceItem, COMBO_OFFSETS } from '@/menu';
-import Sizes from '@/menu/sizes';
+} from '@/api/order'
+import { getMenuItem, getChoiceSlot, getChoiceItem, COMBO_OFFSETS } from '@/menu'
+import Sizes from '@/menu/sizes'
+import { computed, ref } from 'vue'
 
 export const NO_CURRENT_LINE = -1;
 
@@ -22,271 +23,262 @@ export interface SmartOrderPayload {
 
 /// Store module for orders. Is fully replicated to DB.
 
-export const useOrderStore = defineStore('order', {
-  state: () => ({
-    lines: [] as OrderLine[],
-    choices: [] as OrderChoice[],
+export const useOrderStore = defineStore('order', () => {
+  const lines = ref([] as OrderLine[])
+  let choices = ref([] as OrderChoice[])
 
-    // Highest order ID that's been used so far; used to assign the ID's
-    _highestOrderID: -1,
+  // Highest order ID that's been used so far; used to assign the ID's
+  let _highestOrderID = NO_CURRENT_LINE
 
-    // Highest choice ID that's been used so far; used to assign the ID's
-    _highestChoiceID: -1,
+  // Highest choice ID that's been used so far; used to assign the ID's
+  let _highestChoiceID = NO_CURRENT_LINE
 
-    currentLineID: NO_CURRENT_LINE,
+  const currentLineID = ref(NO_CURRENT_LINE)
 
-    // Handle size selection.
-    sizeSelection: null as Sizes | null,
+  // Handle size selection.
+  const sizeSelection = ref(null as Sizes | null)
 
-    // Multiplying count selection.
-    countSelection: 1 as OrderCount,
+  // Multiplying count selection.
+  const countSelection = ref(1 as OrderCount)
 
-    // Incremented to indicate we should scroll the receipt order view.
-    scrollOrderCounter: 0,
-  }),
-  getters: {
-    currentLine(): OrderLine | undefined {
-      return this.lines.find((line) => line.uid === this.currentLineID)
+  // Incremented to indicate we should scroll the receipt order view.
+  const scrollOrderCounter = ref(0)
+
+  const currentLine = computed((): OrderLine | undefined => {
+    return lines.value.find((line) => line.uid === currentLineID.value)
+  })
+
+  function setCurrentLine(line: OrderLine | number): void {
+    currentLineID.value = typeof line === 'number' ? line : line.uid
+  }
+
+  function addLine(line: NewOrderLine): void {
+    // Assign ID to line.
+    _highestOrderID++
+    const realLine: OrderLine = { ...line, uid: _highestOrderID }
+
+    lines.value.push(realLine)
+    currentLineID.value = _highestOrderID
+    sizeSelection.value = null
+    countSelection.value = 1
+  }
+
+  function clearLine(line: OrderLine): void {
+    // Remove line and its choices.
+    lines.value = lines.value.filter((l) => l.uid !== line.uid);
+    choices.value = choices.value.filter((c) => c.line !== line);
+
+    // Also unset current line IF it's the one being removed.
+    if (currentLineID.value === line.uid) {
+      currentLineID.value = lines.value.length === 0
+        ? NO_CURRENT_LINE : lines.value[lines.value.length - 1].uid;
     }
-  },
-  actions: {
-    setCurrentLine(line: OrderLine | number): void {
-      this.currentLineID = typeof line === 'number' ? line : line.uid;
-    },
+  }
 
-    addLine(line: NewOrderLine): void {
-      // Assign ID to line.
-      this._highestOrderID += 1;
-      const realLine: OrderLine = { ...line, uid: this._highestOrderID };
+  /**
+  Replace existing line with one that contains ID.
+  Useful for mutably updating a line with eg. a new size.
+  @param {OrderLine} line the new line with index already injected.
+  */
+  function replaceLine(line: OrderLine): void {
+    const idx = lines.value.findIndex((l) => l.uid === line.uid);
 
-      this.lines = this.lines.concat([realLine]);
-      this.currentLineID = this._highestOrderID;
-      this.sizeSelection = null;
-      this.countSelection = 1;
-    },
+    if (idx === -1) {
+      throw new RangeError('No existing order with ID.');
+    }
 
-    clearLine(line: OrderLine): void {
-      // Remove line and its choices.
-      this.lines = this.lines.filter((l) => l.uid !== line.uid);
-      this.choices = this.choices.filter((c) => c.line !== line);
+    lines.value.splice(idx, 1);
 
-      // Also unset current line IF it's the one being removed.
-      if (this.currentLineID === line.uid) {
-        this.currentLineID = this.lines.length === 0
-          ? NO_CURRENT_LINE : this.lines[this.lines.length - 1].uid;
-      }
-    },
-
-    /**
-    Replace existing line with one that contains ID.
-    Useful for mutably updating a line with eg. a new size.
-    @param {OrderLine} line the new line with index already injected.
-    */
-    replaceLine(line: OrderLine): void {
-      const idx = this.lines.findIndex((l) => l.uid === line.uid);
-
-      if (idx === -1) {
-        throw new RangeError('No existing order with ID.');
+    // And now also update all choices.
+    choices.value = choices.value.map((c) => {
+      if (c.line.uid === line.uid) {
+        return { ...c, line };
       }
 
-      // Replace directly.
-      this.lines[idx] = line;
+      return c;
+    });
+  }
 
-      this.lines = this.lines
-        .slice(0, idx)
-        .concat([line])
-        .concat(this.lines.slice(idx + 1));
+  function addChoice(choice: NewOrderChoice): void {
+    // Assign ID to choice.
+    _highestChoiceID++;
+    const realChoice: OrderChoice = { ...choice, uid: _highestChoiceID };
 
-      // And now also update all choices.
-      this.choices = this.choices.map((c) => {
-        if (c.line.uid === line.uid) {
-          return { ...c, line };
+    choices.value.push(realChoice);
+  }
+
+  function clearChoice(choice: OrderChoice): void {
+    choices.value = choices.value.filter((l) => l.uid !== choice.uid);
+  }
+
+  function scrollOrderView(): void {
+    scrollOrderCounter.value++;
+  }
+
+  // /////////////////////////////////////////////////////////
+  // Higher-level Actions
+  // /////////////////////////////////////////////////////////
+
+  /**
+      Add an order line, considering size, count, and default choices.
+      @param {SmartOrderPayload | string} Either the menu item key, or a SmartOrderPayload.
+      @return {OrderLine} the resulting order.
+  */
+  function addSmartOrderLine(payload: SmartOrderPayload | string): Promise<OrderLine[]> {
+    const { menuItemID: menuItemKey, defaultSize } = (typeof payload !== 'string') ? payload : {
+      menuItemID: payload,
+      defaultSize: undefined,
+    };
+
+    const menuItem = getMenuItem(menuItemKey);
+
+    if (!menuItem) {
+      throw new Error(`Menu item ${menuItemKey} does not exist.`);
+    }
+
+    // Get size, if a size is selefcted and valid for menu item.
+    const size = sizeSelection.value
+      && menuItem.allowedSizes?.includes(sizeSelection.value)
+      ? sizeSelection.value : defaultSize;
+
+    // copy of count to preserve across loop.
+    const count = countSelection.value;
+
+    // Our list of lines.
+    const lines: OrderLine[] = Array(count);
+
+    for (let i = 0; i < count; i += 1) {
+      addLine({ menuItem, size });
+      const line = currentLine.value;
+
+      if (!line) {
+        throw new Error('Order store is in an invalid state and lines cannot be added.');
+      }
+
+      // Add default choices, if they're set.
+      Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
+        if (slotDefault) {
+          const slot = getChoiceSlot(slotID);
+          const choiceItem = getChoiceItem(slotDefault);
+          if (slot && choiceItem) {
+            addChoice({ line, choiceItem });
+          }
         }
-
-        return c;
       });
-    },
 
-    addChoice(choice: NewOrderChoice): void {
-      // Assign ID to choice.
-      this._highestChoiceID += 1;
-      const realChoice: OrderChoice = { ...choice, uid: this._highestChoiceID };
+      lines[i] = line;
+    }
 
-      this.choices = this.choices.concat([realChoice]);
-    },
+    // Select first item again.
+    if (lines[0]) {
+      setCurrentLine(lines[0]);
+      scrollOrderView();
+    }
 
-    clearChoice(choice: OrderChoice): void {
-      this.choices = this.choices.filter((l) => l.uid !== choice.uid);
-    },
+    return new Promise((resolve) => resolve(lines));
+  }
 
-    startSizeSelection(size: Sizes | null): void {
-      this.sizeSelection = size;
-    },
+  /**
+    Add a choice, removing any overlapping old one.
+    @param {Object} payload Info about choice.
+  */
+  function addSmartChoice(payload: {
+    choiceItemID: string, line: OrderLine, slot: ChoiceSlot
+  }): Promise<void> {
+    // Remove old choice, if applicable.
+    const { choiceItemID, line, slot } = payload;
 
-    startCountSelection(count: OrderCount): void {
-      this.countSelection = count;
-    },
+    const oldChoice = choices.value.find((c) => c.line === line
+      && c.choiceItem.slot === slot.id);
+    if (oldChoice) {
+      clearChoice(oldChoice);
+    }
 
-    scrollOrderView(): void {
-      this.scrollOrderCounter += 1;
-    },
+    // Is this a valid choice?
+    if (!(slot.id in line.menuItem.choiceSlots)) {
+      return new Promise((_resolve, reject) => reject(new Error(`${line.menuItem.id} can not accept slot ${slot.grillLabel ?? slot.id}`)));
+    }
 
-    // /////////////////////////////////////////////////////////
-    // Higher-level Actions
-    // /////////////////////////////////////////////////////////
+    // Is this a combo choice on a non-combo line?
+    if (!line.size && slot.isComboOnly) {
+      return new Promise((_resolve, reject) => reject(new Error(`Line is not a combo so cannot accept slot ${slot.grillLabel ?? slot.id}`)));
+    }
 
-    /**
-        Add an order line, considering size, count, and default choices.
-        @param {SmartOrderPayload | string} Either the menu item key, or a SmartOrderPayload.
-        @return {OrderLine} the resulting order.
+    // Add new choice
+    const choiceItem = getChoiceItem(choiceItemID);
+    if (choiceItem) {
+      addChoice({ line, choiceItem });
+    }
+
+    return new Promise((resolve) => resolve());
+  }
+
+  /**
+    Actually submit order as completed.
+    Currently just cleans state.
+  */
+  async function cashOut(): Promise<void> {
+    // Simulate it being more complex.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    lines.value.forEach((line) => clearLine(line));
+
+    sizeSelection.value = null;
+    countSelection.value = 1;
+  }
+
+  /**
+    * Relatively expensive function to get fully selected choices for order line. Considers combo, etc.
+    * @param line The line to get choices from.
     */
-    addSmartOrderLine(payload: SmartOrderPayload | string): Promise<OrderLine[]> {
-      const { menuItemID: menuItemKey, defaultSize } = (typeof payload !== 'string') ? payload : {
-        menuItemID: payload,
-        defaultSize: undefined,
-      };
-
-      const menuItem = getMenuItem(menuItemKey);
-
-      if (!menuItem) {
-        throw new Error(`Menu item ${menuItemKey} does not exist.`);
-      }
-
-      // Get size, if a size is selefcted and valid for menu item.
-      const size = this.sizeSelection
-        && menuItem.allowedSizes?.includes(this.sizeSelection)
-        ? this.sizeSelection : defaultSize;
-
-      // copy of count to preserve across loop.
-      const count = this.countSelection;
-
-      // Our list of lines.
-      const lines: OrderLine[] = Array(count);
-
-      for (let i = 0; i < count; i += 1) {
-        this.addLine({ menuItem, size });
-        const line = this.currentLine;
-
-        if (!line) {
-          throw new Error('Order store is in an invalid state and lines cannot be added.');
+  function getLineChoices(line: OrderLine): { slotID: string, slot?: ChoiceSlot, choice?: OrderChoice | null }[] {
+    return Object.keys(line.menuItem.choiceSlots)
+      .map((slotID) => ({ slotID, slot: getChoiceSlot(slotID) }))
+      // Undefined slots always show up for debugging.
+      // Otherwise, require it be a listed slot and:
+      //   Either this is a combo, or the slot still exists on non-combo items.
+      .filter((s) => s.slot === undefined
+        || (s.slot.isListed && (line.size !== undefined || !s.slot.isComboOnly)))
+      .map((s) => {
+        // Get actual slot object.
+        if (!s.slot) {
+          // Invalid slot, just return as-is.
+          return { slotID: s.slotID };
         }
 
-        // Add default choices, if they're set.
-        Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
-          if (slotDefault) {
-            const slot = getChoiceSlot(slotID);
-            const choiceItem = getChoiceItem(slotDefault);
-            if (slot && choiceItem) {
-              this.addChoice({ line, choiceItem });
-            }
-          }
-        });
+        // Get the order's choice, or null.
+        const choice = choices.value.find(
+          (c) => c.line === line && c.choiceItem.slot === s.slotID,
+        ) ?? null;
+        // It's good.
+        return { slotID: s.slotID, slot: s.slot, choice };
+      });
+  }
 
-        lines[i] = line;
-      }
+  function getLinePrice(line: OrderLine): number {
+    const mainPrice = getItemPrice(line.menuItem, line.size);
+    const comboOffset = line.size === undefined ? 0 : COMBO_OFFSETS[line.size];
 
-      // Select first item again.
-      if (lines[0]) {
-        this.setCurrentLine(lines[0]);
-        this.scrollOrderView();
-      }
+    // Add together choice prices, or if they don't have a price, use slot price.
+    const slotPrices = getLineChoices(line)
+      .reduce(
+        (total, choiceInfo) => total + (
+          choiceInfo.choice && hasPrice(choiceInfo.choice.choiceItem)
+            ? getItemPrice(choiceInfo.choice.choiceItem, line.size)
+            : getItemPrice(choiceInfo.slot ?? { price: 0.00 }, line.size)
+        ),
+        0,
+      );
 
-      return new Promise((resolve) => resolve(lines));
-    },
+    return mainPrice + comboOffset + slotPrices;
+  }
 
-    /**
-      Add a choice, removing any overlapping old one.
-      @param {Object} payload Info about choice.
-    */
-    addSmartChoice(payload: {
-      choiceItemID: string, line: OrderLine, slot: ChoiceSlot
-    }): Promise<void> {
-      // Remove old choice, if applicable.
-      const { choiceItemID, line, slot } = payload;
+  return {
+    currentLineID, sizeSelection, countSelection, scrollOrderCounter,
 
-      const oldChoice = this.choices.find((c) => c.line === line
-        && c.choiceItem.slot === slot.id);
-      if (oldChoice) {
-        this.clearChoice(oldChoice);
-      }
+    lines, choices, currentLine,
 
-      // Is this a valid choice?
-      if (!(slot.id in line.menuItem.choiceSlots)) {
-        return new Promise((_resolve, reject) => reject(new Error(`${line.menuItem.id} can not accept slot ${slot.grillLabel ?? slot.id}`)));
-      }
-
-      // Is this a combo choice on a non-combo line?
-      if (!line.size && slot.isComboOnly) {
-        return new Promise((_resolve, reject) => reject(new Error(`Line is not a combo so cannot accept slot ${slot.grillLabel ?? slot.id}`)));
-      }
-
-      // Add new choice
-      const choiceItem = getChoiceItem(choiceItemID);
-      if (choiceItem) {
-        this.addChoice({ line, choiceItem });
-      }
-
-      return new Promise((resolve) => resolve());
-    },
-
-    /**
-      Actually submit order as completed.
-      Currently just cleans state.
-    */
-    async cashOut(): Promise<void> {
-      // Simulate it being more complex.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      this.lines.forEach((line) => this.clearLine(line));
-
-      this.startSizeSelection(null);
-      this.startCountSelection(1);
-    },
-
-    /**
-     * Relatively expensive function to get fully selected choices for order line. Considers combo, etc.
-     * @param line The line to get choices from.
-     */
-    getLineChoices(line: OrderLine): { slotID: string, slot?: ChoiceSlot, choice?: OrderChoice | null }[] {
-      return Object.keys(line.menuItem.choiceSlots)
-        .map((slotID) => ({ slotID, slot: getChoiceSlot(slotID) }))
-        // Undefined slots always show up for debugging.
-        // Otherwise, require it be a listed slot and:
-        //   Either this is a combo, or the slot still exists on non-combo items.
-        .filter((s) => s.slot === undefined
-          || (s.slot.isListed && (line.size !== undefined || !s.slot.isComboOnly)))
-        .map((s) => {
-          // Get actual slot object.
-          if (!s.slot) {
-            // Invalid slot, just return as-is.
-            return { slotID: s.slotID };
-          }
-
-          // Get the order's choice, or null.
-          const choice = this.choices.find(
-            (c) => c.line === line && c.choiceItem.slot === s.slotID,
-          ) ?? null;
-          // It's good.
-          return { slotID: s.slotID, slot: s.slot, choice };
-        });
-    },
-
-    getLinePrice(line: OrderLine): number {
-      const mainPrice = getItemPrice(line.menuItem, line.size);
-      const comboOffset = line.size === undefined ? 0 : COMBO_OFFSETS[line.size];
-
-      // Add together choice prices, or if they don't have a price, use slot price.
-      const slotPrices = this.getLineChoices(line)
-        .reduce(
-          (total, choiceInfo) => total + (
-            choiceInfo.choice && hasPrice(choiceInfo.choice.choiceItem)
-              ? getItemPrice(choiceInfo.choice.choiceItem, line.size)
-              : getItemPrice(choiceInfo.slot ?? { price: 0.00 }, line.size)
-          ),
-          0,
-        );
-
-      return mainPrice + comboOffset + slotPrices;
-    },
+    setCurrentLine, addLine, clearLine, replaceLine, addChoice, clearChoice, scrollOrderView,
+    addSmartOrderLine, addSmartChoice, cashOut, getLineChoices, getLinePrice,
   }
 })

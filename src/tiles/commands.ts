@@ -51,6 +51,6 @@ export default function generateCommandsGraph(): StripProvider {
         uiStore.setChoiceMenuMode(ChoiceMenuMode.Default);
       }
     }, 'Void Line'),
-    { ...newButton(() => uiStore.setTotallingOrder(true), 'Total'), ySpan: 2, severity: Severity.Success },
+    { ...newButton(() => uiStore.totallingOrder = true, 'Total'), ySpan: 2, severity: Severity.Success },
   ]);
 }

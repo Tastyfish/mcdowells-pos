@@ -18,9 +18,9 @@ export default function generateCountGraph(): StripProvider {
       orderStore.countSelection === index + 1,
       () => {
         if (orderStore.countSelection === index + 1) {
-          orderStore.startCountSelection(1);
+          orderStore.countSelection = 1;
         } else {
-          orderStore.startCountSelection((index + 1) as OrderCount);
+          orderStore.countSelection = (index + 1) as OrderCount;
         }
       },
       (index + 1).toString(),

@@ -17,9 +17,9 @@ function setSTab(base: string): void {
   const uiStore = useUIStore();
 
   if (uiStore.selectedMenuTab === tab0) {
-    uiStore.setSelectedMenuTab(`${base}1`);
+    uiStore.selectedMenuTab = `${base}1`;
   } else {
-    uiStore.setSelectedMenuTab(tab0);
+    uiStore.selectedMenuTab = tab0;
   }
 }
 
@@ -45,7 +45,7 @@ function getSTab(base: string): SplitToggleState {
   @param {string} base The key name of the tab.
 */
 function setTTab(base: string): void {
-  useUIStore().setSelectedMenuTab(base);
+  useUIStore().selectedMenuTab = base;
 }
 
 /**

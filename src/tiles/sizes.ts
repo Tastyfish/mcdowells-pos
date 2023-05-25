@@ -32,10 +32,10 @@ function newSizeToggle(size: Sizes) {
     () => {
       if (orderStore.sizeSelection === size) {
         // Turn off selection.
-        orderStore.startSizeSelection(null);
+        orderStore.sizeSelection = null;
       } else {
         // Select.
-        orderStore.startSizeSelection(size);
+        orderStore.sizeSelection = size;
       }
     },
     name,
