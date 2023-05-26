@@ -18,6 +18,8 @@ import { generateDrinkStrips } from './drinks';
 import { generateGiftStrips } from './gifts';
 import { getItemPrice } from '@/api/menu';
 
+import { currency } from '@/config/locale.json';
+
 function assertGetSlot(slotID: string) {
   const slot = getChoiceSlot(slotID);
 
@@ -115,7 +117,7 @@ export function newMealButton(mealID: string): ButtonTile {
   return {
     ...newButton(
       () => addMealItem(mealID),
-      `${menuItem.displayName}${useUIStore().showingPrices ? ` ($${price.toFixed(2)})` : ''}`,
+      `${menuItem.displayName}${useUIStore().showingPrices ? ` (${currency}${price.toFixed(2)})` : ''}`,
     ),
     classes: [ 'small-text-button' ],
   };
