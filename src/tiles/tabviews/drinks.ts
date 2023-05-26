@@ -1,24 +1,19 @@
 import Rectangle from "@/api/rectangle";
 import { StripProvider, newArrayStrip } from "@/api/strip";
-import { newButton, newLabel, newToggle } from "@/api/tile";
+import { Tile, newButton, newLabel, newToggle } from "@/api/tile";
 import { useUIStore } from "@/store";
 import { addDrink } from ".";
+import { getChoicesBySlot } from "@/menu";
 
 export const generateDrinkStrips = (): StripProvider[] => {
   const uiStore = useUIStore();
 
   return [
-    newArrayStrip(new Rectangle(0, 4, 8, 1), [
-      newButton(() => addDrink('coke'), 'Coke'),
-      newButton(() => addDrink('dietcoke'), 'Diet Coke'),
-      newButton(() => addDrink('sprite'), 'Sprite'),
-      newButton(() => addDrink('fantaorange'), 'Fanta Orange'),
-      newButton(() => addDrink('icedtea'), 'Iced Tea'),
-      newButton(() => addDrink('sweettea'), 'Sweet Tea'),
-      newButton(() => addDrink('coffee'), 'Coffee'),
-
+    newArrayStrip(new Rectangle(0, 4, 8, 1), getChoicesBySlot('drink').map(drink => (
+      newButton(() => addDrink(drink.id), drink.displayName) as Tile
+    )).concat([
       newToggle(uiStore.showingProductBuild, () => uiStore.showingProductBuild = !uiStore.showingProductBuild, 'Show Product Build'),
-    ]),
+    ])),
     newArrayStrip(new Rectangle(0, 5, 1, 1), [
       newToggle(uiStore.showingPrices, () => uiStore.showingPrices = !uiStore.showingPrices, 'Show Prices'),
     ]),
