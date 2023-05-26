@@ -11,6 +11,8 @@ import Rectangle from '@/api/rectangle';
 import { useUIStore } from '@/store';
 import { PaymentMethod, cashOut, getOrderTotals } from '@/api/cashout';
 
+import { currency } from '@/config/locale.json';
+
 function backOut() {
   // Leave the screen and go back.
   useUIStore().totallingOrder = false;
@@ -33,9 +35,9 @@ export default function generateTotalScreenGraph(): StripProvider {
   return newContainerStrip(new Rectangle(0, 0, 10, 10), [
     newArrayStrip(new Rectangle(0, 0, 3, 4), [
       { ...newLabel(`Total Items: ${totals.orderLineCount}`), xSpan: 3 },
-      { ...newLabel(`Subtotal: $${totals.subtotal.toFixed(2)}`), xSpan: 3 },
-      { ...newLabel(`Tax: $${totals.tax.toFixed(2)}`), xSpan: 3 },
-      { ...newLabel(`Final Total: $${totals.grandTotal.toFixed(2)}`), xSpan: 3, severity: Severity.Success },
+      { ...newLabel(`Subtotal: ${currency}${totals.subtotal.toFixed(2)}`), xSpan: 3 },
+      { ...newLabel(`Tax: ${currency}${totals.tax.toFixed(2)}`), xSpan: 3 },
+      { ...newLabel(`Final Total: ${currency}${totals.grandTotal.toFixed(2)}`), xSpan: 3, severity: Severity.Success },
     ]),
     newArrayStrip(new Rectangle(9, 0, 1, 1), [
       severeup(newButton(backOut, 'Back', 'pi pi-arrow-left'), Severity.Info),

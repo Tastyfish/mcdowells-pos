@@ -1,5 +1,7 @@
 import { useOrderStore } from "@/store";
 
+import { salesTax } from '@/config/locale.json';
+
 export enum PaymentMethod {
   Cash,
   Credit,
@@ -35,7 +37,7 @@ export function getOrderTotals(): OrderTotalInfo {
   const orderStore = useOrderStore();
 
   const subtotal = orderStore.lines.map((line) => orderStore.getLinePrice(line)).reduce((a, b) => a + b, 0);
-  const tax = subtotal * 0.15;
+  const tax = subtotal * salesTax
   const grandTotal = subtotal + tax;
 
   return {
