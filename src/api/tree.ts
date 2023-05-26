@@ -62,7 +62,7 @@ function getTotalsNodes(): TreeNode[] {
   const orders = useOrderStore();
   const ui = useUIStore();
 
-  if (!ui.totallingOrder) {
+  if (!ui.totallingOrder || orders.lines.length === 0) {
     return [];
   }
 
