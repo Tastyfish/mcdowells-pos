@@ -9,7 +9,7 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (e: 'select', lineID: number): void
+  select: [lineID: number]
 }>();
 
 const treeComponent = ref(null as Tree | null);
