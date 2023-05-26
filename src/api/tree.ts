@@ -8,7 +8,8 @@ import { TreeNode } from 'primevue/tree';
 import { ChoiceSlot } from './menu';
 import { OrderLine, OrderChoice } from './order';
 import { getMenuItemDisplayName, getChoiceSlotDisplayName } from './displayname';
-import { useOrderStore } from '@/store';
+import { useOrderStore, useUIStore } from '@/store';
+import { getOrderTotals } from './cashout';
 
 const selectedStyle = 'background-color: var(--primary-color); color: var(--primary-color-text);';
 const emptySlotStyle = 'color: var(--orange-400);';
@@ -54,23 +55,66 @@ export function convertSlotToTreeNode(
 }
 
 /**
+ * Generate extra nodes at the end if the order is being totalled.
+ * @returns {TreeNode[]} The tree nodes.
+ */
+function getTotalsNodes(): TreeNode[] {
+  const orders = useOrderStore();
+  const ui = useUIStore();
+
+  if (!ui.totallingOrder) {
+    return [];
+  }
+
+  // Use the last real line's ID for all of them since they shouldn't be selected.
+  const lastLineID = orders.lines[orders.lines.length - 1].uid.toString();
+  const totals = getOrderTotals();
+
+  return [
+    {
+      key: `${lastLineID}:subtotal`,
+      label: 'Subtotal:',
+      type: 'priced',
+      data: totals.subtotal,
+      icon: 'pi pi-calculator',
+    },
+    {
+      key: `${lastLineID}:tax`,
+      label: 'Tax:',
+      type: 'priced',
+      data: totals.tax,
+      icon: 'pi pi-credit-card',
+    },
+    {
+      key: `${lastLineID}:grantTotal`,
+      label: 'Final Total:',
+      type: 'priced',
+      data: totals.grandTotal,
+      styleClass: 'p-inline-message p-inline-message-success',
+    },
+  ]
+}
+
+/**
   Generate full order tree.
 */
 export function generateLineTree(
   lines: OrderLine[], currentLineID: number,
 ): TreeNode[] {
   // Generate receipt tree based on provided order.
-  return lines.map(
-    (line) => ({
-      ...convertLineToTreeNode(line, currentLineID === line.uid),
-      children: useOrderStore().getLineChoices(line).map(choiceInfo => {
-        if(choiceInfo.choice !== undefined && choiceInfo.slot) {
-          return convertSlotToTreeNode(line, choiceInfo.slot, choiceInfo.choice, currentLineID === line.uid)
-        } else {
-          // Invalid slot, just make placeholder item.
-          return { key: choiceInfo.slotID, label: choiceInfo.slotID };
-        }
-      })
-    }),
-  );
+  return lines
+    .map(
+      (line) => ({
+        ...convertLineToTreeNode(line, currentLineID === line.uid),
+        children: useOrderStore().getLineChoices(line).map(choiceInfo => {
+          if(choiceInfo.choice !== undefined && choiceInfo.slot) {
+            return convertSlotToTreeNode(line, choiceInfo.slot, choiceInfo.choice, currentLineID === line.uid)
+          } else {
+            // Invalid slot, just make placeholder item.
+            return { key: choiceInfo.slotID, label: choiceInfo.slotID };
+          }
+        })
+      } as TreeNode),
+    )
+    .concat(getTotalsNodes());
 }

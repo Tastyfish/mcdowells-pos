@@ -214,13 +214,9 @@ export const useOrderStore = defineStore('order', () => {
   }
 
   /**
-    Actually submit order as completed.
-    Currently just cleans state.
+    Clears entire slate.
   */
-  async function cashOut(): Promise<void> {
-    // Simulate it being more complex.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
+  function clearEntireOrder(): void {
     lines.value.forEach((line) => clearLine(line));
 
     sizeSelection.value = null;
@@ -279,6 +275,6 @@ export const useOrderStore = defineStore('order', () => {
     lines, choices, currentLine,
 
     setCurrentLine, addLine, clearLine, replaceLine, addChoice, clearChoice, scrollOrderView,
-    addSmartOrderLine, addSmartChoice, cashOut, getLineChoices, getLinePrice,
+    addSmartOrderLine, addSmartChoice, clearEntireOrder, getLineChoices, getLinePrice,
   }
 })

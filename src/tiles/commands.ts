@@ -22,6 +22,14 @@ function demoPromo() {
   }
 }
 
+function gotoTotalScreen() {
+  const orderStore = useOrderStore();
+  const uiStore = useUIStore();
+
+  uiStore.totallingOrder = true;
+  orderStore.scrollOrderView();
+}
+
 export default function generateCommandsGraph(): StripProvider {
   const orderStore = useOrderStore();
   const uiStore = useUIStore();
@@ -51,6 +59,6 @@ export default function generateCommandsGraph(): StripProvider {
         uiStore.setChoiceMenuMode(ChoiceMenuMode.Default);
       }
     }, 'Void Line'),
-    { ...newButton(() => uiStore.totallingOrder = true, 'Total'), ySpan: 2, severity: Severity.Success },
+    { ...newButton(gotoTotalScreen, 'Total'), ySpan: 2, severity: Severity.Success },
   ]);
 }
