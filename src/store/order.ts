@@ -27,6 +27,9 @@ export const useOrderStore = defineStore('order', () => {
   const lines = ref([] as OrderLine[])
   let choices = ref([] as OrderChoice[])
 
+  // The user-facing number for the entire order.
+  const orderNumber = ref(10)
+
   // Highest order ID that's been used so far; used to assign the ID's
   let _highestOrderID = NO_CURRENT_LINE
 
@@ -221,6 +224,8 @@ export const useOrderStore = defineStore('order', () => {
 
     sizeSelection.value = null;
     countSelection.value = 1;
+
+    orderNumber.value += 1;
   }
 
   /**
@@ -272,7 +277,7 @@ export const useOrderStore = defineStore('order', () => {
   }
 
   return {
-    currentLineID, sizeSelection, countSelection, scrollOrderCounter,
+    orderNumber, currentLineID, sizeSelection, countSelection, scrollOrderCounter,
 
     lines, choices, currentLine,
 
