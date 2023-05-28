@@ -73,15 +73,15 @@ export const emptyStrip = newArrayStrip(new Rectangle(0, 0, 1, 1), []);
   Strip containing other strips at arbitrary locations.
   The... other backbone of the tile system.
   @param {Rectangle} bounds The bounds relative to the parent provider.
-  @param {StripProvider[]} children The strips within.
+  @param {StripProvider[]} strips The strips within.
   @return {StripProvider} The resulting provider.
 * */
-export function newContainerStrip(bounds: Rectangle, children: StripProvider[])
+export function newContainerStrip(bounds: Rectangle, strips: StripProvider[])
   : StripProvider {
   return {
     bounds,
     getTile: (x, y) => {
-      const matchedChild = children.find((strip) => strip.bounds.contains(x, y));
+      const matchedChild = strips.find((strip) => strip.bounds.contains(x, y));
 
       if (matchedChild !== undefined) {
         return matchedChild.getTile(
@@ -139,7 +139,7 @@ export function newListStrip(bounds: Rectangle, items: Tile[],
 /**
   Form a vertical strip going top-down.
   @param {Rectangle} bounds The bounds relative to the parent provider.
-  @param {StripProvider[]} children The strips within.
+  @param {StripProvider[]} strips The strips within.
   @return {StripProvider} The resulting provider.
 * */
 export function newDownwardStrip(bounds: Rectangle, strips: StripProvider[])
@@ -161,7 +161,7 @@ export function newDownwardStrip(bounds: Rectangle, strips: StripProvider[])
 /**
   Form a vertical strip going bottom-up.
   @param {Rectangle} bounds The bounds relative to the parent provider.
-  @param {StripProvider[]} children The strips within.
+  @param {StripProvider[]} strips The strips within.
   @return {StripProvider} The resulting provider.
 * */
 export function newUpwardStrip(bounds: Rectangle, strips: StripProvider[])
@@ -182,7 +182,7 @@ export function newUpwardStrip(bounds: Rectangle, strips: StripProvider[])
 /**
   Form a horizontal strip going left-to-right.
   @param {Rectangle} bounds The bounds relative to the parent provider.
-  @param {StripProvider[]} children The strips within.
+  @param {StripProvider[]} strips The strips within.
   @return {StripProvider} The resulting provider.
 * */
 export function newRightwardStrip(bounds: Rectangle, strips: StripProvider[])
@@ -204,7 +204,7 @@ export function newRightwardStrip(bounds: Rectangle, strips: StripProvider[])
 /**
   Form a vertical strip going right-to-left.
   @param {Rectangle} bounds The bounds relative to the parent provider.
-  @param {StripProvider[]} children The strips within.
+  @param {StripProvider[]} strips The strips within.
   @return {StripProvider} The resulting provider.
 * */
 export function newLeftwardStrip(bounds: Rectangle, strips: StripProvider[])
