@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import { ChoiceSlot } from '@/api/menu';
+import { ChoiceSlot, isPriced } from '@/api/menu';
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu';
 import Sizes from '@/menu/sizes';
 
@@ -117,8 +117,9 @@ export function newMealButton(mealID: string): ButtonTile {
   return {
     ...newButton(
       () => addMealItem(mealID),
-      `${menuItem.displayName}${useUIStore().showingPrices ? ` (${currency}${price.toFixed(2)})` : ''}`,
+      menuItem.displayName,
     ),
+    price,
     classes: [ 'small-text-button' ],
   };
 }
@@ -132,8 +133,8 @@ const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripP
     ...generateDrinkStrips(),
     newArrayStrip(new Rectangle(0, 0, 8, 4),
       // Automatically generate tiles based on existing sauces
-      getChoicesBySlot(slot.id).map((choice) => (
-        newButton(
+      getChoicesBySlot(slot.id).map((choice) => ({
+        ...newButton(
           async () => {
             // Apply sauce to all of the lines added.
             const lines = await orderStore.addSmartOrderLine({
@@ -151,8 +152,10 @@ const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): StripP
             )));
           },
           choice.displayName,
-        )
-      ))
+        ),
+        price: isPriced(choice) ? getItemPrice(choice) : getItemPrice(slot),
+        classes: [ 'small-text-button' ],
+      }))
     ),
   ];
 };

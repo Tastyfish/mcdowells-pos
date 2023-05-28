@@ -6,12 +6,17 @@ import {
   Tile, TileType, emptyTile,
   isLabel, isButton, isToggle, isSplitToggle, Severity, ButtonTile, ToggleTile, SplitToggleTile,
 } from '@/api/tile';
+import { useUIStore } from '@/store';
+
+import { currency } from '@/config/locale.json';
 
 const props = withDefaults(defineProps<{
   tile: Tile,
 }>(), {
   tile: () => emptyTile,
 })
+
+const uiStore = useUIStore();
 
 const severityClass = computed(() => {
   switch (props.tile.type) {
@@ -59,21 +64,27 @@ const extraStyles = computed(() => {
     :style="extraStyles"
     @click="(tile as ButtonTile).onPress"
     :label="tile.label"
-    :icon="tile.icon" />
+    :icon="tile.icon"
+    :badge="uiStore.showingPrices && tile.price !== undefined ? `${currency}${tile.price.toFixed(2)}` : undefined"
+    badge-class="p-badge-success"
+  />
   <Button v-else-if="isToggle(tile)"
     :class="['base', 'toggle', 'p-button-sm', ...extraClasses,
       { ['p-button-outlined']: tile.state}, ...(tile.classes || [])]"
     :style="extraStyles"
     @click="(tile as ToggleTile).onPress"
     :label="tile.label"
-    :icon="tile.icon" />
+    :icon="tile.icon"
+    :badge="uiStore.showingPrices && tile.price !== undefined ? `${currency}${tile.price.toFixed(2)}` : undefined"
+    badge-class="p-badge-success"
+  />
   <Button v-else-if="isSplitToggle(tile)"
     :class="['base', 'split', 'p-button-sm', ...extraClasses, ...(tile.classes || [])]"
     @click="(tile as SplitToggleTile).onPress"
     :style="extraStyles">
-    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'top'}]">{{ tile.topLabel }}</span>
+    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'top'}]">{{ tile.topLabel }}<Badge v-if="tile.topPrice" :value="tile.topPrice" class="p-badge-success" /></span>
     <div class="stogdiv"></div>
-    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'bottom'}]">{{ tile.bottomLabel }}</span>
+    <span :class="['p-button-label', 'flex-none', {stogsel: tile.state == 'bottom'}]">{{ tile.bottomLabel }}<Badge v-if="tile.bottomPrice" :value="tile.bottomPrice" class="p-badge-success" /></span>
   </Button>
   <div v-else-if="isLabel(tile)"
     :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]"

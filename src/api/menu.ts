@@ -30,6 +30,15 @@ export interface PricedItem {
   readonly price: number | [number, number, number]
 }
 
+/**
+ * Is this item actually priced?
+ * @param item A ChoiceItem or other item type where pricing is optional.
+ * @returns Is priced.
+ */
+export function isPriced(item: Partial<PricedItem>): item is PricedItem {
+  return item.price !== undefined
+}
+
 function getSizeComboPricingIndex(size?: Sizes): 0 | 1 | 2 {
   switch(size) {
     case Sizes.Medium:

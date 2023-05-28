@@ -44,6 +44,7 @@ interface ButtonBaseTile extends Tile {
   // Both labels and icons are optional, and can be used together.
   readonly label?: string
   readonly icon?: string
+  readonly price?: number
   readonly onPress: ButtonPress
 }
 
@@ -67,6 +68,8 @@ export interface SplitToggleTile extends Tile {
   readonly state: SplitToggleState
   readonly topLabel: string
   readonly bottomLabel: string
+  readonly topPrice?: number
+  readonly bottomPrice?: number
   readonly onPress: ButtonPress
 }
 
