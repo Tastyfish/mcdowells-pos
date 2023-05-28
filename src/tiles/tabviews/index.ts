@@ -2,7 +2,7 @@
 
 import { newLabel, newButton, ButtonTile, Severity, severeup } from '@/api/tile';
 import {
-  StripProvider, newArrayStrip, newContainerStrip,
+  StripProvider, newArrayStrip, newContainerStrip, newDownwardStrip,
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
