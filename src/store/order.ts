@@ -259,9 +259,11 @@ export const useOrderStore = defineStore('order', () => {
     const slotPrices = getLineChoices(line)
       .reduce(
         (total, choiceInfo) => total + (
-          choiceInfo.choice && hasPrice(choiceInfo.choice.choiceItem)
-            ? getItemPrice(choiceInfo.choice.choiceItem, line.size)
-            : getItemPrice(choiceInfo.slot ?? { price: 0.00 }, line.size)
+          !choiceInfo.choice
+            ? 0
+            : hasPrice(choiceInfo.choice.choiceItem)
+              ? getItemPrice(choiceInfo.choice.choiceItem, line.size)
+              : getItemPrice(choiceInfo.slot ?? { price: 0.00 }, line.size)
         ),
         0,
       );
