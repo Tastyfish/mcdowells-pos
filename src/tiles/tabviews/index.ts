@@ -81,7 +81,7 @@ function voidMenu() {
   orderStore.lines.forEach((line) => orderStore.clearLine(line));
 }
 
-function managerAddItemManually() {
+function managerGiveDiscount() {
   const orderStore = useOrderStore();
 
   orderStore.addSmartOrderLine('discount100');
@@ -91,7 +91,7 @@ const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
   newArrayStrip(new Rectangle(0, 0, 1, 6), [
     newLabel(`Total Items: ${useOrderStore().lines.length}`),
     severeup(newButton(voidMenu, 'Void Order'), Severity.Danger),
-    severeup(newButton(managerAddItemManually, 'MGR AIM'), Severity.Help),
+    severeup(newButton(managerGiveDiscount, 'MGR Discount'), Severity.Help),
   ]),
 ]);
 
@@ -99,10 +99,10 @@ export function finishAddLines(): void {
   useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default);
 }
 
-export function addMealItem(payload: string | SmartOrderPayload): Promise<void> {
-  return useOrderStore()
-    .addSmartOrderLine(payload)
-    .then(finishAddLines);
+export async function addMealItem(payload: string | SmartOrderPayload): Promise<void> {
+  await useOrderStore().addSmartOrderLine(payload);
+
+  return finishAddLines();
 }
 
 export function newMealButton(mealID: string): ButtonTile {
