@@ -4,6 +4,7 @@
 * */
 
 import { TreeNode } from 'primevue/tree';
+import { PrimeIcons } from 'primevue/api';
 
 import { ChoiceSlot } from './menu';
 import { OrderLine, OrderChoice } from './order';
@@ -72,25 +73,33 @@ function getTotalsNodes(): TreeNode[] {
 
   return [
     {
+      key: `${lastLineID}:orderNumber`,
+      label: `Order Number: ${orders.orderNumber}`,
+      icon: PrimeIcons.LIST,
+      styleClass: 'font-bold',
+    },
+    {
       key: `${lastLineID}:subtotal`,
       label: 'Subtotal:',
       type: 'priced',
       data: totals.subtotal,
-      icon: 'pi pi-calculator',
+      icon: PrimeIcons.CALCULATOR,
+      styleClass: 'font-bold',
     },
     {
       key: `${lastLineID}:tax`,
       label: 'Tax:',
       type: 'priced',
       data: totals.tax,
-      icon: 'pi pi-credit-card',
+      icon: PrimeIcons.CREDIT_CARD,
+      styleClass: 'font-bold',
     },
     {
       key: `${lastLineID}:grantTotal`,
       label: 'Final Total:',
       type: 'priced',
       data: totals.grandTotal,
-      styleClass: 'p-inline-message p-inline-message-success',
+      styleClass: 'p-inline-message p-inline-message-success font-bold',
     },
   ]
 }
