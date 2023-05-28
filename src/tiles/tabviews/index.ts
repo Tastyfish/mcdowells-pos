@@ -81,18 +81,35 @@ function voidMenu() {
   orderStore.lines.forEach((line) => orderStore.clearLine(line));
 }
 
-function managerGiveDiscount() {
+function managerGiveDiscount(amt: 1 | 5 | 10 | 25) {
   const orderStore = useOrderStore();
 
-  orderStore.addSmartOrderLine('discount100');
+  orderStore.addSmartOrderLine(`discount${amt < 10 ? '0' : ''}${amt}`);
+}
+
+function newManagerDiscountButton(amt: 1 | 5 | 10 | 25) {
+  return {
+    ...newButton(() => managerGiveDiscount(amt), `MGR Discount ${currency}${amt}`),
+    severity: Severity.Help,
+    price: amt,
+    classes: [ 'small-text-button' ],
+  } as ButtonTile
 }
 
 const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
-  newArrayStrip(new Rectangle(0, 0, 1, 6), [
-    newLabel(`Total Items: ${useOrderStore().lines.length}`),
-    severeup(newButton(voidMenu, 'Void Order'), Severity.Danger),
-    severeup(newButton(managerGiveDiscount, 'MGR Discount'), Severity.Help),
-  ]),
+  newDownwardStrip(new Rectangle(0, 0, 8, 4), [
+    newArrayStrip(new Rectangle(0, 0, 8, 1), [
+      newLabel(`Total Items: ${useOrderStore().lines.length}`),
+      severeup(newButton(voidMenu, 'Void Order'), Severity.Danger),
+
+    ]),
+    newArrayStrip(new Rectangle(0, 0, 8, 1), [
+      newManagerDiscountButton(1),
+      newManagerDiscountButton(5),
+      newManagerDiscountButton(10),
+      newManagerDiscountButton(25),
+    ]),
+  ])
 ]);
 
 export function finishAddLines(): void {

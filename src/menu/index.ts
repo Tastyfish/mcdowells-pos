@@ -132,12 +132,33 @@ export const menu: MenuItem[] = [
     price: 25.00,
   },
   {
-    id: 'discount100', // Todo: Make a better way of doing gift cards and discounts - special slot type?
+    id: 'discount01', // Todo: Make a better way of doing gift cards and discounts - special slot type?
     displayName: '** $1 Discount **',
     simpleDisplayName: true,
     choiceSlots: { },
     price: -1.00,
-  }
+  },
+  {
+    id: 'discount05',
+    displayName: '** $5 Discount **',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: -5.00,
+  },
+  {
+    id: 'discount10',
+    displayName: '** $10 Discount **',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: -10.00,
+  },
+  {
+    id: 'discount25',
+    displayName: '** $25 Discount **',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: -25.00,
+  },
 ];
 
 export const choices: ChoiceItem[] = [
