@@ -51,8 +51,8 @@ const extraStyles = computed(() => {
   const ySpan = props.tile.ySpan ? Math.floor(props.tile.ySpan) : undefined
 
   return {
-    minWidth: xSpan ? `calc(${xSpan}00% + ${xSpan * 0.25}em) !important` : undefined,
-    minHeight: ySpan ? `calc(${ySpan}00% + ${ySpan * 0.25}em) !important` : undefined,
+    minWidth: xSpan ? `calc(${xSpan}00% + ${(xSpan - 1) * 0.5}em) !important` : undefined,
+    minHeight: ySpan ? `calc(${ySpan}00% + ${(ySpan - 1) * 0.5}em) !important` : undefined,
   }
 });
 
