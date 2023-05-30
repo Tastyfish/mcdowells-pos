@@ -132,32 +132,11 @@ export const menu: MenuItem[] = [
     price: 25.00,
   },
   {
-    id: 'discount01', // Todo: Make a better way of doing gift cards and discounts - special slot type?
-    displayName: '** $1 Discount **',
+    id: 'discount01', // Label and price is filled in by a numpad callback.
+    displayName: '** ??? Discount **',
     simpleDisplayName: true,
     choiceSlots: { },
     price: -1.00,
-  },
-  {
-    id: 'discount05',
-    displayName: '** $5 Discount **',
-    simpleDisplayName: true,
-    choiceSlots: { },
-    price: -5.00,
-  },
-  {
-    id: 'discount10',
-    displayName: '** $10 Discount **',
-    simpleDisplayName: true,
-    choiceSlots: { },
-    price: -10.00,
-  },
-  {
-    id: 'discount25',
-    displayName: '** $25 Discount **',
-    simpleDisplayName: true,
-    choiceSlots: { },
-    price: -25.00,
   },
 ];
 

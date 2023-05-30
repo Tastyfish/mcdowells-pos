@@ -5,7 +5,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import { useUIStore } from '@/store';
+import { TileScreen, useUIStore } from '@/store';
 
 import generateChoiceGraph from './choices';
 import generateSizeGraph from './sizes';
@@ -15,23 +15,28 @@ import generateCommandsGraph from './commands';
 import generateTabViewGraph from './tabviews';
 
 import generateTotalScreenGraph from './totalScreen';
+import generateNumpadGraph from './numpad';
 
 // Should be cached between state changes.
 export default function generateGraph(): StripProvider {
   const uiStore = useUIStore();
 
-  if (uiStore.totallingOrder) {
-    // Running the total and cashing out screen
-    return generateTotalScreenGraph();
+  switch(uiStore.tileScreen) {
+    case TileScreen.Totalling:
+      // Running the total and cashing out screen
+      return generateTotalScreenGraph();
+    case TileScreen.Numpad:
+      // Modal numpad.
+      return generateNumpadGraph();
+    default:
+      // Main screen
+      return newContainerStrip(new Rectangle(0, 0, 10, 10), [
+        generateChoiceGraph(),
+        generateCountGraph(),
+        generateTabsGraph(),
+        generateSizeGraph(),
+        generateCommandsGraph(),
+        generateTabViewGraph(),
+      ]);
   }
-
-  // Main screen
-  return newContainerStrip(new Rectangle(0, 0, 10, 10), [
-    generateChoiceGraph(),
-    generateCountGraph(),
-    generateTabsGraph(),
-    generateSizeGraph(),
-    generateCommandsGraph(),
-    generateTabViewGraph(),
-  ]);
 }

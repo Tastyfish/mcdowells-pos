@@ -8,9 +8,15 @@ export enum ChoiceMenuMode {
   ChangeSlot,
 }
 
+export enum TileScreen {
+  Ordering,
+  Totalling,
+  Numpad,
+}
+
 export const useUIStore = defineStore('ui', () => {
   // Showing the total screen, and also sealing order.
-  const totallingOrder = ref(false)
+  const tileScreen = ref(TileScreen.Ordering)
 
   // Show prices on buttons.
   const showingPrices = ref(false)
@@ -33,26 +39,32 @@ export const useUIStore = defineStore('ui', () => {
   // Doing an intensive loading operation - block the screen.
   const isLoading = ref(false)
 
+  // numpad value, as a string to ease decimal input handling.
+  const numpadValue = ref('0')
+
+  // numpad callback
+  const numpadCallback = ref(null as ((value: number) => void) | null)
+
   function gotoNextChoicePage(): void {
     choicePage.value += 1
   }
 
   function setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
     if (typeof modeOrSlotID === 'number') {
-      choiceMenuMode.value = modeOrSlotID;
-      choiceMenuSlotID.value = null;
+      choiceMenuMode.value = modeOrSlotID
+      choiceMenuSlotID.value = null
     } else {
-      choiceMenuMode.value = ChoiceMenuMode.ChangeSlot;
-      choiceMenuSlotID.value = modeOrSlotID;
+      choiceMenuMode.value = ChoiceMenuMode.ChangeSlot
+      choiceMenuSlotID.value = modeOrSlotID
     }
-    choicePage.value = 0;
+    choicePage.value = 0
   }
 
   /**
    * Reset relevent fields for a new order.
    */
   function resetToNewOrder() {
-    totallingOrder.value = false
+    tileScreen.value = TileScreen.Ordering
     choicePage.value = 0
     choiceMenuMode.value = ChoiceMenuMode.Default
     choiceMenuSlotID.value = null
@@ -60,9 +72,19 @@ export const useUIStore = defineStore('ui', () => {
     isLoading.value = false
   }
 
-  return {
-    totallingOrder, showingPrices, showingProductBuild, choicePage, choiceMenuMode, choiceMenuSlotID, selectedMenuTab, isLoading,
+  function openNumpad(callback: (value: number) => void) {
+    tileScreen.value = TileScreen.Numpad
+    numpadValue.value = '0'
+    numpadCallback.value = callback
+  }
 
-    gotoNextChoicePage, setChoiceMenuMode, resetToNewOrder,
+  return {
+    tileScreen,
+    showingPrices, showingProductBuild,
+    choicePage, choiceMenuMode, choiceMenuSlotID, selectedMenuTab,
+    isLoading,
+    numpadValue, numpadCallback,
+
+    gotoNextChoicePage, setChoiceMenuMode, resetToNewOrder, openNumpad,
   }
 })

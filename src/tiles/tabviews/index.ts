@@ -18,7 +18,7 @@ import { generateDrinkStrips } from './drinks';
 import { generateGiftStrips } from './gifts';
 import { getItemPrice } from '@/api/menu';
 
-import { currency } from '@/config/locale.json';
+import { currency } from '@/config/locale.json'
 
 function assertGetSlot(slotID: string) {
   const slot = getChoiceSlot(slotID);
@@ -30,8 +30,19 @@ function assertGetSlot(slotID: string) {
   return slot;
 }
 
+function assertGetItem(itemID: string) {
+  const item = getMenuItem(itemID);
+
+  if (!item) {
+    throw new Error(`Menu item ${itemID} could not be found. This is catastrophic.`);
+  }
+
+  return item;
+}
+
 const drink = assertGetSlot('drink');
 const sauce = assertGetSlot('sauce');
+const managerDiscount = assertGetItem('discount01');
 
 async function addSeperateDrink(choiceItemID: string) {
   if (!drink) {
@@ -81,15 +92,22 @@ function voidMenu() {
   orderStore.lines.forEach((line) => orderStore.clearLine(line));
 }
 
-function managerGiveDiscount(amt: 1 | 5 | 10 | 25) {
+function giveManagerDiscount(amount: number) {
   const orderStore = useOrderStore();
 
-  orderStore.addSmartOrderLine(`discount${amt < 10 ? '0' : ''}${amt}`);
+  // Use managerDiscount as a template, but update label and price.
+  orderStore.addLine({
+    menuItem: {
+      ...managerDiscount,
+      displayName: managerDiscount.displayName.replace('???', `${currency}${amount.toFixed(2)}`),
+      price: -amount,
+    },
+  })
 }
 
 function newManagerDiscountButton(amt: 1 | 5 | 10 | 25) {
   return {
-    ...newButton(() => managerGiveDiscount(amt), `MGR Discount ${currency}${amt}`),
+    ...newButton(() => useUIStore().openNumpad(giveManagerDiscount), 'MGR Discount'),
     severity: Severity.Help,
     price: amt,
     classes: [ 'small-text-button' ],
@@ -101,13 +119,7 @@ const generateSpecialFunctionsViewStrips = (): StripProvider[] => ([
     newArrayStrip(new Rectangle(0, 0, 8, 1), [
       newLabel(`Total Items: ${useOrderStore().lines.length}`),
       severeup(newButton(voidMenu, 'Void Order'), Severity.Danger),
-
-    ]),
-    newArrayStrip(new Rectangle(0, 0, 8, 1), [
       newManagerDiscountButton(1),
-      newManagerDiscountButton(5),
-      newManagerDiscountButton(10),
-      newManagerDiscountButton(25),
     ]),
   ])
 ]);

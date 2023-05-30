@@ -9,7 +9,7 @@ import { PrimeIcons } from 'primevue/api';
 import { ChoiceSlot } from './menu';
 import { OrderLine, OrderChoice } from './order';
 import { getMenuItemDisplayName, getChoiceSlotDisplayName } from './displayname';
-import { useOrderStore, useUIStore } from '@/store';
+import { TileScreen, useOrderStore, useUIStore } from '@/store';
 import { getOrderTotals } from './cashout';
 
 const selectedStyle = 'background-color: var(--primary-color); color: var(--primary-color-text);';
@@ -63,7 +63,7 @@ function getTotalsNodes(): TreeNode[] {
   const orders = useOrderStore();
   const ui = useUIStore();
 
-  if (!ui.totallingOrder || orders.lines.length === 0) {
+  if (ui.tileScreen !== TileScreen.Totalling || orders.lines.length === 0) {
     return [];
   }
 

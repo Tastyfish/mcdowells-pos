@@ -8,14 +8,14 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import { useUIStore } from '@/store';
+import { TileScreen, useUIStore } from '@/store';
 import { PaymentMethod, cashOut, getOrderTotals } from '@/api/cashout';
 
 import { currency } from '@/config/locale.json';
 
 function backOut() {
   // Leave the screen and go back.
-  useUIStore().totallingOrder = false;
+  useUIStore().tileScreen = TileScreen.Ordering;
 }
 
 async function startCashOut(method: PaymentMethod) {

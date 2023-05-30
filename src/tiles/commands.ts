@@ -6,7 +6,7 @@ import {
 } from '@/api/strip';
 import Rectangle from '@/api/rectangle';
 
-import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
+import { ChoiceMenuMode, TileScreen, useOrderStore, useUIStore } from '@/store';
 
 import { getMenuItem } from '@/menu';
 import Sizes from '@/menu/sizes';
@@ -26,7 +26,7 @@ function gotoTotalScreen() {
   const orderStore = useOrderStore();
   const uiStore = useUIStore();
 
-  uiStore.totallingOrder = true;
+  uiStore.tileScreen = TileScreen.Totalling;
   orderStore.scrollOrderView();
 }
 
