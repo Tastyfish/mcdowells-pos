@@ -194,6 +194,7 @@ export const choices: ChoiceItem[] = [
     displayName: 'No Sauce',
     simpleDisplayName: true,
     slot: 'sauce',
+    price: 0.00,
   },
   {
     id: 'ketchup',
