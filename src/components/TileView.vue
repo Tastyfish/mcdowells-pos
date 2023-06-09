@@ -36,7 +36,7 @@ const severityClass = computed(() => {
           severity === Severity.Danger ? 'error' :
           severity;
 
-        return `p-inline-message p-inline-message-${actualSeverity}`;
+        return `p-message p-message-${actualSeverity}`;
       }
       return '';
     default:
@@ -103,6 +103,7 @@ const extraStyles = computed(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
+  margin: 0 !important;
 }
 .toggle {
   display: flex;
