@@ -68,6 +68,7 @@ export const useUIStore = defineStore('ui', () => {
      */
     function resetToNewOrder() {
         tileScreen.value = TileScreen.Ordering
+        drinkPage.value = 0
         choicePage.value = 0
         choiceMenuMode.value = ChoiceMenuMode.Default
         choiceMenuSlotID.value = null
