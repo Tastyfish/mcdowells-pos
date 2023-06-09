@@ -1,32 +1,34 @@
-import { useOrderStore } from "@/store";
+import { useOrderStore } from '@/store'
 
-import { salesTax } from '@/config/locale.json';
+import { salesTax } from '@/config/locale.json'
 
 export enum PaymentMethod {
-  Cash,
-  Credit,
+    Cash,
+    Credit,
 }
 
 /**
  * Perform final cashout of order.
  */
 export async function cashOut(paymentMethod: PaymentMethod): Promise<void> {
-  const delay = paymentMethod === PaymentMethod.Cash ? 500 : 1000;
+    const delay = paymentMethod === PaymentMethod.Cash ? 500 : 1000
 
-  await new Promise((resolve) => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay))
 
-  useOrderStore().clearEntireOrder();
+    useOrderStore().clearEntireOrder()
 }
 
 export interface OrderTotalInfo {
-  /** Total number of order lines. */
-  orderLineCount: number,
-  /** Total cost of all items, without tax. */
-  subtotal: number
-  /** Calcultated tax. */
-  tax: number
-  /** Total cost of all items, plus tax. */
-  grandTotal: number
+    /** The unique order number. */
+    orderNumber: number
+    /** Total number of order lines. */
+    orderLineCount: number
+    /** Total cost of all items, without tax. */
+    subtotal: number
+    /** Calcultated tax. */
+    tax: number
+    /** Total cost of all items, plus tax. */
+    grandTotal: number
 }
 
 /**
@@ -34,16 +36,17 @@ export interface OrderTotalInfo {
  * @returns The info about the current order.
  */
 export function getOrderTotals(): OrderTotalInfo {
-  const orderStore = useOrderStore();
+    const orderStore = useOrderStore()
 
-  const subtotal = orderStore.lines.map((line) => orderStore.getLinePrice(line)).reduce((a, b) => a + b, 0);
-  const tax = subtotal * salesTax
-  const grandTotal = subtotal + tax;
+    const subtotal = orderStore.lines.map((line) => orderStore.getLinePrice(line)).reduce((a, b) => a + b, 0)
+    const tax = subtotal * salesTax
+    const grandTotal = subtotal + tax
 
-  return {
-    orderLineCount: orderStore.lines.length,
-    subtotal,
-    tax,
-    grandTotal,
-  }
+    return {
+        orderNumber: orderStore.orderNumber,
+        orderLineCount: orderStore.lines.length,
+        subtotal,
+        tax,
+        grandTotal,
+    }
 }

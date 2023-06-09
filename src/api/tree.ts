@@ -74,7 +74,7 @@ function getTotalsNodes(): TreeNode[] {
   return [
     {
       key: `${lastLineID}:orderNumber`,
-      label: `Order Number: ${orders.orderNumber}`,
+      label: `Order Number: ${totals.orderNumber}`,
       icon: PrimeIcons.LIST,
       styleClass: 'font-bold',
     },
