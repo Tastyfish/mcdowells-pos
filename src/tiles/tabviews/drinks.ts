@@ -1,26 +1,40 @@
-import Rectangle from "@/api/rectangle";
-import { StripProvider, newArrayStrip } from "@/api/strip";
-import { Tile, newButton, newLabel, newToggle } from "@/api/tile";
-import { useUIStore } from "@/store";
-import { addDrink } from ".";
-import { getChoicesBySlot } from "@/menu";
+import Rectangle from '@/api/rectangle'
+import { ContainedStripInfo, newListStrip, newTileStrip } from '@/api/strip'
+import { Tile, newButton, newLabel, newToggle } from '@/api/tile'
+import { useUIStore } from '@/store'
+import { addDrink } from '.'
+import { getChoicesBySlot } from '@/menu'
 
-export const generateDrinkStrips = (): StripProvider[] => {
-  const uiStore = useUIStore();
+export const generateDrinkStrips = (): ContainedStripInfo[] => {
+    const uiStore = useUIStore()
 
-  return [
-    newArrayStrip(new Rectangle(0, 4, 8, 1), getChoicesBySlot('drink').map(drink => (
-      newButton(() => addDrink(drink.id), drink.displayName) as Tile
-    )).concat([
-      newToggle(uiStore.showingProductBuild, () => uiStore.showingProductBuild = !uiStore.showingProductBuild, 'Show Product Build'),
-    ])),
-    newArrayStrip(new Rectangle(0, 5, 1, 1), [
-      newToggle(uiStore.showingPrices, () => uiStore.showingPrices = !uiStore.showingPrices, 'Show Prices'),
-    ]),
-  ].concat(uiStore.showingProductBuild ? [
-    newArrayStrip(new Rectangle(1, 5, 6, 1), [
-      { ...newLabel(`Software build: ${APP_VERSION}`), xSpan: 3 },
-      { ...newLabel(`Menu build: ${4}`), xSpan: 3 },
-    ]),
-  ] : [] );
-};
+    return [
+        {
+            bounds: new Rectangle(0, 4, 7, 1),
+            strip: newListStrip(
+                getChoicesBySlot('drink').map((drink) => newButton(() => addDrink(drink.id), drink.displayName) as Tile),
+                uiStore.drinkPage,
+                () => uiStore.drinkPage++
+            ),
+        },
+        {
+            bounds: new Rectangle(7, 4, 1, 1),
+            strip: newTileStrip([
+                newToggle(uiStore.showingProductBuild, () => (uiStore.showingProductBuild = !uiStore.showingProductBuild), 'Show Product Build'),
+            ]),
+        },
+        {
+            bounds: new Rectangle(0, 5, 8, 1),
+            strip: newTileStrip(
+                [newToggle(uiStore.showingPrices, () => (uiStore.showingPrices = !uiStore.showingPrices), 'Show Prices') as Tile].concat(
+                    uiStore.showingProductBuild
+                        ? [
+                              { ...newLabel(`Software build: ${APP_VERSION}`), xSpan: 3 },
+                              { ...newLabel(`Menu build: ${4}`), xSpan: 3 },
+                          ]
+                        : []
+                )
+            ),
+        },
+    ]
+}

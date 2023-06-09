@@ -1,90 +1,102 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 // Alternative "choice" menus to show
 export enum ChoiceMenuMode {
-  Default,
-  ChangeComboSize,
-  ChangeSlot,
+    Default,
+    ChangeComboSize,
+    ChangeSlot,
 }
 
 export enum TileScreen {
-  Ordering,
-  Totalling,
-  Numpad,
+    Ordering,
+    Totalling,
+    Numpad,
 }
 
 export const useUIStore = defineStore('ui', () => {
-  // Showing the total screen, and also sealing order.
-  const tileScreen = ref(TileScreen.Ordering)
+    // Showing the total screen, and also sealing order.
+    const tileScreen = ref(TileScreen.Ordering)
 
-  // Show prices on buttons.
-  const showingPrices = ref(false)
+    // Show prices on buttons.
+    const showingPrices = ref(false)
 
-  // Reveal product build
-  const showingProductBuild = ref(false)
+    // Reveal product build
+    const showingProductBuild = ref(false)
 
-  // Current page on listed choice.
-  const choicePage = ref(0)
+    // Page number on the lower drink strip
+    const drinkPage = ref(0)
 
-  // Change to special choice menus.
-  const choiceMenuMode = ref(ChoiceMenuMode.Default)
+    // Current page on listed choice.
+    const choicePage = ref(0)
 
-  // What is the slot ID for choiceMenuMode.ChangeSlot?
-  const choiceMenuSlotID = ref(null as string | null)
+    // Change to special choice menus.
+    const choiceMenuMode = ref(ChoiceMenuMode.Default)
 
-  // Selected menu tab for the lower 4/5 area.
-  const selectedMenuTab = ref('lu0')
+    // What is the slot ID for choiceMenuMode.ChangeSlot?
+    const choiceMenuSlotID = ref(null as string | null)
 
-  // Doing an intensive loading operation - block the screen.
-  const isLoading = ref(false)
+    // Selected menu tab for the lower 4/5 area.
+    const selectedMenuTab = ref('lu0')
 
-  // numpad value, as a string to ease decimal input handling.
-  const numpadValue = ref('0')
+    // Doing an intensive loading operation - block the screen.
+    const isLoading = ref(false)
 
-  // numpad callback
-  const numpadCallback = ref(null as ((value: number) => void) | null)
+    // numpad value, as a string to ease decimal input handling.
+    const numpadValue = ref('0')
 
-  function gotoNextChoicePage(): void {
-    choicePage.value += 1
-  }
+    // numpad callback
+    const numpadCallback = ref(null as ((value: number) => void) | null)
 
-  function setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
-    if (typeof modeOrSlotID === 'number') {
-      choiceMenuMode.value = modeOrSlotID
-      choiceMenuSlotID.value = null
-    } else {
-      choiceMenuMode.value = ChoiceMenuMode.ChangeSlot
-      choiceMenuSlotID.value = modeOrSlotID
+    function gotoNextChoicePage(): void {
+        choicePage.value += 1
     }
-    choicePage.value = 0
-  }
 
-  /**
-   * Reset relevent fields for a new order.
-   */
-  function resetToNewOrder() {
-    tileScreen.value = TileScreen.Ordering
-    choicePage.value = 0
-    choiceMenuMode.value = ChoiceMenuMode.Default
-    choiceMenuSlotID.value = null
-    selectedMenuTab.value = 'lu0'
-    isLoading.value = false
-  }
+    function setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
+        if (typeof modeOrSlotID === 'number') {
+            choiceMenuMode.value = modeOrSlotID
+            choiceMenuSlotID.value = null
+        } else {
+            choiceMenuMode.value = ChoiceMenuMode.ChangeSlot
+            choiceMenuSlotID.value = modeOrSlotID
+        }
+        choicePage.value = 0
+    }
 
-  function openNumpad(callback: (value: number) => void) {
-    tileScreen.value = TileScreen.Numpad
-    numpadValue.value = '0'
-    numpadCallback.value = callback
-  }
+    /**
+     * Reset relevent fields for a new order.
+     */
+    function resetToNewOrder() {
+        tileScreen.value = TileScreen.Ordering
+        choicePage.value = 0
+        choiceMenuMode.value = ChoiceMenuMode.Default
+        choiceMenuSlotID.value = null
+        selectedMenuTab.value = 'lu0'
+        isLoading.value = false
+    }
 
-  return {
-    tileScreen,
-    showingPrices, showingProductBuild,
-    choicePage, choiceMenuMode, choiceMenuSlotID, selectedMenuTab,
-    isLoading,
-    numpadValue, numpadCallback,
+    function openNumpad(callback: (value: number) => void) {
+        tileScreen.value = TileScreen.Numpad
+        numpadValue.value = '0'
+        numpadCallback.value = callback
+    }
 
-    gotoNextChoicePage, setChoiceMenuMode, resetToNewOrder, openNumpad,
-  }
+    return {
+        tileScreen,
+        showingPrices,
+        showingProductBuild,
+        drinkPage,
+        choicePage,
+        choiceMenuMode,
+        choiceMenuSlotID,
+        selectedMenuTab,
+        isLoading,
+        numpadValue,
+        numpadCallback,
+
+        gotoNextChoicePage,
+        setChoiceMenuMode,
+        resetToNewOrder,
+        openNumpad,
+    }
 })

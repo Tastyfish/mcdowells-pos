@@ -1,21 +1,24 @@
 <script setup lang='ts'>
 
-import { StripProvider, emptyStrip } from '@/api/strip'
+import { ProvidedStrip, emptyStrip } from '@/api/strip'
 import TileView from './TileView.vue'
 
+const DIM_X = 10;
+const DIM_Y = 10;
+
 withDefaults(defineProps<{
-  strip: StripProvider
+  strip: ProvidedStrip
 }>(), {
-  strip: () => emptyStrip,
+  strip: () => emptyStrip(DIM_X, DIM_Y),
 })
 
 </script>
 
 <template>
   <div class="tile-grid">
-    <div class="tile-row" v-for="y in strip.bounds.height" :key="y">
-      <div class="tile-cell" v-for="x in strip.bounds.width" :key="x">
-        <TileView :tile="strip.getTile(x - 1, y - 1)" />
+    <div class="tile-row" v-for="y in DIM_X" :key="y">
+      <div class="tile-cell" v-for="x in DIM_Y" :key="x">
+        <TileView :tile="strip.getTile(x - 1, y - 1, DIM_X, DIM_Y)" />
       </div>
     </div>
   </div>

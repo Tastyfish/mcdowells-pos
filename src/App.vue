@@ -11,7 +11,7 @@ import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store';
 const orderStore = useOrderStore();
 const uiStore = useUIStore();
 
-const root = computed(generateTiles);
+const root = computed(() => generateTiles()(10, 10));
 const nodes = computed(() => generateLineTree(orderStore.lines, orderStore.currentLineID));
 
 const isLoading = computed(() => uiStore.isLoading);
