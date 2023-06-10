@@ -12,6 +12,7 @@ export enum TileScreen {
     Ordering,
     Totalling,
     Numpad,
+    MessageBox,
 }
 
 export const useUIStore = defineStore('ui', () => {
@@ -48,9 +49,13 @@ export const useUIStore = defineStore('ui', () => {
     // numpad callback
     const numpadCallback = ref(null as ((value: number) => void) | null)
 
-    function gotoNextChoicePage(): void {
-        choicePage.value += 1
-    }
+    // User-facing text for message box.
+    const messageBoxText = ref('')
+
+    // Button option labels. Labels will also be returned as-is.
+    const messageBoxOptions = ref([] as string[])
+
+    const messageBoxCallback = ref(null as ((label: string) => void) | null)
 
     function setChoiceMenuMode(modeOrSlotID: ChoiceMenuMode | string): void {
         if (typeof modeOrSlotID === 'number') {
@@ -76,28 +81,52 @@ export const useUIStore = defineStore('ui', () => {
         isLoading.value = false
     }
 
+    /**
+     * Open a modal numpad for entry.
+     * @param callback Callback function that receives resulting float number.
+     */
     function openNumpad(callback: (value: number) => void) {
         tileScreen.value = TileScreen.Numpad
         numpadValue.value = '0'
         numpadCallback.value = callback
     }
 
+    /**
+     * Open a modal message box with multiple options.
+     * @param text The text to display to the user.
+     * @param options The labels for each option.
+     * @param callback Callback function that receives which label was pressed.
+     */
+    function openMessageBox<OT extends string>(text: string, options: OT[], callback: (label: OT) => void) {
+        tileScreen.value = TileScreen.MessageBox
+        messageBoxText.value = text
+        messageBoxOptions.value = options,
+        messageBoxCallback.value = callback as (label: string) => void
+    }
+
     return {
         tileScreen,
         showingPrices,
         showingProductBuild,
+
         drinkPage,
         choicePage,
+
         choiceMenuMode,
         choiceMenuSlotID,
         selectedMenuTab,
+
         isLoading,
+
         numpadValue,
         numpadCallback,
+        messageBoxText,
+        messageBoxOptions,
+        messageBoxCallback,
 
-        gotoNextChoicePage,
         setChoiceMenuMode,
         resetToNewOrder,
         openNumpad,
+        openMessageBox,
     }
 })

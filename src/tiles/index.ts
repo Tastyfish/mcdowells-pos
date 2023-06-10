@@ -13,6 +13,7 @@ import generateTabViewGraph from './tabviews'
 
 import generateTotalScreenGraph from './totalScreen'
 import generateNumpadGraph from './numpad'
+import generateMessageBoxGraph from './messagebox'
 
 // Should be cached between state changes.
 export default function generateGraph(): StripProvider {
@@ -25,6 +26,9 @@ export default function generateGraph(): StripProvider {
         case TileScreen.Numpad:
             // Modal numpad.
             return generateNumpadGraph()
+        case TileScreen.MessageBox:
+            // Modal message box.
+            return generateMessageBoxGraph()
         default:
             // Main screen
             return newContainerStrip([

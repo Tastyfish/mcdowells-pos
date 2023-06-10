@@ -20,8 +20,6 @@ function submit() {
 
     uiStore.tileScreen = TileScreen.Ordering
     uiStore.numpadCallback?.(parseFloat(uiStore.numpadValue))
-    uiStore.numpadValue = '0'
-    uiStore.numpadCallback = null
 }
 
 /**

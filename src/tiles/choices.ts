@@ -81,7 +81,7 @@ function slotName(id: string): string {
 const generateSlotGraph = (slotID: string): StripProvider => {
     const uiStore = useUIStore()
 
-    return newListStrip(generateSlotButtons(slotID), uiStore.choicePage, uiStore.gotoNextChoicePage)
+    return newListStrip(generateSlotButtons(slotID), uiStore.choicePage, () => uiStore.choicePage++)
 }
 
 /// Generate a single row of either slot options, or the slot graph if there is only one.
@@ -95,7 +95,7 @@ function generateRemainingSlotsGraph(slots: string[]): StripProvider {
     return newListStrip(
         slots.map((slot) => newButton(() => uiStore.setChoiceMenuMode(slot), slotName(slot), 'pi pi-bars')),
         uiStore.choicePage,
-        uiStore.gotoNextChoicePage
+        () => uiStore.choicePage++
     )
 }
 
@@ -109,7 +109,7 @@ function generateChoiceInnerGraph(): StripProvider {
                 newListStrip(
                     orderStore.currentLine ? generateChoiceButtons(orderStore.currentLine) : [],
                     uiStore.choicePage,
-                    uiStore.gotoNextChoicePage
+                    () => uiStore.choicePage++
                 ),
                 newLeftwardStrip([newTileStrip([choiceModeBack])]),
             ])
