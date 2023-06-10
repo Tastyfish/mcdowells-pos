@@ -60,12 +60,12 @@ export default function generateNumpadGraph(): StripProvider {
             strip: newTileStrip([
                 {
                     ...newLabel(uiStore.numpadValue.toString()),
-                    xSpan: 4,
+                    width: 4,
                     severity: Severity.Info,
                 },
                 {
                     ...emptyTile,
-                    xSpan: 4,
+                    width: 4,
                 },
                 newButton(() => addDigit(uiStore, 1), '1'),
                 newButton(() => addDigit(uiStore, 2), '2'),
@@ -73,7 +73,7 @@ export default function generateNumpadGraph(): StripProvider {
                 {
                     ...newButton(cancel, 'Cancel', 'pi pi-arrow-left'),
                     severity: Severity.Info,
-                    ySpan: 2,
+                    height: 2,
                 },
                 newButton(() => addDigit(uiStore, 4), '4'),
                 newButton(() => addDigit(uiStore, 5), '5'),
@@ -84,7 +84,7 @@ export default function generateNumpadGraph(): StripProvider {
                 {
                     ...newButton(submit, 'Enter', 'pi pi-arrow-right'),
                     severity: Severity.Success,
-                    ySpan: 2,
+                    height: 2,
                 },
                 {
                     ...newButton(() => backspace(uiStore), 'BS', 'pi pi-delete-left'),

@@ -26,8 +26,8 @@ export default function generateMessageBoxGraph(): StripProvider {
                 newTileStrip([
                     {
                         ...newLabel(uiStore.messageBoxText),
-                        xSpan: 4,
-                        ySpan: 2,
+                        width: 4,
+                        height: 2,
                     },
                 ]),
                 newLeftwardStrip([
@@ -35,7 +35,7 @@ export default function generateMessageBoxGraph(): StripProvider {
                         options.reverse().map((label, index) => ({
                             ...newButton(() => submit(label), label),
                             severity: index === options.length - 1 ? Severity.Primary : Severity.Secondary,
-                            xSpan: optionSpan
+                            width: optionSpan,
                         }))
                     ),
                 ]),

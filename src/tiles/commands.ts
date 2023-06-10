@@ -57,7 +57,7 @@ export default function generateCommandsGraph(): ContainedStripInfo {
                     uiStore.setChoiceMenuMode(ChoiceMenuMode.Default)
                 }
             }, 'Void Line'),
-            { ...newButton(gotoTotalScreen, 'Total'), ySpan: 2, severity: Severity.Success },
+            { ...newButton(gotoTotalScreen, 'Total'), height: 2, severity: Severity.Success },
         ]),
     }
 }

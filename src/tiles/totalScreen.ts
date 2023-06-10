@@ -32,18 +32,18 @@ export default function generateTotalScreenGraph(): StripProvider {
             1,
             newDownwardStrip([
                 grow(emptyStrip),
-                newTileStrip([{ ...newButton(backOut, 'Back', 'pi pi-arrow-left'), ySpan: 2, severity: Severity.Info }]),
+                newTileStrip([{ ...newButton(backOut, 'Back', 'pi pi-arrow-left'), height: 2, severity: Severity.Info }]),
                 grow(
                     newUpwardStrip([
                         newTileStrip([
                             {
                                 ...newButton(() => startCashOut(PaymentMethod.Credit), 'Card', 'pi pi-credit-card'),
-                                ySpan: 2,
+                                height: 2,
                                 severity: Severity.Primary,
                             },
                             {
                                 ...newButton(() => startCashOut(PaymentMethod.Cash), 'Cash Out', 'pi pi-money-bill'),
-                                ySpan: 2,
+                                height: 2,
                                 severity: Severity.Success,
                             },
                         ]),
@@ -51,16 +51,16 @@ export default function generateTotalScreenGraph(): StripProvider {
                 ),
             ])
         ),
-        newTileStrip([{ ...emptyTile, xSpan: 3 }]),
+        newTileStrip([{ ...emptyTile, width: 3 }]),
         constrainWidth(
             3,
             newTileStrip([
-                { ...emptyTile, xSpan: 3, ySpan: 2 },
-                { ...newLabel(`Total Items: ${totals.orderLineCount}`), xSpan: 3 },
-                { ...newLabel(`Order Number: ${totals.orderNumber}`), xSpan: 3, severity: Severity.Info },
-                { ...newLabel(`Subtotal: ${currency}${totals.subtotal.toFixed(2)}`), xSpan: 3 },
-                { ...newLabel(`Tax: ${currency}${totals.tax.toFixed(2)}`), xSpan: 3 },
-                { ...newLabel(`Final Total: ${currency}${totals.grandTotal.toFixed(2)}`), xSpan: 3, severity: Severity.Success },
+                { ...emptyTile, width: 3, height: 2 },
+                { ...newLabel(`Total Items: ${totals.orderLineCount}`), width: 3 },
+                { ...newLabel(`Order Number: ${totals.orderNumber}`), width: 3, severity: Severity.Info },
+                { ...newLabel(`Subtotal: ${currency}${totals.subtotal.toFixed(2)}`), width: 3 },
+                { ...newLabel(`Tax: ${currency}${totals.tax.toFixed(2)}`), width: 3 },
+                { ...newLabel(`Final Total: ${currency}${totals.grandTotal.toFixed(2)}`), width: 3, severity: Severity.Success },
             ])
         ),
     ])

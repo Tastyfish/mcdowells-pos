@@ -21,13 +21,15 @@ export enum TileType {
 * */
 export interface Tile {
     readonly type: TileType
-    readonly classes?: string[] // Optional style on the element.
+    /** Optional style on the element. */
+    readonly classes?: string[]
 
-    // If tile is multiple tiles big.
-    readonly xSpan?: number
-    readonly ySpan?: number
+    /** If tile is multiple tiles wide. Default is 1. */
+    readonly width?: number
+    /** If tile is multiple tiles tall. Default is 1. */
+    readonly height?: number
 
-    // Button / message severity
+    /** Button / label severity */
     readonly severity?: Severity
 }
 
@@ -44,6 +46,7 @@ interface ButtonBaseTile extends Tile {
     // Both labels and icons are optional, and can be used together.
     readonly label?: string
     readonly icon?: string
+    /** Price shown in a badge if Show Prices is enabled by user. */
     readonly price?: number
     readonly onPress: ButtonPress
 }
@@ -54,7 +57,8 @@ export interface ButtonTile extends ButtonBaseTile {
 
 export interface ToggleTile extends ButtonBaseTile {
     readonly type: TileType.Toggle
-    readonly state: boolean // true means toggled on
+    /** true means toggled on */
+    readonly state: boolean
 }
 
 export enum SplitToggleState {

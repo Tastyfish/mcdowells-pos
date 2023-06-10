@@ -50,7 +50,7 @@ export interface ProvidedStrip {
 * */
 export function newTileStrip(tiles: Tile[]): StripProvider {
     return (maxWidth, maxHeight) => {
-        // Adjust list to account for xSpan and ySpan.
+        // Adjust list to account for tile width and height.
         const realTiles: (Tile | undefined)[] = new Array(maxWidth * maxHeight)
 
         // To determine actual bounds at the end.
@@ -70,20 +70,20 @@ export function newTileStrip(tiles: Tile[]): StripProvider {
                 realTiles[x + y * maxWidth] = tile
 
                 if (tile !== emptyTile) {
-                    finalWidth = Math.max(finalWidth, x + (tile.xSpan ?? 1))
-                    finalHeight = Math.max(finalHeight, y + (tile.ySpan ?? 1))
+                    finalWidth = Math.max(finalWidth, x + (tile.width ?? 1))
+                    finalHeight = Math.max(finalHeight, y + (tile.height ?? 1))
                 }
 
-                for (let subY = 1; subY < (tile.ySpan ?? 1); subY++) {
+                for (let subY = 1; subY < (tile.height ?? 1); subY++) {
                     realTiles[x + (y + subY) * maxWidth] = emptyTile
                 }
 
                 x++
 
-                for (let subX = 1; subX < (tile.xSpan ?? 1); subX++, x++) {
+                for (let subX = 1; subX < (tile.width ?? 1); subX++, x++) {
                     realTiles[x + y * maxWidth] = emptyTile
 
-                    for (let subY = 1; subY < (tile.ySpan ?? 1); subY++) {
+                    for (let subY = 1; subY < (tile.height ?? 1); subY++) {
                         realTiles[x + (y + subY) * maxWidth] = emptyTile
                     }
                 }

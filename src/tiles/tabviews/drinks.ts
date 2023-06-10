@@ -29,8 +29,8 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
                 [newToggle(uiStore.showingPrices, () => (uiStore.showingPrices = !uiStore.showingPrices), 'Show Prices') as Tile].concat(
                     uiStore.showingProductBuild
                         ? [
-                              { ...newLabel(`Software build: ${APP_VERSION}`), xSpan: 3 },
-                              { ...newLabel(`Menu build: ${4}`), xSpan: 3 },
+                              { ...newLabel(`Software build: ${APP_VERSION}`), width: 3 },
+                              { ...newLabel(`Menu build: ${4}`), width: 3 },
                           ]
                         : []
                 )
