@@ -1,6 +1,6 @@
 /**
   Adaption of order lines into the primevue tree api
-  See: https://primefaces.org/primevue/showcase/#/tree
+  See: https://primevue.org/tree/
 * */
 
 import { TreeNode } from 'primevue/tree';
