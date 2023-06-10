@@ -1,4 +1,4 @@
-import { SplitToggleState, Severity, newToggle, newSplitToggle, severeup } from '@/api/tile'
+import { SplitToggleState, Severity, newToggle, newSplitToggle, withSeverity } from '@/api/tile'
 import { ContainedStripInfo, newTileStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
 
@@ -57,43 +57,43 @@ export default function generateTabsGraph(): ContainedStripInfo {
     return {
         bounds: new Rectangle(0, 3, 10, 1),
         strip: newTileStrip([
-            severeup(
+            withSeverity(
                 newSplitToggle(getSTab('br'), () => setSTab('br'), 'Breakfast', 'Breakfast 2'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newSplitToggle(getSTab('lu'), () => setSTab('lu'), 'Lunch', 'Lunch 2'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newSplitToggle(getSTab('mc'), () => setSTab('mc'), 'McValue', 'Salads'),
                 Severity.Danger
             ),
-            severeup(
+            withSeverity(
                 newToggle(getTTab('dr'), () => setTTab('dr'), 'Drinks'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newToggle(getTTab('cf'), () => setTTab('cf'), 'McCafé'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newSplitToggle(getSTab('de'), () => setSTab('de'), 'Desert', 'Desert 2'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newToggle(getTTab('hm'), () => setTTab('hm'), 'Happy Meal'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newToggle(getTTab('ls'), () => setTTab('ls'), 'LSM'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newSplitToggle(getSTab('co'), () => setSTab('co'), 'Condiments', 'Gifts'),
                 Severity.Primary
             ),
-            severeup(
+            withSeverity(
                 newToggle(getTTab('special'), () => setTTab('special'), 'Special Functions'),
                 Severity.Danger
             ),

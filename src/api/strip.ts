@@ -1,5 +1,5 @@
 import Rectangle from './rectangle'
-import { Tile, Severity, emptyTile, newButton, severeup } from './tile'
+import { Tile, Severity, emptyTile, newButton, withSeverity } from './tile'
 
 /**
   Base provider of strip info.
@@ -189,7 +189,7 @@ export function newListStrip(items: Tile[], page: number, incrementPage: () => v
 
         return newRightwardStrip([
             grow(newTileStrip(pageContent)),
-            newTileStrip([severeup(newButton(incrementPage, 'MORE', 'pi pi-arrow-right'), Severity.Info)]),
+            newTileStrip([withSeverity(newButton(incrementPage, 'MORE', 'pi pi-arrow-right'), Severity.Info)]),
         ])(maxWidth, 1)
     }
 }

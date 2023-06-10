@@ -1,4 +1,4 @@
-import { newLabel, newButton, severeup, Tile, Severity } from '@/api/tile'
+import { newLabel, newButton, withSeverity, Tile, Severity } from '@/api/tile'
 import { ContainedStripInfo, StripProvider, newListStrip, newDownwardStrip, newTileStrip, emptyStrip, newLeftwardStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
 
@@ -10,7 +10,7 @@ import { OrderLine } from '@/api/order'
 
 const choiceRect = new Rectangle(0, 0, 10, 2)
 
-const choiceModeBack = severeup(
+const choiceModeBack = withSeverity(
     newButton(() => useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default), 'Back', 'pi pi-arrow-left'),
     Severity.Info
 )
@@ -130,7 +130,7 @@ function generateChoiceInnerGraph(): StripProvider {
                 generateRemainingSlotsGraph(remainingSlots),
                 newTileStrip([
                     canCombo
-                        ? severeup(
+                        ? withSeverity(
                               newButton(
                                   () => {
                                       uiStore.setChoiceMenuMode(ChoiceMenuMode.ChangeComboSize)
@@ -142,7 +142,7 @@ function generateChoiceInnerGraph(): StripProvider {
                           )
                         : newLabel(''),
                     canHaveSide
-                        ? severeup(
+                        ? withSeverity(
                               newButton(
                                   () => {
                                       uiStore.setChoiceMenuMode('side')

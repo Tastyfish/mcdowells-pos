@@ -130,19 +130,10 @@ export const emptyTile: Tile = {
 }
 
 /**
-  Change the class of a tile
-  @param {Tile} tile The tile to change the class of.
-  @param {string} classes The classes to add.
-* */
-export function classup(tile: Tile, classes: string[]): Tile {
-    return { ...tile, classes }
-}
-
-/**
   Change the severity of a tile
   @param {Tile} tile The tile to change the class of.
   @param {Severity} severity The classes to add.
 * */
-export function severeup(tile: Tile, severity: Severity): Tile {
+export function withSeverity(tile: Tile, severity: Severity): Tile {
     return { ...tile, severity }
 }

@@ -1,4 +1,4 @@
-import { Severity, newLabel, newToggle, severeup } from '@/api/tile'
+import { Severity, newLabel, newToggle, withSeverity } from '@/api/tile'
 import { ContainedStripInfo, newTileStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
 
@@ -47,7 +47,7 @@ export default function generateSizeGraph(): ContainedStripInfo {
             newSizeToggle(Sizes.Small),
             newSizeToggle(Sizes.Medium),
             newSizeToggle(Sizes.Large),
-            severeup(newLabel('Lunch'), Severity.Success),
+            withSeverity(newLabel('Lunch'), Severity.Success),
             newSizeToggle(Sizes.Senior),
         ]),
     }
