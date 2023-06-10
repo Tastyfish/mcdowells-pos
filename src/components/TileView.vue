@@ -89,7 +89,7 @@ const extraStyles = computed(() => {
         /></span>
     </Button>
     <div v-else-if="isLabel(tile)" :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]" :style="extraStyles">
-        <span>{{ tile.label }}</span>
+        <span class="p-message-text">{{ tile.label }}</span>
     </div>
 </template>
 
