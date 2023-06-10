@@ -195,11 +195,12 @@ export function newListStrip(items: Tile[], page: number, incrementPage: () => v
 }
 
 /**
-  Form a vertical strip going top-down.
-  @param {StripProvider[]} strips The strips within.
-  @return {StripProvider} The resulting provider.
-* */
-export function newDownwardStrip(strips: StripProvider[]): StripProvider {
+ * Common functionality of downward and upward strip, as they only diverge on 2 lines.
+ * @param {StripProvider[]} strips The strips within.
+ * @param {boolean} upward upward if true, downward if false.
+ * @return {StripProvider} The resulting provider.
+ */
+function newVerticalStrip(strips: StripProvider[], upward: boolean): StripProvider {
     return (maxWidth, maxHeight) => {
         // Render all items, which will give us their heights implicitly.
         let remainingHeight = maxHeight
@@ -230,6 +231,10 @@ export function newDownwardStrip(strips: StripProvider[]): StripProvider {
             width: finalWidth,
             height: finalHeight,
             getTile(x, y, width, height) {
+                if(upward) {
+                    y = height - y - 1
+                }
+
                 // Amount to add to each grow item's height.
                 const growAmount = numberGrows === 0 ? 0 : Math.floor((height - finalHeight) / numberGrows)
 
@@ -248,10 +253,19 @@ export function newDownwardStrip(strips: StripProvider[]): StripProvider {
                     return emptyTile
                 }
 
-                return strip.getTile(x, y, width, strip.height + (strip.grow ? growAmount : 0))
+                return strip.getTile(x, upward ? strip.height - y - 1 : y, width, strip.height + (strip.grow ? growAmount : 0))
             },
         }
     }
+}
+
+/**
+  Form a vertical strip going top-down.
+  @param {StripProvider[]} strips The strips within.
+  @return {StripProvider} The resulting provider.
+* */
+export function newDownwardStrip(strips: StripProvider[]): StripProvider {
+    return newVerticalStrip(strips, false)
 }
 
 /**
@@ -260,18 +274,28 @@ export function newDownwardStrip(strips: StripProvider[]): StripProvider {
   @return {StripProvider} The resulting provider.
 * */
 export function newUpwardStrip(strips: StripProvider[]): StripProvider {
+    return newVerticalStrip(strips, true)
+}
+
+/**
+ * Common functionality of rightward and leftware strip, as they only diverge on 2 lines.
+ * @param {StripProvider[]} strips The strips within.
+ * @param {boolean} leftward leftward if true, rightward if false.
+ * @return {StripProvider} The resulting provider.
+ */
+function newHorizontalStrip(strips: StripProvider[], leftward: boolean): StripProvider {
     return (maxWidth, maxHeight) => {
         // Render all items, which will give us their heights implicitly.
-        let remainingHeight = maxHeight
+        let remainingWidth = maxWidth
         // Number of strips that grow.
         let numberGrows = 0
 
         const finalStrips = strips
             .map((strip) => {
-                if (remainingHeight <= 0) return null
+                if (remainingWidth <= 0) return null
 
-                const ps = strip(maxWidth, remainingHeight)
-                remainingHeight -= ps.height
+                const ps = strip(remainingWidth, maxHeight)
+                remainingWidth -= ps.width
                 if(ps.grow) {
                     numberGrows++
                 }
@@ -279,31 +303,32 @@ export function newUpwardStrip(strips: StripProvider[]): StripProvider {
             })
             .filter((ps) => ps !== null) as ProvidedStrip[]
 
-        const finalWidth = Math.min(
-            maxWidth,
-            finalStrips.map(({ width }) => width).reduce((old, width) => Math.max(old, width))
-        )
+        const finalWidth = Math.min(maxWidth, maxWidth - remainingWidth)
 
-        const finalHeight = Math.min(maxHeight, maxHeight - remainingHeight)
+        const finalHeight = Math.min(
+            maxHeight,
+            finalStrips.map(({ height }) => height).reduce((old, height) => Math.max(old, height))
+        )
 
         return {
             width: finalWidth,
             height: finalHeight,
             getTile(x, y, width, height) {
-                // Search bottom to top.
-                y = height - y - 1
+                if(leftward) {
+                    x = width - x - 1
+                }
 
-                // Amount to add to each grow item's height.
-                const growAmount = numberGrows === 0 ? 0 : Math.floor((height - finalHeight) / numberGrows)
+                // Amount to add to each grow item's width.
+                const growAmount = numberGrows === 0 ? 0 : Math.floor((width - finalWidth) / numberGrows)
 
                 const strip = finalStrips.find((ps) => {
-                    const stripHeight = ps.height + (ps.grow ? growAmount : 0)
+                    const stripWidth = ps.width + (ps.grow ? growAmount : 0)
 
-                    if (y < stripHeight) {
+                    if (x < stripWidth) {
                         return true
                     }
 
-                    y -= stripHeight
+                    x -= stripWidth
                     return false
                 })
 
@@ -311,7 +336,7 @@ export function newUpwardStrip(strips: StripProvider[]): StripProvider {
                     return emptyTile
                 }
 
-                return strip.getTile(x, strip.height - y - 1, width, strip.height + (strip.grow ? growAmount : 0))
+                return strip.getTile(leftward ? strip.width - x - 1 : x, y, strip.width + (strip.grow ? growAmount : 0), height)
             },
         }
     }
@@ -323,58 +348,7 @@ export function newUpwardStrip(strips: StripProvider[]): StripProvider {
   @return {StripProvider} The resulting provider.
 * */
 export function newRightwardStrip(strips: StripProvider[]): StripProvider {
-    return (maxWidth, maxHeight) => {
-        // Render all items, which will give us their heights implicitly.
-        let remainingWidth = maxWidth
-        // Number of strips that grow.
-        let numberGrows = 0
-
-        const finalStrips = strips
-            .map((strip) => {
-                if (remainingWidth <= 0) return null
-
-                const ps = strip(remainingWidth, maxHeight)
-                remainingWidth -= ps.width
-                if(ps.grow) {
-                    numberGrows++
-                }
-                return ps
-            })
-            .filter((ps) => ps !== null) as ProvidedStrip[]
-
-        const finalWidth = Math.min(maxWidth, maxWidth - remainingWidth)
-
-        const finalHeight = Math.min(
-            maxHeight,
-            finalStrips.map(({ height }) => height).reduce((old, height) => Math.max(old, height))
-        )
-
-        return {
-            width: finalWidth,
-            height: finalHeight,
-            getTile(x, y, width, height) {
-                // Amount to add to each grow item's width.
-                const growAmount = numberGrows === 0 ? 0 : Math.floor((width - finalWidth) / numberGrows)
-
-                const strip = finalStrips.find((ps) => {
-                    const stripWidth = ps.width + (ps.grow ? growAmount : 0)
-
-                    if (x < stripWidth) {
-                        return true
-                    }
-
-                    x -= stripWidth
-                    return false
-                })
-
-                if (strip === undefined) {
-                    return emptyTile
-                }
-
-                return strip.getTile(x, y, strip.width + (strip.grow ? growAmount : 0), height)
-            },
-        }
-    }
+    return newHorizontalStrip(strips, false)
 }
 
 /**
@@ -383,61 +357,7 @@ export function newRightwardStrip(strips: StripProvider[]): StripProvider {
   @return {StripProvider} The resulting provider.
 * */
 export function newLeftwardStrip(strips: StripProvider[]): StripProvider {
-    return (maxWidth, maxHeight) => {
-        // Render all items, which will give us their heights implicitly.
-        let remainingWidth = maxWidth
-        // Number of strips that grow.
-        let numberGrows = 0
-
-        const finalStrips = strips
-            .map((strip) => {
-                if (remainingWidth <= 0) return null
-
-                const ps = strip(remainingWidth, maxHeight)
-                remainingWidth -= ps.width
-                if(ps.grow) {
-                    numberGrows++
-                }
-                return ps
-            })
-            .filter((ps) => ps !== null) as ProvidedStrip[]
-
-        const finalWidth = Math.min(maxWidth, maxWidth - remainingWidth)
-
-        const finalHeight = Math.min(
-            maxHeight,
-            finalStrips.map(({ height }) => height).reduce((old, height) => Math.max(old, height))
-        )
-
-        return {
-            width: finalWidth,
-            height: finalHeight,
-            getTile(x, y, width, height) {
-                // Search right to left.
-                x = width - x - 1
-
-                // Amount to add to each grow item's width.
-                const growAmount = numberGrows === 0 ? 0 : Math.floor((width - finalWidth) / numberGrows)
-
-                const strip = finalStrips.find((ps) => {
-                    const stripWidth = ps.width + (ps.grow ? growAmount : 0)
-
-                    if (x < stripWidth) {
-                        return true
-                    }
-
-                    x -= stripWidth
-                    return false
-                })
-
-                if (strip === undefined) {
-                    return emptyTile
-                }
-
-                return strip.getTile(strip.width - x - 1, y, strip.width + (strip.grow ? growAmount : 0), height)
-            },
-        }
-    }
+    return newHorizontalStrip(strips, true)
 }
 
 export function constrainWidth(width: number, provider: StripProvider): StripProvider {
