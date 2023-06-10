@@ -185,12 +185,12 @@ export function newListStrip(items: Tile[], page: number, incrementPage: () => v
 
         // Page number is fine with looping
         const realPage = page % numPages
-        const moreButton = severeup(newButton(incrementPage, 'MORE', 'pi pi-arrow-right'), Severity.Info)
-
-        // Note, the last page may be less than a page in length.
         const pageContent = items.slice(realPage * pageSize, (realPage + 1) * pageSize)
 
-        return newTileStrip(pageContent.concat(Array(pageSize - pageContent.length).fill(emptyTile)).concat([moreButton]))(maxWidth, 1)
+        return newRightwardStrip([
+            grow(newTileStrip(pageContent)),
+            newTileStrip([severeup(newButton(incrementPage, 'MORE', 'pi pi-arrow-right'), Severity.Info)]),
+        ])(maxWidth, 1)
     }
 }
 
@@ -213,7 +213,7 @@ function newVerticalStrip(strips: StripProvider[], upward: boolean): StripProvid
 
                 const ps = strip(maxWidth, remainingHeight)
                 remainingHeight -= ps.height
-                if(ps.grow) {
+                if (ps.grow) {
                     numberGrows++
                 }
                 return ps
@@ -231,7 +231,7 @@ function newVerticalStrip(strips: StripProvider[], upward: boolean): StripProvid
             width: finalWidth,
             height: finalHeight,
             getTile(x, y, width, height) {
-                if(upward) {
+                if (upward) {
                     y = height - y - 1
                 }
 
@@ -296,7 +296,7 @@ function newHorizontalStrip(strips: StripProvider[], leftward: boolean): StripPr
 
                 const ps = strip(remainingWidth, maxHeight)
                 remainingWidth -= ps.width
-                if(ps.grow) {
+                if (ps.grow) {
                     numberGrows++
                 }
                 return ps
@@ -314,7 +314,7 @@ function newHorizontalStrip(strips: StripProvider[], leftward: boolean): StripPr
             width: finalWidth,
             height: finalHeight,
             getTile(x, y, width, height) {
-                if(leftward) {
+                if (leftward) {
                     x = width - x - 1
                 }
 
