@@ -16,7 +16,8 @@ function submit(label: string) {
 export default function generateMessageBoxGraph(): StripProvider {
     const uiStore = useUIStore()
 
-    uiStore.tileScreen
+    const options = uiStore.messageBoxOptions
+    const optionSpan = Math.floor(4 / options.length)
 
     return newContainerStrip([
         {
@@ -31,9 +32,10 @@ export default function generateMessageBoxGraph(): StripProvider {
                 ]),
                 newLeftwardStrip([
                     newTileStrip(
-                        uiStore.messageBoxOptions.reverse().map((label, index) => ({
+                        options.reverse().map((label, index) => ({
                             ...newButton(() => submit(label), label),
-                            severity: index === uiStore.messageBoxOptions.length - 1 ? Severity.Primary : Severity.Secondary,
+                            severity: index === options.length - 1 ? Severity.Primary : Severity.Secondary,
+                            xSpan: optionSpan
                         }))
                     ),
                 ]),
