@@ -54,7 +54,7 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
 
     return [
         {
-            bounds: new Rectangle(0, 4, 7, 1),
+            bounds: new Rectangle(0, 4, 8, 1),
             strip: newListStrip(
                 getChoicesBySlot('drink').map((drink) => newButton(() => addSmartDrink(drink.id), drink.displayName) as Tile),
                 uiStore.drinkPage,
@@ -62,15 +62,12 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
             ),
         },
         {
-            bounds: new Rectangle(7, 4, 1, 1),
-            strip: newTileStrip([
-                newToggle(uiStore.showingProductBuild, () => (uiStore.showingProductBuild = !uiStore.showingProductBuild), 'Show Product Build'),
-            ]),
-        },
-        {
             bounds: new Rectangle(0, 5, 8, 1),
             strip: newTileStrip(
-                [newToggle(uiStore.showingPrices, () => (uiStore.showingPrices = !uiStore.showingPrices), 'Show Prices') as Tile].concat(
+                [
+                    newToggle(uiStore.showingPrices, () => (uiStore.showingPrices = !uiStore.showingPrices), 'Show Prices') as Tile,
+                    newToggle(uiStore.showingProductBuild, () => (uiStore.showingProductBuild = !uiStore.showingProductBuild), 'Show Product Build'),
+                ].concat(
                     uiStore.showingProductBuild
                         ? [
                               { ...newLabel(`Software build: ${APP_VERSION}`), width: 3 },
