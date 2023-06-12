@@ -27,46 +27,52 @@
             }
         ]
     ],
-    "co1": [
-        [
-            "gift05",
-            "gift10",
-            "gift25",
-            {
-                "type": "var",
-                "base": "giftV",
-                "label": "? Gift Card"
-            }
+    "co1": {
+        "drinks": false,
+        "content": [
+            [
+                "gift05",
+                "gift10",
+                "gift25",
+                {
+                    "type": "var",
+                    "base": "giftV",
+                    "label": "? Gift Card"
+                }
+            ]
         ]
-    ],
-    "special": [
-        [
-            {
-                "type": "action",
-                "action": "voidOrder"
-            },
-            {
-                "type": "var",
-                "base": "discountV",
-                "label": "MGR Discount",
-                "perPrice": -1
-            }
-        ],
-        [
-            {
-                "type": "label",
-                "label": "Order #{order:orderNumber}"
-            },
-            {
-                "type": "label",
-                "label": "Total Items: {order:lines}"
-            }
-        ],
-        [
-            {
-                "type": "action",
-                "action": "factoryReset"
-            }
+    },
+    "special": {
+        "drinks": false,
+        "content": [
+            [
+                {
+                    "type": "action",
+                    "action": "voidOrder"
+                },
+                {
+                    "type": "var",
+                    "base": "discountV",
+                    "label": "MGR Discount",
+                    "perPrice": -1
+                }
+            ],
+            [
+                {
+                    "type": "label",
+                    "label": "Order #{order:orderNumber}"
+                },
+                {
+                    "type": "label",
+                    "label": "Total Items: {order:lines}"
+                }
+            ],
+            [
+                {
+                    "type": "action",
+                    "action": "factoryReset"
+                }
+            ]
         ]
-    ]
+    }
 }

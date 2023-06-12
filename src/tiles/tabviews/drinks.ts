@@ -1,6 +1,6 @@
 import Rectangle from '@/api/rectangle'
-import { ContainedStripInfo, newListStrip, newTileStrip } from '@/api/strip'
-import { Tile, newButton, newLabel, newToggle } from '@/api/tile'
+import { ContainedStripInfo, newListStrip } from '@/api/strip'
+import { Tile, newButton } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'
 import { assertGetSlot } from '.'
 import { getChoicesBySlot } from '@/menu'
@@ -59,22 +59,6 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
                 getChoicesBySlot('drink').map((drink) => newButton(() => addSmartDrink(drink.id), drink.displayName) as Tile),
                 uiStore.drinkPage,
                 () => uiStore.drinkPage++
-            ),
-        },
-        {
-            bounds: new Rectangle(0, 5, 8, 1),
-            strip: newTileStrip(
-                [
-                    newToggle(uiStore.showingPrices, () => (uiStore.showingPrices = !uiStore.showingPrices), 'Show Prices') as Tile,
-                    newToggle(uiStore.showingProductBuild, () => (uiStore.showingProductBuild = !uiStore.showingProductBuild), 'Show Product Build'),
-                ].concat(
-                    uiStore.showingProductBuild
-                        ? [
-                              { ...newLabel(`Software build: ${APP_VERSION}`), width: 3 },
-                              { ...newLabel(`Menu build: ${MENU_VERSION}`), width: 3 },
-                          ]
-                        : []
-                )
             ),
         },
     ]

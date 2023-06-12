@@ -3,7 +3,7 @@
 import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
-import parseTabs, { TabItem, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
+import parseTabs, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
 import { currency } from '@/config/locale.json'
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
@@ -142,10 +142,10 @@ function generateTabItems(item: TabItem): Tile[] {
     return []
 }
 
-function generateTabView(sections: TabItem[][]): ContainedStripInfo[] {
+function generateTabView(tabView: TabView): ContainedStripInfo[] {
     return [
-        ...generateDrinkStrips(),
-        ...generateSimpleTabStrips(sections.map((section) => newTileStrip(section.map((item) => generateTabItems(item)).flat()))),
+        ...(tabView.drinks ? generateDrinkStrips() : []),
+        ...generateSimpleTabStrips(tabView.content.map((section) => newTileStrip(section.map((item) => generateTabItems(item)).flat()))),
     ]
 }
 
@@ -155,7 +155,7 @@ export default function generateTabViewGraph(): ContainedStripInfo {
     const currentTab = useUIStore().selectedMenuTab
 
     return {
-        bounds: new Rectangle(1, 4, 8, 6),
+        bounds: new Rectangle(1, 4, 8, 5),
         strip: newContainerStrip(
             tabConfig[currentTab] ? generateTabView(tabConfig[currentTab]) : generateDrinkStrips()
         ),

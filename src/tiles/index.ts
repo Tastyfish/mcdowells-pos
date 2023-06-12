@@ -7,6 +7,7 @@ import { TileScreen, useUIStore } from '@/store'
 import generateChoiceGraph from './choices'
 import generateCountGraph from './count'
 import generateCommandsGraph from './commands'
+import generateOptionsGraph from './options'
 import generateSizeGraph from './sizes'
 import generateTabsGraph from './tabs'
 import generateTabViewGraph from './tabviews'
@@ -35,6 +36,7 @@ export default function generateGraph(): StripProvider {
                 generateChoiceGraph(),
                 generateCommandsGraph(),
                 generateCountGraph(),
+                generateOptionsGraph(),
                 generateSizeGraph(),
                 generateTabsGraph(),
                 generateTabViewGraph(),

@@ -45,10 +45,19 @@ export interface LabelTabItem extends AdvancedTabItem {
 /** A string means a menu item key. */
 export type TabItem = AdvancedTabItem | string
 
-// Schema of tabs.json
-interface TabData {
-    // Outer array is a section, inner is each item.
-    [tabKey: string]: TabItem[][]
+/**
+ * Info about a tab view.
+ */
+export interface TabView {
+    /** Outer array is a section, inner is each item. */
+    content: TabItem[][]
+
+    /** Whether the drinks bar appears or not. */
+    drinks: boolean
+}
+
+interface TabViewLookup {
+    [tabKey: string]: TabView
 }
 
 function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
@@ -149,11 +158,15 @@ function sanitizeTabItem(item: TabItem): TabItem | null {
     }
 }
 
-export default function parseTabs(): TabData {
-    return Object.fromEntries(
-        Object.entries(tabviews).map(([tab, tabData]) => [
-            tab,
-            tabData.map((section) => section.map((item) => sanitizeTabItem(item)).filter((item) => item !== null) as TabItem[]),
-        ])
-    )
+function sanitizeTabView(view: TabView | TabItem[][]): TabView {
+    const fullView: TabView = view instanceof Array ? { drinks: true, content: view } : view
+
+    return {
+        ...fullView,
+        content: fullView.content.map((section) => section.map((item) => sanitizeTabItem(item)).filter((item) => item !== null) as TabItem[]),
+    }
+}
+
+export default function parseTabs(): TabViewLookup {
+    return Object.fromEntries(Object.entries(tabviews).map(([tab, tabData]) => [tab, sanitizeTabView(tabData)]))
 }
