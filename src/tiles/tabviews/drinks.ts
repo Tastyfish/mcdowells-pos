@@ -30,7 +30,7 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
                     uiStore.showingProductBuild
                         ? [
                               { ...newLabel(`Software build: ${APP_VERSION}`), width: 3 },
-                              { ...newLabel(`Menu build: ${4}`), width: 3 },
+                              { ...newLabel(`Menu build: ${MENU_VERSION}`), width: 3 },
                           ]
                         : []
                 )
