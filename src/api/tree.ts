@@ -28,7 +28,7 @@ export function convertLineToTreeNode(line: OrderLine, selected: boolean): TreeN
         label: getMenuItemDisplayName(line),
         style: selected ? selectedStyle : undefined,
         type: 'priced',
-        data: useOrderStore().getLinePrice(line),
+        data: { price: useOrderStore().getLinePrice(line) },
     }
 }
 
@@ -80,7 +80,7 @@ function getTotalsNodes(): TreeNode[] {
             key: `${lastLineID}:subtotal`,
             label: 'Subtotal:',
             type: 'priced',
-            data: totals.subtotal,
+            data: { price: totals.subtotal },
             icon: PrimeIcons.CALCULATOR,
             styleClass: 'font-bold',
         },
@@ -88,7 +88,7 @@ function getTotalsNodes(): TreeNode[] {
             key: `${lastLineID}:tax`,
             label: 'Tax:',
             type: 'priced',
-            data: totals.tax,
+            data: { price: totals.tax },
             icon: PrimeIcons.CREDIT_CARD,
             styleClass: 'font-bold',
         },
@@ -96,10 +96,48 @@ function getTotalsNodes(): TreeNode[] {
             key: `${lastLineID}:grantTotal`,
             label: 'Final Total:',
             type: 'priced',
-            data: totals.grandTotal,
+            data: { price: totals.grandTotal },
             styleClass: 'p-inline-message p-inline-message-success font-bold',
         },
     ]
+}
+
+function comparableLine(node: TreeNode): string {
+    return JSON.stringify({
+        ...node,
+        children: node.children?.map((child) => ({
+            ...child,
+            key: undefined,
+            style: undefined,
+        })),
+        data: {
+            ...node.data,
+            count: undefined,
+        },
+        key: undefined,
+        style: undefined,
+    })
+}
+
+/**
+ * Turn line duplicates into having a data.count value.
+ */
+function processLineDuplicates(prevLines: TreeNode[], newLine: TreeNode): TreeNode[] {
+    const original = prevLines.find((line) => comparableLine(line) == comparableLine(newLine))
+
+    if (!original) {
+        return [...prevLines, newLine]
+    }
+
+    if (original.data) {
+        original.data.count = (original.data.count ?? 1) + 1
+    } else {
+        original.data = { count: 2 }
+    }
+
+    original.style = `${original.style ?? ''} ${newLine.style ?? ''}`
+
+    return prevLines
 }
 
 /**
@@ -124,5 +162,6 @@ export function generateLineTree(lines: OrderLine[], currentLineID: number): Tre
                         }),
                 } as TreeNode)
         )
+        .reduce(processLineDuplicates, [] as TreeNode[])
         .concat(getTotalsNodes())
 }

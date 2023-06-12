@@ -49,12 +49,12 @@ watch(
         @node-select="select"
     >
         <template #default="slotProps">
-            {{ slotProps.node.label }}
+            <Badge v-if="slotProps.node.data?.count" :value="slotProps.node.data?.count" severity="warning" class="mr-2" />{{ slotProps.node.label }}
         </template>
         <template #priced="slotProps">
             <div class="w-full flex flex-row">
-                <span class="flex-auto">{{ slotProps.node.label }}</span>
-                <b>{{ locale.currency }}{{ (slotProps.node.data as number).toFixed(2) }}</b>
+                <span class="flex-auto"><Badge v-if="slotProps.node.data.count" :value="slotProps.node.data.count" severity="warning" class="mr-2" />{{ slotProps.node.label }}</span>
+                <b>{{ locale.currency }}{{ ((slotProps.node.data.count ?? 1) * slotProps.node.data.price as number).toFixed(2) }}</b>
             </div>
         </template>
     </Tree>
