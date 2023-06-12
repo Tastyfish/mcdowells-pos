@@ -156,8 +156,6 @@ export default function generateTabViewGraph(): ContainedStripInfo {
 
     return {
         bounds: new Rectangle(1, 4, 8, 5),
-        strip: newContainerStrip(
-            tabConfig[currentTab] ? generateTabView(tabConfig[currentTab]) : generateDrinkStrips()
-        ),
+        strip: newContainerStrip(tabConfig[currentTab] ? generateTabView(tabConfig[currentTab]) : generateDrinkStrips()),
     }
 }
