@@ -1,18 +1,18 @@
-import { ChoiceSlot } from "./menu";
-import { NewOrderLine, NewOrderChoice } from "./order";
+import { ChoiceSlot } from './menu'
+import { NewOrderLine, NewOrderChoice } from './order'
 
 export function getMenuItemDisplayName(line: NewOrderLine) {
-  if (!line.menuItem.simpleDisplayName && line.size) {
-    return `${line.size} ${line.menuItem.displayName}`;
-  }
-  return line.menuItem.displayName;
+    if (!line.menuItem.simpleDisplayName && line.size) {
+        return `${line.size} ${line.menuItem.displayName}`
+    }
+    return line.menuItem.displayName
 }
 
 export function getChoiceItemDisplayName(choice: NewOrderChoice) {
-  if (!choice.choiceItem.simpleDisplayName && choice.line.size) {
-    return `${choice.line.size} ${choice.choiceItem.displayName}`;
-  }
-  return choice.choiceItem.displayName;
+    if (!choice.choiceItem.simpleDisplayName && choice.line.size) {
+        return `${choice.line.size} ${choice.choiceItem.displayName}`
+    }
+    return choice.choiceItem.displayName
 }
 
 /**
@@ -22,5 +22,5 @@ export function getChoiceItemDisplayName(choice: NewOrderChoice) {
  * @returns The display name.
  */
 export function getChoiceSlotDisplayName(slot: ChoiceSlot, choice?: NewOrderChoice) {
-  return choice ? getChoiceItemDisplayName(choice) : `Missing: ${slot.displayName}`;
+    return choice ? getChoiceItemDisplayName(choice) : `Missing: ${slot.displayName}`
 }
