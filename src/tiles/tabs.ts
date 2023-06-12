@@ -1,4 +1,4 @@
-import parseTabs, { Tab, isSplitTab, isToggleTab } from '@/api/tab'
+import tabs, { Tab, isSplitTab, isToggleTab } from '@/api/tab'
 import { SplitToggleState, Severity, newToggle, newSplitToggle, withSeverity, emptyTile } from '@/api/tile'
 import { ContainedStripInfo, newTileStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
@@ -73,6 +73,6 @@ function generateTabButton(tab: Tab) {
 export default function generateTabsGraph(): ContainedStripInfo {
     return {
         bounds: new Rectangle(0, 3, 10, 1),
-        strip: newTileStrip(parseTabs().map((tab) => generateTabButton(tab))),
+        strip: newTileStrip(tabs.value.map((tab) => generateTabButton(tab))),
     }
 }

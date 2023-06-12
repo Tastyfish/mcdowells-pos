@@ -1,4 +1,5 @@
-import tabs from '@/config/tabs.json'
+import { readonly, ref } from 'vue'
+import { loadConfig } from './config'
 
 // Structures for tabs.json
 
@@ -67,6 +68,20 @@ function sanitizeTab(tab: Tab): Tab | null {
     }
 }
 
-export default function parseTabs(): Tab[] {
-    return tabs.tabs.map((tab) => sanitizeTab(tab as Tab)).filter((tab) => tab !== null) as Tab[]
+function parseTabs(rawTabs: Tab[]): Tab[] {
+    return rawTabs.map((tab) => sanitizeTab(tab as Tab)).filter((tab) => tab !== null) as Tab[]
 }
+
+const tabs = ref([] as Tab[])
+
+interface RawTabSchema {
+    tabs: Tab[]
+}
+
+async function loadTabs() {
+    tabs.value = parseTabs((await loadConfig<RawTabSchema>('tabs')).tabs)
+}
+
+loadTabs()
+
+export default readonly(tabs)
