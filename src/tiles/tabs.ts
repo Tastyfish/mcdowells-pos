@@ -1,7 +1,7 @@
-import { SplitToggleState, Severity, newToggle, newSplitToggle, withSeverity } from '@/api/tile'
+import parseTabs, { Tab, isSplitTab, isToggleTab } from '@/api/tab'
+import { SplitToggleState, Severity, newToggle, newSplitToggle, withSeverity, emptyTile } from '@/api/tile'
 import { ContainedStripInfo, newTileStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
-
 import { useUIStore } from '@/store'
 
 /**
@@ -53,50 +53,26 @@ function getTTab(base: string): boolean {
     return useUIStore().selectedMenuTab === base
 }
 
+function generateTabButton(tab: Tab) {
+    if (isToggleTab(tab)) {
+        return withSeverity(
+            newToggle(getTTab(tab.key), () => setTTab(tab.key), tab.label),
+            (tab.severity as Severity) ?? Severity.Primary
+        )
+    } else if (isSplitTab(tab)) {
+        return withSeverity(
+            newSplitToggle(getSTab(tab.key), () => setSTab(tab.key), tab.labels[0], tab.labels[1]),
+            (tab.severity as Severity) ?? Severity.Primary
+        )
+    }
+
+    console.error('Unknown tab type: ', tab)
+    return emptyTile
+}
+
 export default function generateTabsGraph(): ContainedStripInfo {
     return {
         bounds: new Rectangle(0, 3, 10, 1),
-        strip: newTileStrip([
-            withSeverity(
-                newSplitToggle(getSTab('br'), () => setSTab('br'), 'Breakfast', 'Breakfast 2'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newSplitToggle(getSTab('lu'), () => setSTab('lu'), 'Lunch', 'Lunch 2'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newSplitToggle(getSTab('mc'), () => setSTab('mc'), 'McValue', 'Salads'),
-                Severity.Danger
-            ),
-            withSeverity(
-                newToggle(getTTab('dr'), () => setTTab('dr'), 'Drinks'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newToggle(getTTab('cf'), () => setTTab('cf'), 'McCafé'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newSplitToggle(getSTab('de'), () => setSTab('de'), 'Desert', 'Desert 2'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newToggle(getTTab('hm'), () => setTTab('hm'), 'Happy Meal'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newToggle(getTTab('ls'), () => setTTab('ls'), 'LSM'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newSplitToggle(getSTab('co'), () => setSTab('co'), 'Condiments', 'Gifts'),
-                Severity.Primary
-            ),
-            withSeverity(
-                newToggle(getTTab('special'), () => setTTab('special'), 'Special Functions'),
-                Severity.Danger
-            ),
-        ]),
+        strip: newTileStrip(parseTabs().map((tab) => generateTabButton(tab))),
     }
 }

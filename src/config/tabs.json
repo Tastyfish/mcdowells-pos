@@ -1,0 +1,51 @@
+{
+    "tabs": [
+        {
+            "key": "br",
+            "type": "split",
+            "labels": ["Breakfast", "Breakfast 2"]
+        },
+        {
+            "key": "lu",
+            "type": "split",
+            "labels": ["Lunch", "Lunch 2"]
+        },
+        {
+            "key": "mc",
+            "type": "split",
+            "labels": ["McValue", "Salads"],
+            "severity": "danger"
+        },
+        {
+            "key": "dr",
+            "label": "Drinks"
+        },
+        {
+            "key": "cf",
+            "label": "McCafé"
+        },
+        {
+            "key": "de",
+            "type": "split",
+            "labels": ["Desert", "Desert 2"]
+        },
+        {
+            "key": "hm",
+            "label": "Happy Meal"
+        },
+        {
+            "key": "ls",
+            "label": "LSM"
+        },
+        {
+            "key": "co",
+            "type": "split",
+            "labels": ["Condiments", "Gifts"]
+        },
+        {
+            "key": "special",
+            "label": "Special Functions",
+            "severity": "danger"
+        }
+    ]
+}
