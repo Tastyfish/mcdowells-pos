@@ -1,5 +1,5 @@
 import { useOrderStore, useUIStore } from '@/store'
-import { Severity, Tile, emptyTile, newButton } from '@/api/tile'
+import { Severity, Tile, newButton, newLabel } from '@/api/tile'
 import { ActionTabItem } from '@/api/tabview'
 
 function voidMenu(option: string) {
@@ -49,6 +49,6 @@ export function generateActionItem(item: ActionTabItem): Tile {
             }
         default:
             console.error('Unknown tab action type:', item.action)
-            return emptyTile
+            return newLabel(`ACTION? ${item.action}`)
     }
 }
