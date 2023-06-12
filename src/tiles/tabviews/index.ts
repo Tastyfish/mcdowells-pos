@@ -1,20 +1,18 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
-import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
-import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
+import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
-
-import { ChoiceSlot, isPriced } from '@/api/menu'
+import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
+import parseTabs, { TabItem, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tab'
+import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
+import { currency } from '@/config/locale.json'
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
+import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
 
-import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
-import { SmartOrderPayload } from '@/store/order'
-
+import { generateActionItem } from './action'
 import { generateDrinkStrips } from './drinks'
-import { getItemPrice } from '@/api/menu'
-import parseTabs, { TabItem, VarTabItem, isSlotTabItem, isVarTabItem } from '@/api/tab'
-import { generateSpecialStrips } from './special'
+import { generateLabelItem } from './label'
 
 export function assertGetSlot(slotID: string) {
     const slot = getChoiceSlot(slotID)
@@ -101,7 +99,7 @@ const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] 
     }))
 }
 
-function addVariableItem(item: VarTabItem, amount: number) {
+function generateVariableItem(item: VarTabItem, amount: number) {
     const orderStore = useOrderStore()
     const base = assertGetItem(item.base)
     const price = amount * item.perPrice
@@ -110,7 +108,7 @@ function addVariableItem(item: VarTabItem, amount: number) {
     orderStore.addLine({
         menuItem: {
             ...base,
-            displayName: base.displayName.replace(item.replace, price.toFixed(2)),
+            displayName: base.displayName.replace(item.replace, `${currency}${price.toFixed(2)}`),
             price,
         },
     })
@@ -127,20 +125,24 @@ function generateTabItems(item: TabItem): Tile[] {
     if (isVarTabItem(item)) {
         return [
             {
-                ...newButton(() => uiStore.openNumpad((amount) => addVariableItem(item, amount)), item.label),
+                ...newButton(() => uiStore.openNumpad((amount) => generateVariableItem(item, amount)), item.label),
                 severity: Severity.Help,
                 classes: ['small-text-button'],
             },
         ]
     } else if (isSlotTabItem(item)) {
         return generateStandaloneSlotTiles(assertGetSlot(item.slot))
+    } else if (isActionTabItem(item)) {
+        return [generateActionItem(item)]
+    } else if (isLabelTabItem(item)) {
+        return [generateLabelItem(item)]
     }
 
     console.error('Unknown advanced tab item type: ', item)
     return []
 }
 
-function generateGenericTabView(sections: TabItem[][]): ContainedStripInfo[] {
+function generateTabView(sections: TabItem[][]): ContainedStripInfo[] {
     return [
         ...generateDrinkStrips(),
         ...generateSimpleTabStrips(sections.map((section) => newTileStrip(section.map((item) => generateTabItems(item)).flat()))),
@@ -149,17 +151,13 @@ function generateGenericTabView(sections: TabItem[][]): ContainedStripInfo[] {
 
 const tabConfig = parseTabs()
 
-const staticTabs: { [tabKey: string]: () => ContainedStripInfo[] } = {
-    special: generateSpecialStrips,
-}
-
 export default function generateTabViewGraph(): ContainedStripInfo {
     const currentTab = useUIStore().selectedMenuTab
 
     return {
         bounds: new Rectangle(1, 4, 8, 6),
         strip: newContainerStrip(
-            staticTabs[currentTab]?.() ?? (tabConfig[currentTab] ? generateGenericTabView(tabConfig[currentTab]) : generateDrinkStrips())
+            tabConfig[currentTab] ? generateTabView(tabConfig[currentTab]) : generateDrinkStrips()
         ),
     }
 }

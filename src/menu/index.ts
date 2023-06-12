@@ -132,7 +132,14 @@ export const menu: MenuItem[] = [
     price: 25.00,
   },
   {
-    id: 'discount01', // Label and price is filled in by a numpad callback.
+    id: 'giftV',
+    displayName: '??? Gift Card',
+    simpleDisplayName: true,
+    choiceSlots: { },
+    price: 1.00,
+  },
+  {
+    id: 'discountV', // Label and price is filled in by a numpad callback.
     displayName: '** ??? Discount **',
     simpleDisplayName: true,
     choiceSlots: { },

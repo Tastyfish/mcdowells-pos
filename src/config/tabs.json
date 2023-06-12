@@ -34,9 +34,38 @@
             "gift25",
             {
                 "type": "var",
-                "base": "gift10",
-                "label": "? Gift Card",
-                "replace": "10"
+                "base": "giftV",
+                "label": "? Gift Card"
+            }
+        ]
+    ],
+    "special": [
+        [
+            {
+                "type": "action",
+                "action": "voidOrder"
+            },
+            {
+                "type": "var",
+                "base": "discountV",
+                "label": "MGR Discount",
+                "perPrice": -1
+            }
+        ],
+        [
+            {
+                "type": "label",
+                "label": "Order #{order:orderNumber}"
+            },
+            {
+                "type": "label",
+                "label": "Total Items: {order:lines}"
+            }
+        ],
+        [
+            {
+                "type": "action",
+                "action": "factoryReset"
             }
         ]
     ]

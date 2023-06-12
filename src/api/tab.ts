@@ -28,6 +28,18 @@ export interface SlotTabItem extends AdvancedTabItem {
     slot: string
 }
 
+export interface ActionTabItem extends AdvancedTabItem {
+    type: 'action'
+    /** Which tile prefab is being used. Not verified until render. */
+    action: string
+}
+
+export interface LabelTabItem extends AdvancedTabItem {
+    type: 'label'
+    /** Which tile prefab is being used. Not verified until render. */
+    label: string
+}
+
 /** A string means a menu item key. */
 export type TabItem = AdvancedTabItem | string
 
@@ -85,6 +97,32 @@ export function isSlotTabItem(item: AdvancedTabItem): item is SlotTabItem {
     return true
 }
 
+export function isActionTabItem(item: AdvancedTabItem): item is ActionTabItem {
+    if (item.type !== 'action') {
+        return false
+    }
+
+    if (!('action' in item) || typeof item.action !== 'string') {
+        console.error('Var tab item missing required action in', item)
+        return false
+    }
+
+    return true
+}
+
+export function isLabelTabItem(item: AdvancedTabItem): item is LabelTabItem {
+    if (item.type !== 'label') {
+        return false
+    }
+
+    if (!('label' in item) || typeof item.label !== 'string') {
+        console.error('Var tab item missing required label in', item)
+        return false
+    }
+
+    return true
+}
+
 function sanitizeTabItem(item: TabItem): TabItem | null {
     if (typeof item === 'string') {
         return item
@@ -101,6 +139,10 @@ function sanitizeTabItem(item: TabItem): TabItem | null {
                 : null
         case 'slot':
             return isSlotTabItem(item) ? item : null
+        case 'action':
+            return isActionTabItem(item) ? item : null
+        case 'label':
+            return isLabelTabItem(item) ? item : null
         default:
             console.error(`Invalid advanced tab item type: ${item.type}`, item)
             return null
