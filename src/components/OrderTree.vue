@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ComponentPublicInstance, computed, watch, nextTick, ref } from 'vue'
 import Tree, { TreeExpandedKeys, TreeNode } from 'primevue/tree'
-import { currency } from '@/config/locale.json'
+import locale from '@/api/locale'
 
 const props = defineProps<{
     nodes: TreeNode[]
@@ -54,7 +54,7 @@ watch(
         <template #priced="slotProps">
             <div class="w-full flex flex-row">
                 <span class="flex-auto">{{ slotProps.node.label }}</span>
-                <b>{{ currency }}{{ (slotProps.node.data as number).toFixed(2) }}</b>
+                <b>{{ locale.currency }}{{ (slotProps.node.data as number).toFixed(2) }}</b>
             </div>
         </template>
     </Tree>

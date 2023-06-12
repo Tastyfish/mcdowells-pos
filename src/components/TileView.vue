@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import locale from '@/api/locale'
 import { Tile, TileType, emptyTile, isLabel, isButton, isToggle, isSplitToggle, Severity, ButtonTile, ToggleTile, SplitToggleTile } from '@/api/tile'
 import { useUIStore } from '@/store'
-
-import { currency } from '@/config/locale.json'
 
 const props = withDefaults(
     defineProps<{
@@ -61,7 +60,7 @@ const extraStyles = computed(() => {
         @click="(tile as ButtonTile).onPress"
         :label="tile.label"
         :icon="tile.icon"
-        :badge="uiStore.showingPrices && tile.price !== undefined ? `${currency}${tile.price.toFixed(2)}` : undefined"
+        :badge="uiStore.showingPrices && tile.price !== undefined ? `${locale.currency}${tile.price.toFixed(2)}` : undefined"
         badge-class="p-badge-success"
     />
     <Button
@@ -71,7 +70,7 @@ const extraStyles = computed(() => {
         @click="(tile as ToggleTile).onPress"
         :label="tile.label"
         :icon="tile.icon"
-        :badge="uiStore.showingPrices && tile.price !== undefined ? `${currency}${tile.price.toFixed(2)}` : undefined"
+        :badge="uiStore.showingPrices && tile.price !== undefined ? `${locale.currency}${tile.price.toFixed(2)}` : undefined"
         badge-class="p-badge-success"
     />
     <Button

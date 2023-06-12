@@ -1,12 +1,10 @@
 // Completely different scene graph fork for when the cashier presses "Total"
 
+import { PaymentMethod, cashOut, getOrderTotals } from '@/api/cashout'
+import locale from '@/api/locale'
 import { Severity, newButton, newLabel, emptyTile } from '@/api/tile'
 import { StripProvider, newTileStrip, newLeftwardStrip, newDownwardStrip, newUpwardStrip, constrainWidth, grow, emptyStrip } from '@/api/strip'
-
 import { TileScreen, useUIStore } from '@/store'
-import { PaymentMethod, cashOut, getOrderTotals } from '@/api/cashout'
-
-import { currency } from '@/config/locale.json'
 
 function backOut() {
     // Leave the screen and go back.
@@ -26,6 +24,7 @@ async function startCashOut(method: PaymentMethod) {
 
 export default function generateTotalScreenGraph(): StripProvider {
     const totals = getOrderTotals()
+    const currency = locale.value.currency
 
     return newLeftwardStrip([
         constrainWidth(

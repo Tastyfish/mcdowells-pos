@@ -1,11 +1,11 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
+import locale from '@/api/locale'
 import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
 import parseTabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
-import { currency } from '@/config/locale.json'
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
 import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
@@ -108,7 +108,7 @@ function generateVariableItem(item: VarTabItem, amount: number) {
     orderStore.addLine({
         menuItem: {
             ...base,
-            displayName: base.displayName.replace(item.replace, `${currency}${price.toFixed(2)}`),
+            displayName: base.displayName.replace(item.replace, `${locale.value.currency}${price.toFixed(2)}`),
             price,
         },
     })
