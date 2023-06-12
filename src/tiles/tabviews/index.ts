@@ -36,46 +36,19 @@ export function assertGetItem(itemID: string) {
     return item
 }
 
-const drink = assertGetSlot('drink')
+export function newMealButton(mealID: string): ButtonTile {
+    const menuItem = getMenuItem(mealID)
 
-async function addSeperateDrink(choiceItemID: string) {
-    if (!drink) {
-        throw new Error('Drink slot missing. This is a serious error.')
+    if (!menuItem) {
+        return newButton(() => {}, mealID)
     }
 
-    const orderStore = useOrderStore()
+    const price = getItemPrice(menuItem, undefined)
 
-    const lines = await orderStore.addSmartOrderLine({
-        menuItemID: 'drink',
-        defaultSize: Sizes.Medium,
-    })
-
-    await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot: drink })))
-}
-
-export async function addDrink(choiceItemID: string): Promise<void> {
-    if (!drink) {
-        throw new Error('Drink slot missing. This is a serious error.')
-    }
-
-    const orderStore = useOrderStore()
-
-    const line = orderStore.currentLine
-    if (!line) {
-        // Just add a drink to the order.
-        await addSeperateDrink(choiceItemID)
-        return
-    }
-
-    try {
-        await orderStore.addSmartChoice({
-            choiceItemID,
-            line,
-            slot: drink,
-        })
-    } catch {
-        // Likely due to the line not supporting drinks, add a stand-alone smart line.
-        await addSeperateDrink(choiceItemID)
+    return {
+        ...newButton(() => addMealItem(mealID), menuItem.displayName),
+        price,
+        classes: ['small-text-button'],
     }
 }
 
@@ -98,22 +71,6 @@ export async function addMealItem(payload: string | SmartOrderPayload): Promise<
     await useOrderStore().addSmartOrderLine(payload)
 
     return finishAddLines()
-}
-
-export function newMealButton(mealID: string): ButtonTile {
-    const menuItem = getMenuItem(mealID)
-
-    if (!menuItem) {
-        return newButton(() => {}, mealID)
-    }
-
-    const price = getItemPrice(menuItem, undefined)
-
-    return {
-        ...newButton(() => addMealItem(mealID), menuItem.displayName),
-        price,
-        classes: ['small-text-button'],
-    }
 }
 
 const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] => {
