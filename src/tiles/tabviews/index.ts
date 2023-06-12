@@ -80,7 +80,7 @@ export async function addDrink(choiceItemID: string): Promise<void> {
 }
 
 function isStripProviders(strips: Tile[] | StripProvider[]): strips is StripProvider[] {
-    return strips.some(strip => typeof strip === 'function')
+    return strips.some((strip) => typeof strip === 'function')
 }
 
 export const generateSimpleTabStrips = (tilesOrStrips: Tile[] | StripProvider[]): ContainedStripInfo[] => [
@@ -178,6 +178,9 @@ function generateTabItems(item: TabItem): Tile[] {
     } else if (isSlotTabItem(item)) {
         return generateStandaloneSlotTiles(assertGetSlot(item.slot))
     }
+
+    console.error('Unknown advanced tab item type: ', item)
+    return []
 }
 
 function generateGenericTabView(sections: TabItem[][]): ContainedStripInfo[] {
