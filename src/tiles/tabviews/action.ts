@@ -36,6 +36,7 @@ export function generateActionItem(item: ActionTabItem): Tile {
             return {
                 ...newButton(() => uiStore.openMessageBox('Void entire order?', ['Void', 'Cancel'], voidMenu), 'Void Order'),
                 severity: Severity.Danger,
+                classes: ['small-text-button'],
             }
         case 'factoryReset':
             return {
@@ -44,6 +45,7 @@ export function generateActionItem(item: ActionTabItem): Tile {
                     'Factory Reset'
                 ),
                 severity: Severity.Danger,
+                classes: ['small-text-button'],
             }
         default:
             console.error('Unknown tab action type:', item.action)
