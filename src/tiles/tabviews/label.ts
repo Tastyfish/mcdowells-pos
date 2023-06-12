@@ -1,4 +1,4 @@
-import { LabelTabItem } from '@/api/tab'
+import { LabelTabItem } from '@/api/tabview'
 import { newLabel } from '@/api/tile'
 import { Tile } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'

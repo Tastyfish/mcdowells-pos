@@ -1,6 +1,6 @@
 import { useOrderStore, useUIStore } from '@/store'
 import { Severity, Tile, emptyTile, newButton } from '@/api/tile'
-import { ActionTabItem } from '@/api/tab'
+import { ActionTabItem } from '@/api/tabview'
 
 function voidMenu(option: string) {
     if (option !== 'Void') {

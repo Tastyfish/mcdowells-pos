@@ -1,3 +1,5 @@
+import tabviews from '@/config/tabviews.json'
+
 // Structures for tabs.json
 
 /**
@@ -48,8 +50,6 @@ interface TabData {
     // Outer array is a section, inner is each item.
     [tabKey: string]: TabItem[][]
 }
-
-import tabs from '@/config/tabs.json'
 
 function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
     if (item.type !== 'var') {
@@ -151,7 +151,7 @@ function sanitizeTabItem(item: TabItem): TabItem | null {
 
 export default function parseTabs(): TabData {
     return Object.fromEntries(
-        Object.entries(tabs).map(([tab, tabData]) => [
+        Object.entries(tabviews).map(([tab, tabData]) => [
             tab,
             tabData.map((section) => section.map((item) => sanitizeTabItem(item)).filter((item) => item !== null) as TabItem[]),
         ])
