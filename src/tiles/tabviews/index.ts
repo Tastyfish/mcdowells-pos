@@ -3,7 +3,7 @@
 import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
-import parseTabs, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
+import parseTabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
 import { currency } from '@/config/locale.json'
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
@@ -149,7 +149,7 @@ function generateTabView(tabView: TabView): ContainedStripInfo[] {
     ]
 }
 
-const tabConfig = parseTabs()
+const tabConfig = parseTabviews()
 
 export default function generateTabViewGraph(): ContainedStripInfo {
     const currentTab = useUIStore().selectedMenuTab

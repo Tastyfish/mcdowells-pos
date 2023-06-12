@@ -1,6 +1,6 @@
 import tabviews from '@/config/tabviews.json'
 
-// Structures for tabs.json
+// Structures for tabviews.json
 
 /**
  * Base for advanced tab items that aren't just menu item keys.
@@ -167,6 +167,6 @@ function sanitizeTabView(view: TabView | TabItem[][]): TabView {
     }
 }
 
-export default function parseTabs(): TabViewLookup {
+export default function parseTabviews(): TabViewLookup {
     return Object.fromEntries(Object.entries(tabviews).map(([tab, tabData]) => [tab, sanitizeTabView(tabData)]))
 }
