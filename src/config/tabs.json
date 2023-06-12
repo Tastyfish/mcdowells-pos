@@ -1,0 +1,43 @@
+{
+    "lu0": [
+        [
+            "bigmac",
+            "2cheeseburgers",
+            "quarterpounder",
+            "DBLquarterpounder",
+            "BCNclubhouseburger"
+        ],
+        [
+            "nuggets10"
+        ]
+    ],
+    "dr": [
+        [
+            {
+                "type": "slot",
+                "slot": "drink"
+            }
+        ]
+    ],
+    "co0": [
+        [
+            {
+                "type": "slot",
+                "slot": "sauce"
+            }
+        ]
+    ],
+    "co1": [
+        [
+            "gift05",
+            "gift10",
+            "gift25",
+            {
+                "type": "var",
+                "base": "gift10",
+                "label": "? Gift Card",
+                "replace": "10"
+            }
+        ]
+    ]
+}

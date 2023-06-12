@@ -1,7 +1,7 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
-import { newButton, ButtonTile, Tile } from '@/api/tile'
-import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip } from '@/api/strip'
+import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
+import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
 
 import { ChoiceSlot, isPriced } from '@/api/menu'
@@ -11,17 +11,16 @@ import Sizes from '@/menu/sizes'
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
 import { SmartOrderPayload } from '@/store/order'
 
-import { generateLunchViewStrips } from './lunch'
 import { generateDrinkStrips } from './drinks'
-import { generateGiftStrips } from './gifts'
 import { getItemPrice } from '@/api/menu'
+import parseTabs, { TabItem, VarTabItem, isSlotTabItem, isVarTabItem } from '@/api/tab'
 import { generateSpecialStrips } from './special'
 
 export function assertGetSlot(slotID: string) {
     const slot = getChoiceSlot(slotID)
 
     if (!slot) {
-        throw new Error(`Slot ${slotID} could not be found. This is catastrophic.`)
+        throw new Error(`Slot ${slotID} could not be found.`)
     }
 
     return slot
@@ -31,14 +30,13 @@ export function assertGetItem(itemID: string) {
     const item = getMenuItem(itemID)
 
     if (!item) {
-        throw new Error(`Menu item ${itemID} could not be found. This is catastrophic.`)
+        throw new Error(`Menu item ${itemID} could not be found.`)
     }
 
     return item
 }
 
 const drink = assertGetSlot('drink')
-const sauce = assertGetSlot('sauce')
 
 async function addSeperateDrink(choiceItemID: string) {
     if (!drink) {
@@ -81,18 +79,15 @@ export async function addDrink(choiceItemID: string): Promise<void> {
     }
 }
 
-export const generateSimpleTabStrips = (tiles: Tile[]): ContainedStripInfo[] => [
+function isStripProviders(strips: Tile[] | StripProvider[]): strips is StripProvider[] {
+    return strips.some(strip => typeof strip === 'function')
+}
+
+export const generateSimpleTabStrips = (tilesOrStrips: Tile[] | StripProvider[]): ContainedStripInfo[] => [
     {
         bounds: new Rectangle(0, 0, 8, 4),
-        strip: newDownwardStrip([
-            newTileStrip(tiles),
-        ]),
+        strip: newDownwardStrip(isStripProviders(tilesOrStrips) ? tilesOrStrips : [newTileStrip(tilesOrStrips)]),
     },
-]
-
-export const generateMealTabStrips = (tiles: Tile[]): ContainedStripInfo[] => [
-    ...generateSimpleTabStrips(tiles),
-    ...generateDrinkStrips(),
 ]
 
 export function finishAddLines(): void {
@@ -121,47 +116,81 @@ export function newMealButton(mealID: string): ButtonTile {
     }
 }
 
-// For the dedicated drinks and condiments menus
-const generateStandaloneSlotStrips = (slot: ChoiceSlot, menuID?: string): ContainedStripInfo[] => {
+const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] => {
     const uiStore = useUIStore()
     const orderStore = useOrderStore()
 
-    return generateMealTabStrips(
-        // Automatically generate tiles based on existing sauces
-        getChoicesBySlot(slot.id).map((choice) => ({
-            ...newButton(async () => {
-                // Apply sauce to all of the lines added.
-                const lines = await orderStore.addSmartOrderLine({
-                    menuItemID: menuID ?? slot.id,
-                    defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
-                })
-                uiStore.setChoiceMenuMode(ChoiceMenuMode.Default)
+    return getChoicesBySlot(slot.id).map((choice) => ({
+        ...newButton(async () => {
+            // Apply sauce to all of the lines added.
+            const lines = await orderStore.addSmartOrderLine({
+                menuItemID: menuID ?? slot.id,
+                defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
+            })
+            uiStore.setChoiceMenuMode(ChoiceMenuMode.Default)
 
-                await Promise.all(
-                    lines.map((line) =>
-                        orderStore.addSmartChoice({
-                            line,
-                            choiceItemID: choice.id,
-                            slot,
-                        })
-                    )
+            await Promise.all(
+                lines.map((line) =>
+                    orderStore.addSmartChoice({
+                        line,
+                        choiceItemID: choice.id,
+                        slot,
+                    })
                 )
-            }, choice.displayName),
-            price: isPriced(choice) ? getItemPrice(choice) : getItemPrice(slot),
-            classes: ['small-text-button'],
-        }))
-    )
+            )
+        }, choice.displayName),
+        price: isPriced(choice) ? getItemPrice(choice) : getItemPrice(slot),
+        classes: ['small-text-button'],
+    }))
 }
 
-const generateCondimentViewStrips = (): ContainedStripInfo[] => generateStandaloneSlotStrips(sauce)
-const generateDrinkViewStrips = (): ContainedStripInfo[] => generateStandaloneSlotStrips(drink)
+function addVariableItem(item: VarTabItem, amount: number) {
+    const orderStore = useOrderStore()
+    const base = assertGetItem(item.base)
+    const price = amount * item.perPrice
 
-const tabMap: { [tabKey: string]: () => ContainedStripInfo[] } = {
+    // Use base as a template, but update label and price.
+    orderStore.addLine({
+        menuItem: {
+            ...base,
+            displayName: base.displayName.replace(item.replace, price.toFixed(2)),
+            price,
+        },
+    })
+}
+
+function generateTabItems(item: TabItem): Tile[] {
+    if (typeof item === 'string') {
+        // Menu item.
+        return [newMealButton(item)]
+    }
+
+    const uiStore = useUIStore()
+
+    if (isVarTabItem(item)) {
+        return [
+            {
+                ...newButton(() => uiStore.openNumpad((amount) => addVariableItem(item, amount)), item.label),
+                severity: Severity.Help,
+                classes: ['small-text-button'],
+            },
+        ]
+    } else if (isSlotTabItem(item)) {
+        return generateStandaloneSlotTiles(assertGetSlot(item.slot))
+    }
+}
+
+function generateGenericTabView(sections: TabItem[][]): ContainedStripInfo[] {
+    return [
+        ...generateDrinkStrips(),
+        ...generateSimpleTabStrips(sections.map((section) => newTileStrip(section.map((item) => generateTabItems(item)).flat()))),
+    ]
+}
+
+const tabConfig = parseTabs()
+
+const staticTabs: { [tabKey: string]: () => ContainedStripInfo[] } = {
     special: generateSpecialStrips,
-    lu0: generateLunchViewStrips,
-    dr: generateDrinkViewStrips,
-    co0: generateCondimentViewStrips,
-    co1: generateGiftStrips,
 }
 
 export default function generateTabViewGraph(): ContainedStripInfo {
@@ -169,6 +198,8 @@ export default function generateTabViewGraph(): ContainedStripInfo {
 
     return {
         bounds: new Rectangle(1, 4, 8, 6),
-        strip: newContainerStrip(tabMap[currentTab]?.() ?? generateDrinkStrips()),
+        strip: newContainerStrip(
+            staticTabs[currentTab]?.() ?? (tabConfig[currentTab] ? generateGenericTabView(tabConfig[currentTab]) : generateDrinkStrips())
+        ),
     }
 }
