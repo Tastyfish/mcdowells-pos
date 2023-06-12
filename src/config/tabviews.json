@@ -47,6 +47,16 @@
         "content": [
             [
                 {
+                    "type": "label",
+                    "label": ""
+                }
+            ],
+            [
+                {
+                    "type": "label",
+                    "label": ""
+                },
+                {
                     "type": "action",
                     "action": "voidOrder"
                 },
@@ -60,6 +70,10 @@
             [
                 {
                     "type": "label",
+                    "label": ""
+                },
+                {
+                    "type": "label",
                     "label": "Order #{order:orderNumber}"
                 },
                 {
@@ -68,6 +82,10 @@
                 }
             ],
             [
+                {
+                    "type": "label",
+                    "label": ""
+                },
                 {
                     "type": "action",
                     "action": "factoryReset"
