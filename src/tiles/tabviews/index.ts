@@ -1,10 +1,11 @@
 // The actually main menu content in the lower 4/5 of the screen.
 
+import { DeepReadonly } from 'vue'
 import locale from '@/api/locale'
 import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
-import parseTabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
+import tabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
 import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
@@ -142,20 +143,18 @@ function generateTabItems(item: TabItem): Tile[] {
     return []
 }
 
-function generateTabView(tabView: TabView): ContainedStripInfo[] {
+function generateTabView(tabView: DeepReadonly<TabView>): ContainedStripInfo[] {
     return [
         ...(tabView.drinks ? generateDrinkStrips() : []),
         ...generateSimpleTabStrips(tabView.content.map((section) => newTileStrip(section.map((item) => generateTabItems(item)).flat()))),
     ]
 }
 
-const tabConfig = parseTabviews()
-
 export default function generateTabViewGraph(): ContainedStripInfo {
     const currentTab = useUIStore().selectedMenuTab
 
     return {
         bounds: new Rectangle(1, 4, 8, 5),
-        strip: newContainerStrip(tabConfig[currentTab] ? generateTabView(tabConfig[currentTab]) : generateDrinkStrips()),
+        strip: newContainerStrip(tabviews.value[currentTab] ? generateTabView(tabviews.value[currentTab]) : generateDrinkStrips()),
     }
 }

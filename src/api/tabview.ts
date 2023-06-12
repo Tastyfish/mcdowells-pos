@@ -1,4 +1,5 @@
-import tabviews from '@/config/tabviews.json'
+import { readonly, ref } from 'vue'
+import { loadConfig } from './config'
 
 // Structures for tabviews.json
 
@@ -167,6 +168,16 @@ function sanitizeTabView(view: TabView | TabItem[][]): TabView {
     }
 }
 
-export default function parseTabviews(): TabViewLookup {
-    return Object.fromEntries(Object.entries(tabviews).map(([tab, tabData]) => [tab, sanitizeTabView(tabData)]))
+function parseTabviews(raw: TabViewLookup): TabViewLookup {
+    return Object.fromEntries(Object.entries(raw).map(([tab, tabData]) => [tab, sanitizeTabView(tabData)]))
 }
+
+const tabviews = ref({} as TabViewLookup)
+
+async function loadTabviews() {
+    tabviews.value = parseTabviews(await loadConfig<TabViewLookup>('tabviews'))
+}
+
+loadTabviews()
+
+export default readonly(tabviews)
