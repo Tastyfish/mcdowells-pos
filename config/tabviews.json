@@ -1,0 +1,96 @@
+{
+    "lu0": [
+        [
+            "bigmac",
+            "2cheeseburgers",
+            "quarterpounder",
+            "DBLquarterpounder",
+            "BCNclubhouseburger"
+        ],
+        [
+            "nuggets10"
+        ]
+    ],
+    "dr": [
+        [
+            {
+                "type": "slot",
+                "slot": "drink"
+            }
+        ]
+    ],
+    "co0": [
+        [
+            {
+                "type": "slot",
+                "slot": "sauce"
+            }
+        ]
+    ],
+    "co1": {
+        "drinks": false,
+        "content": [
+            [
+                "gift05",
+                "gift10",
+                "gift25",
+                {
+                    "type": "var",
+                    "base": "giftV",
+                    "label": "? Gift Card"
+                }
+            ]
+        ]
+    },
+    "special": {
+        "drinks": false,
+        "content": [
+            [
+                {
+                    "type": "label",
+                    "label": ""
+                }
+            ],
+            [
+                {
+                    "type": "label",
+                    "label": ""
+                },
+                {
+                    "type": "action",
+                    "action": "voidOrder"
+                },
+                {
+                    "type": "var",
+                    "base": "discountV",
+                    "label": "MGR Discount",
+                    "perPrice": -1
+                }
+            ],
+            [
+                {
+                    "type": "label",
+                    "label": ""
+                },
+                {
+                    "type": "label",
+                    "label": "Order #{order:orderNumber}"
+                },
+                {
+                    "type": "label",
+                    "label": "Total Items: {order:lines}"
+                }
+            ],
+            [
+                {
+                    "type": "label",
+                    "label": ""
+                },
+                {
+                    "type": "action",
+                    "action": "factoryReset"
+                }
+            ]
+        ]
+    }
+}
