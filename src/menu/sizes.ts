@@ -14,11 +14,6 @@ export const baseSizes: Sizes[] = [
   Sizes.Large,
 ];
 
-export const baseSizesAndHM: Sizes[] = [
-  ...baseSizes,
-  Sizes.HappyMeal,
-];
-
 export const baseSizesAndSr: Sizes[] = [
   ...baseSizes,
   Sizes.Senior,
