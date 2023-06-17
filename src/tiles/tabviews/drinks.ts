@@ -1,15 +1,16 @@
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newListStrip } from '@/api/strip'
-import { Tile, newButton } from '@/api/tile'
+import { newButton } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'
 import { assertGetSlot } from '.'
 import { getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
+import { isPriced, getItemPrice } from '@/api/menu'
 
-const drink = assertGetSlot('drink')
+const drinkSlot = assertGetSlot('drink')
 
 async function addSeperateDrink(choiceItemID: string) {
-    if (!drink) {
+    if (!drinkSlot) {
         throw new Error('Drink slot missing. This is a serious error.')
     }
 
@@ -20,11 +21,11 @@ async function addSeperateDrink(choiceItemID: string) {
         defaultSize: Sizes.Medium,
     })
 
-    await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot: drink })))
+    await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot: drinkSlot })))
 }
 
 async function addSmartDrink(choiceItemID: string): Promise<void> {
-    if (!drink) {
+    if (!drinkSlot) {
         throw new Error('Drink slot missing. This is a serious error.')
     }
 
@@ -41,7 +42,7 @@ async function addSmartDrink(choiceItemID: string): Promise<void> {
         await orderStore.addSmartChoice({
             choiceItemID,
             line,
-            slot: drink,
+            slot: drinkSlot,
         })
     } catch {
         // Likely due to the line not supporting drinks, add a stand-alone smart line.
@@ -56,7 +57,10 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
         {
             bounds: new Rectangle(0, 4, 8, 1),
             strip: newListStrip(
-                getChoicesBySlot('drink').map((drink) => newButton(() => addSmartDrink(drink.id), drink.displayName) as Tile),
+                getChoicesBySlot('drink').map((drink) => ({
+                    ...newButton(() => addSmartDrink(drink.id), drink.displayName),
+                    price: isPriced(drink) ? getItemPrice(drink) : getItemPrice(drinkSlot),
+                })),
                 uiStore.drinkPage,
                 () => uiStore.drinkPage++
             ),
