@@ -50,6 +50,10 @@ const extraStyles = computed(() => {
         minHeight: height ? `calc(${height}00% + ${(height - 1) * 0.5}em) !important` : undefined,
     }
 })
+
+function formatPrice(price: number): string {
+    return Number.isNaN(price) ? 'Varies' : `${locale.value.currency}${price.toFixed(2)}`
+}
 </script>
 
 <template>
@@ -60,7 +64,7 @@ const extraStyles = computed(() => {
         @click="(tile as ButtonTile).onPress"
         :label="tile.label"
         :icon="tile.icon"
-        :badge="uiStore.showingPrices && tile.price !== undefined ? `${locale.currency}${tile.price.toFixed(2)}` : undefined"
+        :badge="uiStore.showingPrices && tile.price !== undefined ? formatPrice(tile.price) : undefined"
         badge-class="p-badge-success"
     />
     <Button
@@ -70,7 +74,7 @@ const extraStyles = computed(() => {
         @click="(tile as ToggleTile).onPress"
         :label="tile.label"
         :icon="tile.icon"
-        :badge="uiStore.showingPrices && tile.price !== undefined ? `${locale.currency}${tile.price.toFixed(2)}` : undefined"
+        :badge="uiStore.showingPrices && tile.price !== undefined ? formatPrice(tile.price) : undefined"
         badge-class="p-badge-success"
     />
     <Button
@@ -80,11 +84,11 @@ const extraStyles = computed(() => {
         :style="extraStyles"
     >
         <span :class="['p-button-label', 'flex-none', { stogsel: tile.state == 'top' }]"
-            >{{ tile.topLabel }}<Badge v-if="tile.topPrice" :value="tile.topPrice" class="p-badge-success"
+            >{{ tile.topLabel }}<Badge v-if="tile.topPrice" :value="formatPrice(tile.topPrice)" class="p-badge-success"
         /></span>
         <div class="stogdiv"></div>
         <span :class="['p-button-label', 'flex-none', { stogsel: tile.state == 'bottom' }]"
-            >{{ tile.bottomLabel }}<Badge v-if="tile.bottomPrice" :value="tile.bottomPrice" class="p-badge-success"
+            >{{ tile.bottomLabel }}<Badge v-if="tile.bottomPrice" :value="formatPrice(tile.bottomPrice)" class="p-badge-success"
         /></span>
     </Button>
     <div v-else-if="isLabel(tile)" :class="['base', 'label', ...extraClasses, ...(tile.classes || [])]" :style="extraStyles">

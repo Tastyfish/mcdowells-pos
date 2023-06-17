@@ -129,7 +129,8 @@ function generateTabItems(item: TabItem): Tile[] {
                 ...newButton(() => uiStore.openNumpad((amount) => generateVariableItem(item, amount)), item.label),
                 severity: Severity.Help,
                 classes: ['small-text-button'],
-            },
+                price: Number.NaN,
+            } as ButtonTile,
         ]
     } else if (isSlotTabItem(item)) {
         return generateStandaloneSlotTiles(assertGetSlot(item.slot))
