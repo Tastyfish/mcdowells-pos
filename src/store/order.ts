@@ -217,7 +217,9 @@ export const useOrderStore = defineStore(
          * Clears entire slate.
          */
         function clearEntireOrder(): void {
-            lines.value.forEach((line) => clearLine(line))
+            lines.value = []
+            choices.value = []
+            currentLineID.value = NO_CURRENT_LINE
 
             sizeSelection.value = null
             countSelection.value = 1
