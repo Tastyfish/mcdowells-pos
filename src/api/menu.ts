@@ -39,9 +39,15 @@ export function isPriced(item: Partial<PricedItem>): item is PricedItem {
     return item.price !== undefined
 }
 
+/**
+ * Convert a size to an index in the price[size] array.
+ * @param size The size to get an index of. Medium is the default.
+ * @returns Size index.
+ */
 function getSizeComboPricingIndex(size?: Sizes): 0 | 1 | 2 {
     switch (size) {
         case Sizes.Medium:
+        case undefined:
             return 1
         case Sizes.Large:
             return 2
