@@ -27,7 +27,7 @@ export interface PricedItem {
     /**
      * Price as a number or 3 numbers for the 3 sizes.
      */
-    readonly price: number | [number, number, number]
+    readonly price: number | readonly [number, number, number]
 }
 
 /**
@@ -98,3 +98,66 @@ export interface ChoiceSlot extends ItemBase, PricedItem {
     /** The label in the grill bar, if applicable. */
     readonly grillLabel?: string
 }
+
+/**
+ * Determine if menu item is valid. Used for data loading.
+ * @param item The menu item in question.
+ * @returns Typeguard
+ */
+export function isValidItemBase(item: {}): item is ItemBase {
+    if (!('id' in item) || typeof item.id !== 'string') {
+        console.error('Menu item missing required id in', item)
+        return false
+    }
+
+    if (!('displayName' in item) || typeof item.displayName !== 'string') {
+        console.error('Menu item missing required display name in', item)
+        return false
+    }
+
+    if ('simpleDisplayName' in item && typeof item.simpleDisplayName !== 'boolean') {
+        console.error('Illegal simple display name in menu item:', item.simpleDisplayName, 'in', item)
+        return false
+    }
+
+    return true
+}
+
+/**
+ * Determine if priced item is valid. Used for data loading.
+ * @param item The priced item in question.
+ * @returns Typeguard
+ */
+export function isValidPricedItem(item: {}): item is PricedItem {
+    if (!('price' in item) || (typeof item.price !== 'number' && !(item.price instanceof Array && item.price.length === 3))) {
+        console.error('Menu item missing required price in', item)
+        return false
+    }
+
+    return true
+}
+
+export function isValidChoiceSlot(slot: {}): slot is ChoiceSlot {
+    if (!isValidItemBase(slot) || !isValidPricedItem(slot)) {
+        return false
+    }
+
+    if ('isListed' in slot && typeof slot.isListed !== 'boolean') {
+        console.error('Illegal isListed in choice slot:', slot.isListed, 'in', slot)
+        return false
+    }
+
+    if ('isComboOnly' in slot && typeof slot.isComboOnly !== 'boolean') {
+        console.error('Illegal isComboOnly in choice slot:', slot.isComboOnly, 'in', slot)
+        return false
+    }
+
+    if ('grillLabel' in slot && typeof slot.grillLabel !== 'string') {
+        console.error('Illegal grillLabel in choice slot:', slot.grillLabel, 'in', slot)
+        return false
+    }
+
+    return true
+}
+
+export { default as slots } from './loaders/slots'

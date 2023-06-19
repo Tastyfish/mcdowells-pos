@@ -1,8 +1,3 @@
-import { readonly, ref } from 'vue'
-import { loadConfig } from './config'
-
-// Structures for tabviews.json
-
 /**
  * Base for advanced tab items that aren't just menu item keys.
  */
@@ -57,11 +52,7 @@ export interface TabView {
     drinks: boolean
 }
 
-interface TabViewLookup {
-    [tabKey: string]: TabView
-}
-
-function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
+export function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
     if (item.type !== 'var') {
         return false
     }
@@ -133,51 +124,4 @@ export function isLabelTabItem(item: AdvancedTabItem): item is LabelTabItem {
     return true
 }
 
-function sanitizeTabItem(item: TabItem): TabItem | null {
-    if (typeof item === 'string') {
-        return item
-    }
-
-    switch (item.type) {
-        case 'var':
-            return isPartialVarTabItem(item)
-                ? ({
-                      replace: '???',
-                      perPrice: 1,
-                      ...item,
-                  } as VarTabItem)
-                : null
-        case 'slot':
-            return isSlotTabItem(item) ? item : null
-        case 'action':
-            return isActionTabItem(item) ? item : null
-        case 'label':
-            return isLabelTabItem(item) ? item : null
-        default:
-            console.error(`Invalid advanced tab item type: ${item.type}`, item)
-            return null
-    }
-}
-
-function sanitizeTabView(view: TabView | TabItem[][]): TabView {
-    const fullView: TabView = view instanceof Array ? { drinks: true, content: view } : view
-
-    return {
-        ...fullView,
-        content: fullView.content.map((section) => section.map((item) => sanitizeTabItem(item)).filter((item) => item !== null) as TabItem[]),
-    }
-}
-
-function parseTabviews(raw: TabViewLookup): TabViewLookup {
-    return Object.fromEntries(Object.entries(raw).map(([tab, tabData]) => [tab, sanitizeTabView(tabData)]))
-}
-
-const tabviews = ref({} as TabViewLookup)
-
-async function loadTabviews() {
-    tabviews.value = parseTabviews(await loadConfig<TabViewLookup>('tabviews'))
-}
-
-loadTabviews()
-
-export default readonly(tabviews)
+export { default } from './loaders/tabviews'
