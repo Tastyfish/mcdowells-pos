@@ -75,11 +75,11 @@ function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
         return false
     }
     if ('replace' in item && typeof item.replace !== 'string') {
-        console.error('Illegal replace in var tab item:', item.label, 'in', item)
+        console.error('Illegal replace in var tab item:', item.replace, 'in', item)
         return false
     }
     if ('perPrice' in item && typeof item.perPrice !== 'number') {
-        console.error('Illegal perPrice in var tab item:', item.label, 'in', item)
+        console.error('Illegal perPrice in var tab item:', item.perPrice, 'in', item)
         return false
     }
 
