@@ -1,3 +1,5 @@
+import { validateOptional, validateRequired } from './valid'
+
 /**
  * Base for advanced tab items that aren't just menu item keys.
  */
@@ -53,75 +55,29 @@ export interface TabView {
 }
 
 export function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
-    if (item.type !== 'var') {
-        return false
-    }
-
-    if (!('base' in item) || typeof item.base !== 'string') {
-        console.error('Var tab item missing required base in', item)
-        return false
-    }
-    if (!('label' in item) || typeof item.label !== 'string') {
-        console.error('Var tab item missing required label in', item)
-        return false
-    }
-    if ('replace' in item && typeof item.replace !== 'string') {
-        console.error('Illegal replace in var tab item:', item.replace, 'in', item)
-        return false
-    }
-    if ('perPrice' in item && typeof item.perPrice !== 'number') {
-        console.error('Illegal perPrice in var tab item:', item.perPrice, 'in', item)
-        return false
-    }
-
-    return true
+    return (
+        item.type === 'var' &&
+        validateRequired('VarTabItem', item as PartialVarTabItem, 'base', 'string') &&
+        validateRequired('VarTabItem', item as PartialVarTabItem, 'label', 'string') &&
+        validateOptional('VarTabItem', item as PartialVarTabItem, 'replace', 'string') &&
+        validateOptional('VarTabItem', item as PartialVarTabItem, 'perPrice', 'number')
+    )
 }
 
 export function isVarTabItem(item: AdvancedTabItem): item is VarTabItem {
-    if (!isPartialVarTabItem(item)) {
-        return false
-    }
-
-    return item.perPrice !== undefined && item.replace !== undefined
+    return isPartialVarTabItem(item) && 'perPrice' in item && 'replace' in item
 }
 
 export function isSlotTabItem(item: AdvancedTabItem): item is SlotTabItem {
-    if (item.type !== 'slot') {
-        return false
-    }
-
-    if (!('slot' in item) || typeof item.slot !== 'string') {
-        console.error('Var tab item missing required slot in', item)
-        return false
-    }
-
-    return true
+    return item.type === 'slot' && validateRequired('SlotTabItem', item as SlotTabItem, 'slot', 'string')
 }
 
 export function isActionTabItem(item: AdvancedTabItem): item is ActionTabItem {
-    if (item.type !== 'action') {
-        return false
-    }
-
-    if (!('action' in item) || typeof item.action !== 'string') {
-        console.error('Var tab item missing required action in', item)
-        return false
-    }
-
-    return true
+    return item.type === 'action' && validateRequired('ActionTabItem', item as ActionTabItem, 'action', 'string')
 }
 
 export function isLabelTabItem(item: AdvancedTabItem): item is LabelTabItem {
-    if (item.type !== 'label') {
-        return false
-    }
-
-    if (!('label' in item) || typeof item.label !== 'string') {
-        console.error('Var tab item missing required label in', item)
-        return false
-    }
-
-    return true
+    return item.type === 'label' && validateRequired('LabelTabItem', item as LabelTabItem, 'label', 'string')
 }
 
 export { default } from './loaders/tabviews'

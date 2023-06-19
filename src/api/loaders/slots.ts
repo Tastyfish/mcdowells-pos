@@ -22,7 +22,6 @@ const slots = ref({} as Record<string, ChoiceSlot>)
 
 async function loadSlots() {
     slots.value = parseSlots(await loadConfig<RawSlotSchema>('slots'))
-    console.log(slots.value)
 }
 
 loadSlots()

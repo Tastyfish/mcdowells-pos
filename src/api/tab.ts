@@ -1,3 +1,5 @@
+import { validateOptional, validateRequired } from './valid'
+
 export interface Tab {
     key: string
     type?: 'toggle' | 'split'
@@ -15,21 +17,11 @@ export interface SplitTab extends Tab {
 }
 
 export function isToggleTab(tab: Tab): tab is ToggleTab {
-    if (tab.type !== undefined && tab.type !== 'toggle') {
-        return false
-    }
-
-    if (!('label' in tab) || typeof tab.label !== 'string') {
-        console.error('Toggle tab missing required label in', tab)
-        return false
-    }
-
-    if ('severity' in tab && typeof tab.severity !== 'string') {
-        console.error('Illegal severity in tab:', tab.severity, 'in', tab)
-        return false
-    }
-
-    return true
+    return (
+        (tab.type === undefined || tab.type === 'toggle') &&
+        validateRequired('ToggleTab', tab as ToggleTab, 'label', 'string') &&
+        validateOptional('ToggleTab', tab, 'severity', 'string')
+    )
 }
 
 export function isSplitTab(tab: Tab): tab is SplitTab {
@@ -42,12 +34,7 @@ export function isSplitTab(tab: Tab): tab is SplitTab {
         return false
     }
 
-    if ('severity' in tab && typeof tab.severity !== 'string') {
-        console.error('Illegal severity in tab:', tab.severity, 'in', tab)
-        return false
-    }
-
-    return true
+    return validateOptional('SplitTab', tab, 'severity', 'string')
 }
 
 export { default } from './loaders/tabs'
