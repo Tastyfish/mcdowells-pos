@@ -1,4 +1,4 @@
-import { MenuItem, ChoiceItem, ChoiceSlot } from '@/api/menu';
+import { MenuItem, ChoiceItem } from '@/api/menu';
 import Sizes, { baseSizesAndHMAndSr, baseSizesAndSr } from './sizes';
 
 type ComboOffset = {
@@ -223,37 +223,6 @@ export const choices: ChoiceItem[] = [
   },
 ];
 
-export const choiceSlots: ChoiceSlot[] = [
-  {
-    id: 'drink',
-    displayName: 'Drink',
-    isListed: true,
-    isComboOnly: true,
-    price: [1.00, 1.29, 1.49],
-  },
-  {
-    id: 'side',
-    displayName: 'Side',
-    isListed: true,
-    isComboOnly: true,
-    price: [1.39, 1.79, 1.89],
-  },
-  {
-    id: 'grill',
-    displayName: 'Toppings',
-    isListed: true,
-    grillLabel: 'Grill',
-    price: 0.00,
-  },
-  {
-    id: 'sauce',
-    displayName: 'Sauce',
-    isListed: true,
-    grillLabel: 'Sauce',
-    price: 0.30,
-  },
-];
-
 export function getMenuItem(id: string): MenuItem | undefined {
   return menu.find((item) => item.id === id);
 }
@@ -264,8 +233,4 @@ export function getChoiceItem(id: string): ChoiceItem | undefined {
 
 export function getChoicesBySlot(slotID: string): ChoiceItem[] {
   return choices.filter((item) => item.slot === slotID);
-}
-
-export function getChoiceSlot(id: string): ChoiceSlot | undefined {
-  return choiceSlots.find((item) => item.id === id);
 }

@@ -2,28 +2,18 @@
 
 import { DeepReadonly } from 'vue'
 import locale from '@/api/locale'
-import { ChoiceSlot, getItemPrice, isPriced } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, isPriced, slots } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
 import tabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
-import { getMenuItem, getChoiceSlot, getChoicesBySlot } from '@/menu'
+import { getMenuItem, getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
 import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
 
 import { generateActionItem } from './action'
 import { generateDrinkStrips } from './drinks'
 import { generateLabelItem } from './label'
-
-export function assertGetSlot(slotID: string) {
-    const slot = getChoiceSlot(slotID)
-
-    if (!slot) {
-        throw new Error(`Slot ${slotID} could not be found.`)
-    }
-
-    return slot
-}
 
 export function assertGetItem(itemID: string) {
     const item = getMenuItem(itemID)
@@ -133,7 +123,8 @@ function generateTabItems(item: TabItem): Tile[] {
             } as ButtonTile,
         ]
     } else if (isSlotTabItem(item)) {
-        return generateStandaloneSlotTiles(assertGetSlot(item.slot))
+        const slot = slots.value[item.slot] ?? { id: item.slot, displayName: item.slot, price: 0 }
+        return generateStandaloneSlotTiles(slot)
     } else if (isActionTabItem(item)) {
         return [generateActionItem(item)]
     } else if (isLabelTabItem(item)) {

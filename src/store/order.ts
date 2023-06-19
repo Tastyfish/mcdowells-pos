@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 
-import { ChoiceSlot, getItemPrice, hasPrice } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, hasPrice, slots } from '@/api/menu'
 import { NewOrderLine, OrderLine, NewOrderChoice, OrderChoice } from '@/api/order'
-import { getMenuItem, getChoiceSlot, getChoiceItem, COMBO_OFFSETS } from '@/menu'
+import { getMenuItem, getChoiceItem, COMBO_OFFSETS } from '@/menu'
 import Sizes from '@/menu/sizes'
 import { computed, ref } from 'vue'
 
@@ -161,7 +161,7 @@ export const useOrderStore = defineStore(
                 // Add default choices, if they're set.
                 Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
                     if (slotDefault) {
-                        const slot = getChoiceSlot(slotID)
+                        const slot = slots.value[slotID]
                         const choiceItem = getChoiceItem(slotDefault)
                         if (slot && choiceItem) {
                             addChoice({ line, choiceItem })
@@ -234,7 +234,7 @@ export const useOrderStore = defineStore(
         function getLineChoices(line: OrderLine): { slotID: string; slot?: ChoiceSlot; choice?: OrderChoice | null }[] {
             return (
                 Object.keys(line.menuItem.choiceSlots)
-                    .map((slotID) => ({ slotID, slot: getChoiceSlot(slotID) }))
+                    .map((slotID) => ({ slotID, slot: slots.value[slotID] }))
                     // Undefined slots always show up for debugging.
                     // Otherwise, require it be a listed slot and:
                     //   Either this is a combo, or the slot still exists on non-combo items.

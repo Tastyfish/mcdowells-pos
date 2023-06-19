@@ -3,9 +3,9 @@ import { ContainedStripInfo, StripProvider, newListStrip, newDownwardStrip, newT
 import Rectangle from '@/api/rectangle'
 
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
-import { getChoiceSlot, getChoicesBySlot } from '@/menu'
+import { getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
-import { ChoiceItem } from '@/api/menu'
+import { ChoiceItem, slots } from '@/api/menu'
 import { OrderLine } from '@/api/order'
 
 const choiceRect = new Rectangle(0, 0, 10, 2)
@@ -42,7 +42,7 @@ function generateChoiceButtons(line: OrderLine): Tile[] {
 
 // A button to replace the side of the current line
 function newChoiceButton(choice: ChoiceItem): Tile {
-    const sideSlot = getChoiceSlot(choice.slot)
+    const sideSlot = slots.value[choice.slot]
 
     if (!sideSlot) {
         throw new Error('Side slot missing.')
@@ -72,7 +72,7 @@ function generateSlotButtons(slotID: string): Tile[] {
 }
 
 function slotName(id: string): string {
-    const slot = getChoiceSlot(id)
+    const slot = slots.value[id]
 
     return slot?.grillLabel ?? id
 }

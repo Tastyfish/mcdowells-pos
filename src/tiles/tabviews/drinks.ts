@@ -1,16 +1,18 @@
+import { computed } from 'vue'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newListStrip } from '@/api/strip'
 import { newButton } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'
-import { assertGetSlot } from '.'
 import { getChoicesBySlot } from '@/menu'
 import Sizes from '@/menu/sizes'
-import { isPriced, getItemPrice } from '@/api/menu'
+import { isPriced, getItemPrice, slots, ChoiceSlot } from '@/api/menu'
 
-const drinkSlot = assertGetSlot('drink')
+const drinkSlot = computed(() => slots.value['drink'] as ChoiceSlot | undefined)
 
 async function addSeperateDrink(choiceItemID: string) {
-    if (!drinkSlot) {
+    const slot = drinkSlot.value
+
+    if (!slot) {
         throw new Error('Drink slot missing. This is a serious error.')
     }
 
@@ -21,11 +23,13 @@ async function addSeperateDrink(choiceItemID: string) {
         defaultSize: Sizes.Medium,
     })
 
-    await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot: drinkSlot })))
+    await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot })))
 }
 
 async function addSmartDrink(choiceItemID: string): Promise<void> {
-    if (!drinkSlot) {
+    const slot = drinkSlot.value
+
+    if (!slot) {
         throw new Error('Drink slot missing. This is a serious error.')
     }
 
@@ -42,7 +46,7 @@ async function addSmartDrink(choiceItemID: string): Promise<void> {
         await orderStore.addSmartChoice({
             choiceItemID,
             line,
-            slot: drinkSlot,
+            slot,
         })
     } catch {
         // Likely due to the line not supporting drinks, add a stand-alone smart line.
@@ -52,6 +56,7 @@ async function addSmartDrink(choiceItemID: string): Promise<void> {
 
 export const generateDrinkStrips = (): ContainedStripInfo[] => {
     const uiStore = useUIStore()
+    const slot = drinkSlot.value
 
     return [
         {
@@ -59,7 +64,7 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
             strip: newListStrip(
                 getChoicesBySlot('drink').map((drink) => ({
                     ...newButton(() => addSmartDrink(drink.id), drink.displayName),
-                    price: isPriced(drink) ? getItemPrice(drink) : getItemPrice(drinkSlot),
+                    price: isPriced(drink) ? getItemPrice(drink) : slot ? getItemPrice(slot) : undefined,
                 })),
                 uiStore.drinkPage,
                 () => uiStore.drinkPage++
