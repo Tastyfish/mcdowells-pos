@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 
-import { ChoiceSlot, getItemPrice, getMenuItemAllowedSizes, hasPrice, slots } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, getMenuItemAllowedSizes, hasPrice, choiceSlots, choiceItems } from '@/api/menu'
 import { NewOrderLine, OrderLine, NewOrderChoice, OrderChoice } from '@/api/order'
-import { getMenuItem, getChoiceItem } from '@/menu'
+import { getMenuItem } from '@/menu'
 import { computed, ref } from 'vue'
 import { ComboSize } from '@/api/size'
 
@@ -161,8 +161,8 @@ export const useOrderStore = defineStore(
                 // Add default choices, if they're set.
                 Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
                     if (slotDefault) {
-                        const slot = slots.value[slotID]
-                        const choiceItem = getChoiceItem(slotDefault)
+                        const slot = choiceSlots.value[slotID]
+                        const choiceItem = choiceItems.value[slotDefault]
                         if (slot && choiceItem) {
                             addChoice({ line, choiceItem })
                         }
@@ -205,7 +205,7 @@ export const useOrderStore = defineStore(
             }
 
             // Add new choice
-            const choiceItem = getChoiceItem(choiceItemID)
+            const choiceItem = choiceItems.value[choiceItemID]
             if (choiceItem) {
                 addChoice({ line, choiceItem })
             }
@@ -234,7 +234,7 @@ export const useOrderStore = defineStore(
         function getLineChoices(line: OrderLine): { slotID: string; slot?: ChoiceSlot; choice?: OrderChoice | null }[] {
             return (
                 Object.keys(line.menuItem.choiceSlots)
-                    .map((slotID) => ({ slotID, slot: slots.value[slotID] }))
+                    .map((slotID) => ({ slotID, slot: choiceSlots.value[slotID] }))
                     // Undefined slots always show up for debugging.
                     // Otherwise, require it be a listed slot and:
                     //   Either this is a combo, or the slot still exists on non-combo items.

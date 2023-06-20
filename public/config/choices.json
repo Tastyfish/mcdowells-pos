@@ -1,0 +1,62 @@
+{
+    "coke": {
+        "displayName": "Coca-Cola",
+        "slot": "drink"
+    },
+    "dietcoke": {
+        "displayName": "Diet Coke",
+        "slot": "drink"
+    },
+    "sprite": {
+        "displayName": "Sprite",
+        "slot": "drink"
+    },
+    "fantaorange": {
+        "displayName": "Fanta Orange",
+        "slot": "drink"
+    },
+    "icedtea": {
+        "displayName": "Iced Tea",
+        "slot": "drink"
+    },
+    "sweettea": {
+        "displayName": "Sweet Tea",
+        "slot": "drink"
+    },
+    "coffee": {
+        "displayName": "Coffee",
+        "slot": "drink"
+    },
+
+    "fries": {
+        "displayName": "Fries",
+        "slot": "side"
+    },
+    "apples": {
+        "displayName": "Apple Slices",
+        "slot": "side",
+        "price": 1.0
+    },
+
+    "no_sauce": {
+        "displayName": "No Sauce",
+        "simpleDisplayName": true,
+        "slot": "sauce",
+        "price": 0.0
+    },
+    "ketchup": {
+        "displayName": "Ketchup",
+        "simpleDisplayName": true,
+        "slot": "sauce"
+    },
+    "honey_mustard": {
+        "displayName": "Honey Mustard",
+        "simpleDisplayName": true,
+        "slot": "sauce"
+    },
+    "bbq": {
+        "displayName": "BBQ Sauce",
+        "simpleDisplayName": true,
+        "slot": "sauce"
+    }
+}

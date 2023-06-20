@@ -3,11 +3,10 @@ import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newListStrip } from '@/api/strip'
 import { newButton } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'
-import { getChoicesBySlot } from '@/menu'
-import { isPriced, getItemPrice, slots, ChoiceSlot } from '@/api/menu'
+import { isPriced, getItemPrice, choiceItemsBySlot, choiceSlots, ChoiceSlot } from '@/api/menu'
 import { defaultSize } from '@/api/size'
 
-const drinkSlot = computed(() => slots.value['drink'] as ChoiceSlot | undefined)
+const drinkSlot = computed(() => choiceSlots.value['drink'] as ChoiceSlot | undefined)
 
 async function addSeperateDrink(choiceItemID: string) {
     const slot = drinkSlot.value
@@ -62,10 +61,10 @@ export const generateDrinkStrips = (): ContainedStripInfo[] => {
         {
             bounds: new Rectangle(0, 4, 8, 1),
             strip: newListStrip(
-                getChoicesBySlot('drink').map((drink) => ({
+                choiceItemsBySlot.value['drink']?.map((drink) => ({
                     ...newButton(() => addSmartDrink(drink.id), drink.displayName),
                     price: isPriced(drink) ? getItemPrice(drink) : slot ? getItemPrice(slot) : undefined,
-                })),
+                })) ?? [],
                 uiStore.drinkPage,
                 () => uiStore.drinkPage++
             ),

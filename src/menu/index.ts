@@ -1,7 +1,4 @@
-import { MenuItem, ChoiceItem } from '@/api/menu'
-
-// Default offset. Also used for stand-alone drinks and sides to counter the built-in discount.
-const COMBO_BASE_MOD = 1.08
+import { MenuItem } from '@/api/menu'
 
 export const menu: MenuItem[] = [
     {
@@ -76,14 +73,14 @@ export const menu: MenuItem[] = [
         displayName: 'Drink',
         choiceSlots: { drink: null },
         allowedSizes: 'allNoHM',
-        price: COMBO_BASE_MOD,
+        price: 1.08,
     },
     {
         id: 'side',
         displayName: 'Side',
         choiceSlots: { side: null },
         allowedSizes: 'allNoHM',
-        price: COMBO_BASE_MOD,
+        price: 1.08,
     },
     {
         id: 'sauce',
@@ -130,90 +127,6 @@ export const menu: MenuItem[] = [
     },
 ]
 
-export const choices: ChoiceItem[] = [
-    {
-        id: 'coke',
-        displayName: 'Coca-Cola',
-        slot: 'drink',
-    },
-    {
-        id: 'dietcoke',
-        displayName: 'Diet Coke',
-        slot: 'drink',
-    },
-    {
-        id: 'sprite',
-        displayName: 'Sprite',
-        slot: 'drink',
-    },
-    {
-        id: 'fantaorange',
-        displayName: 'Fanta Orange',
-        slot: 'drink',
-    },
-    {
-        id: 'icedtea',
-        displayName: 'Iced Tea',
-        slot: 'drink',
-    },
-    {
-        id: 'sweettea',
-        displayName: 'Sweet Tea',
-        slot: 'drink',
-    },
-    {
-        id: 'coffee',
-        displayName: 'Coffee',
-        slot: 'drink',
-    },
-
-    {
-        id: 'fries',
-        displayName: 'Fries',
-        slot: 'side',
-    },
-    {
-        id: 'apples',
-        displayName: 'Apple Slices',
-        slot: 'side',
-        price: 1.0,
-    },
-
-    {
-        id: 'no_sauce',
-        displayName: 'No Sauce',
-        simpleDisplayName: true,
-        slot: 'sauce',
-        price: 0.0,
-    },
-    {
-        id: 'ketchup',
-        displayName: 'Ketchup',
-        simpleDisplayName: true,
-        slot: 'sauce',
-    },
-    {
-        id: 'honey_mustard',
-        displayName: 'Honey Mustard',
-        simpleDisplayName: true,
-        slot: 'sauce',
-    },
-    {
-        id: 'bbq',
-        displayName: 'BBQ Sauce',
-        simpleDisplayName: true,
-        slot: 'sauce',
-    },
-]
-
 export function getMenuItem(id: string): MenuItem | undefined {
     return menu.find((item) => item.id === id)
-}
-
-export function getChoiceItem(id: string): ChoiceItem | undefined {
-    return choices.find((item) => item.id === id)
-}
-
-export function getChoicesBySlot(slotID: string): ChoiceItem[] {
-    return choices.filter((item) => item.slot === slotID)
 }

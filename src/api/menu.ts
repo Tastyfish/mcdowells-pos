@@ -106,20 +106,38 @@ export function isValidPricedItem(item: Partial<PricedItem>): item is PricedItem
         !('price' in item) ||
         (typeof item.price !== 'number' && !validateRequiredDictionary('PricedItem', item as { price: Record<string, number> }, 'price', 'number'))
     ) {
-        console.error('Menu item missing required price in', item)
+        console.error('PricedItem missing required price in', item)
         return false
     }
 
     return true
 }
 
+/**
+ * Determine if choice slot is valid. Used for data loading.
+ * @param slot The choice slot in question.
+ * @returns Typeguard
+ */
 export function isValidChoiceSlot(slot: Partial<ChoiceSlot>): slot is ChoiceSlot {
     return (
         isValidItemBase(slot) &&
         isValidPricedItem(slot as Partial<PricedItem>) &&
-        validateOptional('ChoiceSlot', slot as Partial<ChoiceSlot>, 'isListed', 'boolean') &&
-        validateOptional('ChoiceSlot', slot as Partial<ChoiceSlot>, 'isComboOnly', 'boolean') &&
-        validateOptional('ChoiceSlot', slot as Partial<ChoiceSlot>, 'grillLabel', 'string')
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isListed', 'boolean') &&
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isComboOnly', 'boolean') &&
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'grillLabel', 'string')
+    )
+}
+
+/**
+ * Determine if choice item is valid. Used for data loading.
+ * @param item The choice item in question.
+ * @returns Typeguard
+ */
+export function isValidChoiceItem(item: Partial<ChoiceItem>): item is ChoiceItem {
+    return (
+        isValidItemBase(item) &&
+        (!('price' in item) || isValidPricedItem(item as Partial<PricedItem>)) &&
+        validateRequired('ChoiceItem', item as ChoiceItem, 'slot', 'string')
     )
 }
 
@@ -131,4 +149,5 @@ export function getMenuItemAllowedSizes(item: MenuItem): ComboSize[] | undefined
     return sizeGroups.value[item.allowedSizes].sizes.map((sizeKey) => sizes.value[sizeKey])
 }
 
-export { default as slots } from './loaders/slots'
+export { default as choiceSlots } from './loaders/slots'
+export * from './loaders/choices'

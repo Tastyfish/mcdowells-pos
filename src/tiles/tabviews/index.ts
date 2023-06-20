@@ -2,12 +2,12 @@
 
 import { DeepReadonly } from 'vue'
 import locale from '@/api/locale'
-import { ChoiceSlot, getItemPrice, isPriced, slots } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, isPriced, choiceItemsBySlot, choiceSlots } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
 import tabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
-import { getMenuItem, getChoicesBySlot } from '@/menu'
+import { getMenuItem } from '@/menu'
 import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
 
 import { generateActionItem } from './action'
@@ -66,7 +66,7 @@ const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] 
     const uiStore = useUIStore()
     const orderStore = useOrderStore()
 
-    return getChoicesBySlot(slot.id).map((choice) => ({
+    return choiceItemsBySlot.value[slot.id].map((choice) => ({
         ...newButton(async () => {
             // Apply sauce to all of the lines added.
             const lines = await orderStore.addSmartOrderLine({
@@ -123,7 +123,7 @@ function generateTabItems(item: TabItem): Tile[] {
             } as ButtonTile,
         ]
     } else if (isSlotTabItem(item)) {
-        const slot = slots.value[item.slot] ?? { id: item.slot, displayName: item.slot, price: 0 }
+        const slot = choiceSlots.value[item.slot] ?? { id: item.slot, displayName: item.slot, price: 0 }
         return generateStandaloneSlotTiles(slot)
     } else if (isActionTabItem(item)) {
         return [generateActionItem(item)]

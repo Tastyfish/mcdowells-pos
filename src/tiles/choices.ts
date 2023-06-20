@@ -1,10 +1,9 @@
-import { ChoiceItem, getMenuItemAllowedSizes, slots } from '@/api/menu'
+import { ChoiceItem, getMenuItemAllowedSizes, choiceItemsBySlot, choiceSlots } from '@/api/menu'
 import { OrderLine } from '@/api/order'
 import Rectangle from '@/api/rectangle'
 import { ComboSize } from '@/api/size'
 import { ContainedStripInfo, StripProvider, newListStrip, newDownwardStrip, newTileStrip, emptyStrip, newLeftwardStrip } from '@/api/strip'
 import { newLabel, newButton, withSeverity, Tile, Severity } from '@/api/tile'
-import { getChoicesBySlot } from '@/menu'
 import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
 
 const choiceRect = new Rectangle(0, 0, 10, 2)
@@ -41,7 +40,7 @@ function generateChoiceButtons(line: OrderLine): Tile[] {
 
 // A button to replace the side of the current line
 function newChoiceButton(choice: ChoiceItem): Tile {
-    const sideSlot = slots.value[choice.slot]
+    const sideSlot = choiceSlots.value[choice.slot]
 
     if (!sideSlot) {
         throw new Error('Side slot missing.')
@@ -67,11 +66,11 @@ function newChoiceButton(choice: ChoiceItem): Tile {
 }
 
 function generateSlotButtons(slotID: string): Tile[] {
-    return getChoicesBySlot(slotID).map(newChoiceButton)
+    return choiceItemsBySlot.value[slotID].map(newChoiceButton)
 }
 
 function slotName(id: string): string {
-    const slot = slots.value[id]
+    const slot = choiceSlots.value[id]
 
     return slot?.grillLabel ?? id
 }
