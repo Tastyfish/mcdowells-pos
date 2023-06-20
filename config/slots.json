@@ -1,0 +1,32 @@
+{
+    "drink": {
+        "displayName": "Drink",
+        "isListed": true,
+        "isComboOnly": true,
+        "price": { "_": 1.0, "medium": 1.29, "large": 1.49 }
+    },
+    "side": {
+        "displayName": "Side",
+        "isListed": true,
+        "isComboOnly": true,
+        "price": { "_": 0.49, "medium": 0.74, "large": 0.99 }
+    },
+    "grill": {
+        "displayName": "Toppings",
+        "isListed": true,
+        "grillLabel": "Grill",
+        "price": 0.0
+    },
+    "sauce": {
+        "displayName": "Sauce",
+        "isListed": true,
+        "grillLabel": "Sauce",
+        "price": 0.3
+    },
+    "sprink": {
+        "displayName": "Sprinkling",
+        "isListed": true,
+        "grillLabel": "Sprinkling",
+        "price": 0.2
+    }
+}
