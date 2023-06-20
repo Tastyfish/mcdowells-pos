@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 
-import { ChoiceSlot, getItemPrice, getMenuItemAllowedSizes, hasPrice, choiceSlots, choiceItems } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, getMenuItemAllowedSizes, hasPrice, choiceSlots, choiceItems, menuItems } from '@/api/menu'
 import { NewOrderLine, OrderLine, NewOrderChoice, OrderChoice } from '@/api/order'
-import { getMenuItem } from '@/menu'
 import { computed, ref } from 'vue'
 import { ComboSize } from '@/api/size'
 
@@ -135,7 +134,7 @@ export const useOrderStore = defineStore(
                           defaultSize: undefined,
                       }
 
-            const menuItem = getMenuItem(menuItemKey)
+            const menuItem = menuItems.value[menuItemKey]
 
             if (!menuItem) {
                 throw new Error(`Menu item ${menuItemKey} does not exist.`)

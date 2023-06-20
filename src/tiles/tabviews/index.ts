@@ -2,12 +2,11 @@
 
 import { DeepReadonly } from 'vue'
 import locale from '@/api/locale'
-import { ChoiceSlot, getItemPrice, isPriced, choiceItemsBySlot, choiceSlots } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, isPriced, choiceItemsBySlot, choiceSlots, menuItems } from '@/api/menu'
 import Rectangle from '@/api/rectangle'
 import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, StripProvider } from '@/api/strip'
 import tabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
-import { getMenuItem } from '@/menu'
 import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
 
 import { generateActionItem } from './action'
@@ -15,18 +14,8 @@ import { generateDrinkStrips } from './drinks'
 import { generateLabelItem } from './label'
 import { defaultSize } from '@/api/size'
 
-export function assertGetItem(itemID: string) {
-    const item = getMenuItem(itemID)
-
-    if (!item) {
-        throw new Error(`Menu item ${itemID} could not be found.`)
-    }
-
-    return item
-}
-
 export function newMealButton(mealID: string): ButtonTile {
-    const menuItem = getMenuItem(mealID)
+    const menuItem = menuItems.value[mealID]
 
     if (!menuItem) {
         return newButton(() => {}, mealID)
@@ -92,7 +81,7 @@ const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] 
 
 function generateVariableItem(item: VarTabItem, amount: number) {
     const orderStore = useOrderStore()
-    const base = assertGetItem(item.base)
+    const base = menuItems.value[item.base]
     const price = amount * item.perPrice
 
     // Use base as a template, but update label and price.

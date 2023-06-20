@@ -83,6 +83,14 @@ export interface ChoiceSlot extends ItemBase, PricedItem {
     readonly grillLabel?: string
 }
 
+export function getMenuItemAllowedSizes(item: MenuItem): ComboSize[] | undefined {
+    if (item.allowedSizes === undefined) {
+        return undefined
+    }
+
+    return sizeGroups.value[item.allowedSizes].sizes.map((sizeKey) => sizes.value[sizeKey])
+}
+
 /**
  * Determine if menu item is valid. Used for data loading.
  * @param item The menu item in question.
@@ -104,7 +112,7 @@ export function isValidItemBase(item: Partial<ItemBase>): item is ItemBase {
 export function isValidPricedItem(item: Partial<PricedItem>): item is PricedItem {
     if (
         !('price' in item) ||
-        (typeof item.price !== 'number' && !validateRequiredDictionary('PricedItem', item as { price: Record<string, number> }, 'price', 'number'))
+        (typeof item.price !== 'number' && !validateRequiredDictionary('PricedItem', item as { price: Record<string, number> }, 'price', ['number']))
     ) {
         console.error('PricedItem missing required price in', item)
         return false
@@ -141,13 +149,20 @@ export function isValidChoiceItem(item: Partial<ChoiceItem>): item is ChoiceItem
     )
 }
 
-export function getMenuItemAllowedSizes(item: MenuItem): ComboSize[] | undefined {
-    if (item.allowedSizes === undefined) {
-        return undefined
-    }
-
-    return sizeGroups.value[item.allowedSizes].sizes.map((sizeKey) => sizes.value[sizeKey])
+/**
+ * Determine if menu item is valid. Used for data loading.
+ * @param item The menu item in question.
+ * @returns Typeguard
+ */
+export function isValidMenuItem(item: Partial<MenuItem>): item is MenuItem {
+    return (
+        isValidItemBase(item) &&
+        isValidPricedItem(item as Partial<PricedItem>) &&
+        validateRequiredDictionary('MenuItem', item as MenuItem, 'choiceSlots', ['string', 'null']) &&
+        validateOptional('MenuItem', item as MenuItem, 'allowedSizes', 'string')
+    )
 }
 
 export { default as choiceSlots } from './loaders/slots'
 export * from './loaders/choices'
+export { default as menuItems } from './loaders/menu'

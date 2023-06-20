@@ -1,14 +1,13 @@
+import { menuItems } from '@/api/menu'
+import { defaultSize } from '@/api/size'
 import { Severity, newButton } from '@/api/tile'
 import { ContainedStripInfo, newTileStrip } from '@/api/strip'
 import Rectangle from '@/api/rectangle'
 
 import { ChoiceMenuMode, TileScreen, useOrderStore, useUIStore } from '@/store'
 
-import { getMenuItem } from '@/menu'
-import { defaultSize } from '@/api/size'
-
 function demoPromo() {
-    const gift25 = getMenuItem('gift25')
+    const gift25 = menuItems.value['gift25']
 
     if (gift25) {
         useOrderStore().addLine({

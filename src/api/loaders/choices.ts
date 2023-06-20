@@ -5,11 +5,11 @@ import { ChoiceItem, isValidChoiceItem } from '../menu'
 
 type RawChoiceSchema = Record<string, Omit<ChoiceItem, 'id'>>
 
-function parseChoices(rawSlots: RawChoiceSchema): Record<string, ChoiceItem> {
+function parseChoices(rawChoices: RawChoiceSchema): Record<string, ChoiceItem> {
     return Object.fromEntries(
-        Object.entries(rawSlots)
-            .map(([id, slot]) => [id, { ...slot, id }] as [string, ChoiceItem])
-            .filter(([_id, slot]) => isValidChoiceItem(slot))
+        Object.entries(rawChoices)
+            .map(([id, choice]) => [id, { ...choice, id }] as [string, ChoiceItem])
+            .filter(([_id, choice]) => isValidChoiceItem(choice))
     )
 }
 
