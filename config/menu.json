@@ -1,0 +1,115 @@
+{
+    "bigmac": {
+        "displayName": "Big Mac",
+        "choiceSlots": {
+            "grill": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 3.99
+    },
+    "2cheeseburgers": {
+        "displayName": "2 Cheeseburgers",
+        "choiceSlots": {
+            "grill": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 2.0
+    },
+    "quarterpounder": {
+        "displayName": "¼ Pounder w/ Cheese",
+        "choiceSlots": {
+            "grill": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 3.79
+    },
+    "DBLquarterpounder": {
+        "displayName": "Double ¼ Pounder w/ Cheese",
+        "choiceSlots": {
+            "grill": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 4.79
+    },
+    "BCNclubhouseburger": {
+        "displayName": "Bacon Clubhouse Burger",
+        "choiceSlots": {
+            "grill": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 4.49
+    },
+    "nuggets10": {
+        "displayName": "10pc Nuggets",
+        "choiceSlots": {
+            "sauce": null,
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 4.19,
+        "#": "sauce discounted."
+    },
+
+    "drink": {
+        "displayName": "Drink",
+        "choiceSlots": { "drink": null },
+        "allowedSizes": "allNoHM",
+        "price": 1.08
+    },
+    "side": {
+        "displayName": "Side",
+        "choiceSlots": { "side": null },
+        "allowedSizes": "allNoHM",
+        "price": 1.08
+    },
+    "sauce": {
+        "displayName": "Condiment",
+        "simpleDisplayName": true,
+        "choiceSlots": { "sauce": null },
+        "price": 0.0,
+        "#": "Since this doesn't have sizes, we don't have to do weird incantations."
+    },
+
+    "gift05": {
+        "displayName": "$5 Gift Card",
+        "simpleDisplayName": true,
+        "choiceSlots": {},
+        "price": 5.0
+    },
+    "gift10": {
+        "displayName": "$10 Gift Card",
+        "simpleDisplayName": true,
+        "choiceSlots": {},
+        "price": 10.0
+    },
+    "gift25": {
+        "displayName": "$25 Gift Card",
+        "simpleDisplayName": true,
+        "choiceSlots": {},
+        "price": 25.0
+    },
+    "giftV": {
+        "displayName": "??? Gift Card",
+        "simpleDisplayName": true,
+        "choiceSlots": {},
+        "price": 1.0
+    },
+    "discountV": {
+        "displayName": "** ??? Discount **",
+        "simpleDisplayName": true,
+        "choiceSlots": {},
+        "price": -1.0,
+        "#": "Label and price is filled in by a numpad callback."
+    }
+}
