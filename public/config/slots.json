@@ -9,7 +9,7 @@
         "displayName": "Side",
         "isListed": true,
         "isComboOnly": true,
-        "price": { "_": 0.49, "medium": 0.74, "large": 0.99 }
+        "price": { "_": 1.39, "medium": 1.79, "large": 1.89 }
     },
     "grill": {
         "displayName": "Toppings",
@@ -22,11 +22,5 @@
         "isListed": true,
         "grillLabel": "Sauce",
         "price": 0.3
-    },
-    "sprink": {
-        "displayName": "Sprinkling",
-        "isListed": true,
-        "grillLabel": "Sprinkling",
-        "price": 0.2
     }
 }
