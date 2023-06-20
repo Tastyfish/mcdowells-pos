@@ -8,12 +8,12 @@ import { ContainedStripInfo, newTileStrip, newContainerStrip, newDownwardStrip, 
 import tabviews, { TabItem, TabView, VarTabItem, isActionTabItem, isLabelTabItem, isSlotTabItem, isVarTabItem } from '@/api/tabview'
 import { newButton, ButtonTile, Tile, Severity } from '@/api/tile'
 import { getMenuItem, getChoicesBySlot } from '@/menu'
-import Sizes from '@/menu/sizes'
 import { ChoiceMenuMode, SmartOrderPayload, useOrderStore, useUIStore } from '@/store'
 
 import { generateActionItem } from './action'
 import { generateDrinkStrips } from './drinks'
 import { generateLabelItem } from './label'
+import { defaultSize } from '@/api/size'
 
 export function assertGetItem(itemID: string) {
     const item = getMenuItem(itemID)
@@ -71,7 +71,7 @@ const generateStandaloneSlotTiles = (slot: ChoiceSlot, menuID?: string): Tile[] 
             // Apply sauce to all of the lines added.
             const lines = await orderStore.addSmartOrderLine({
                 menuItemID: menuID ?? slot.id,
-                defaultSize: slot.isComboOnly ? Sizes.Medium : undefined,
+                defaultSize: slot.isComboOnly ? defaultSize.value : undefined,
             })
             uiStore.setChoiceMenuMode(ChoiceMenuMode.Default)
 

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 
-import { ChoiceSlot, getItemPrice, hasPrice, slots } from '@/api/menu'
+import { ChoiceSlot, getItemPrice, getMenuItemAllowedSizes, hasPrice, slots } from '@/api/menu'
 import { NewOrderLine, OrderLine, NewOrderChoice, OrderChoice } from '@/api/order'
-import { getMenuItem, getChoiceItem, COMBO_OFFSETS } from '@/menu'
-import Sizes from '@/menu/sizes'
+import { getMenuItem, getChoiceItem } from '@/menu'
 import { computed, ref } from 'vue'
+import { ComboSize } from '@/api/size'
 
 export const NO_CURRENT_LINE = -1
 
@@ -16,7 +16,7 @@ export interface SmartOrderPayload {
     /// The menu item id.
     menuItemID: string
     /// The default size, if no size selected.
-    defaultSize?: Sizes
+    defaultSize?: ComboSize
 }
 
 /// Store module for orders. Is fully replicated to DB.
@@ -39,7 +39,7 @@ export const useOrderStore = defineStore(
         const currentLineID = ref(NO_CURRENT_LINE)
 
         // Handle size selection.
-        const sizeSelection = ref(null as Sizes | null)
+        const sizeSelection = ref(null as ComboSize | null)
 
         // Multiplying count selection.
         const countSelection = ref(1 as OrderCount)
@@ -141,8 +141,8 @@ export const useOrderStore = defineStore(
                 throw new Error(`Menu item ${menuItemKey} does not exist.`)
             }
 
-            // Get size, if a size is selefcted and valid for menu item.
-            const size = sizeSelection.value && menuItem.allowedSizes?.includes(sizeSelection.value) ? sizeSelection.value : defaultSize
+            // Get size, if a size is selected and valid for menu item.
+            const size = sizeSelection.value && getMenuItemAllowedSizes(menuItem)?.includes(sizeSelection.value) ? sizeSelection.value : defaultSize
 
             // copy of count to preserve across loop.
             const count = countSelection.value
@@ -256,7 +256,7 @@ export const useOrderStore = defineStore(
 
         function getLinePrice(line: OrderLine): number {
             const mainPrice = getItemPrice(line.menuItem, line.size)
-            const comboOffset = line.size === undefined ? 0 : COMBO_OFFSETS[line.size]
+            const comboOffset = line.size?.priceOffset ?? 0
 
             // Add together choice prices, or if they don't have a price, use slot price.
             const slotPrices = getLineChoices(line).reduce(

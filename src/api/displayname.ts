@@ -3,14 +3,14 @@ import { NewOrderLine, NewOrderChoice } from './order'
 
 export function getMenuItemDisplayName(line: NewOrderLine) {
     if (!line.menuItem.simpleDisplayName && line.size) {
-        return `${line.size} ${line.menuItem.displayName}`
+        return `${line.size.label} ${line.menuItem.displayName}`
     }
     return line.menuItem.displayName
 }
 
 export function getChoiceItemDisplayName(choice: NewOrderChoice) {
     if (!choice.choiceItem.simpleDisplayName && choice.line.size) {
-        return `${choice.line.size} ${choice.choiceItem.displayName}`
+        return `${choice.line.size.label} ${choice.choiceItem.displayName}`
     }
     return choice.choiceItem.displayName
 }

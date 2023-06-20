@@ -3,13 +3,13 @@
         "displayName": "Drink",
         "isListed": true,
         "isComboOnly": true,
-        "price": [1.0, 1.29, 1.49]
+        "price": { "_": 1.0, "medium": 1.29, "large": 1.49 }
     },
     "side": {
         "displayName": "Side",
         "isListed": true,
         "isComboOnly": true,
-        "price": [0.49, 0.74, 0.99]
+        "price": { "_": 0.49, "medium": 0.74, "large": 0.99 }
     },
     "grill": {
         "displayName": "Toppings",

@@ -2,8 +2,8 @@
   The restaurant kind of menu.
 * */
 
-import Sizes from '@/menu/sizes'
-import { validateOptional, validateRequired } from './valid'
+import { ComboSize, defaultSize, sizeGroups, sizes } from './size'
+import { validateOptional, validateRequired, validateRequiredDictionary } from './valid'
 
 /**
   Info about what choice slots a menu item has.
@@ -26,9 +26,9 @@ interface ItemBase {
 
 export interface PricedItem {
     /**
-     * Price as a number or 3 numbers for the 3 sizes.
+     * Price as a number or a mapping of size IDs to numbers. If using the mapping, the default key will be "_".
      */
-    readonly price: number | readonly [number, number, number]
+    readonly price: number | { [size: string]: number }
 }
 
 /**
@@ -40,33 +40,16 @@ export function isPriced(item: Partial<PricedItem>): item is PricedItem {
     return item.price !== undefined
 }
 
-/**
- * Convert a size to an index in the price[size] array.
- * @param size The size to get an index of. Medium is the default.
- * @returns Size index.
- */
-function getSizeComboPricingIndex(size?: Sizes): 0 | 1 | 2 {
-    switch (size) {
-        case Sizes.Medium:
-        case undefined:
-            return 1
-        case Sizes.Large:
-            return 2
-        default:
-            return 0
-    }
-}
-
 export function hasPrice(item: Partial<PricedItem>): item is PricedItem {
     return item.price !== undefined
 }
 
-export function getItemPrice(item: PricedItem, size?: Sizes): number {
+export function getItemPrice(item: PricedItem, size?: ComboSize): number {
     if (typeof item.price === 'number') {
         return item.price
     }
 
-    return item.price[getSizeComboPricingIndex(size)]
+    return item.price[size?.id ?? defaultSize.value?.id ?? '_'] ?? item.price['_'] ?? Number.NaN
 }
 
 /**
@@ -76,8 +59,8 @@ export interface MenuItem extends ItemBase, PricedItem {
     /** Slot names and default values for choices */
     readonly choiceSlots: ChoiceSlotInfo
 
-    /** Sizes allowed for comboing this item. */
-    readonly allowedSizes?: Sizes[]
+    /** Size group key allowed for comboing this item. If undefined, you cannot combo it. */
+    readonly allowedSizes?: string
 }
 
 /**
@@ -119,7 +102,10 @@ export function isValidItemBase(item: Partial<ItemBase>): item is ItemBase {
  * @returns Typeguard
  */
 export function isValidPricedItem(item: Partial<PricedItem>): item is PricedItem {
-    if (!('price' in item) || (typeof item.price !== 'number' && !(item.price instanceof Array && item.price.length === 3))) {
+    if (
+        !('price' in item) ||
+        (typeof item.price !== 'number' && !validateRequiredDictionary('PricedItem', item as { price: Record<string, number> }, 'price', 'number'))
+    ) {
         console.error('Menu item missing required price in', item)
         return false
     }
@@ -135,6 +121,14 @@ export function isValidChoiceSlot(slot: Partial<ChoiceSlot>): slot is ChoiceSlot
         validateOptional('ChoiceSlot', slot as Partial<ChoiceSlot>, 'isComboOnly', 'boolean') &&
         validateOptional('ChoiceSlot', slot as Partial<ChoiceSlot>, 'grillLabel', 'string')
     )
+}
+
+export function getMenuItemAllowedSizes(item: MenuItem): ComboSize[] | undefined {
+    if (item.allowedSizes === undefined) {
+        return undefined
+    }
+
+    return sizeGroups.value[item.allowedSizes].sizes.map((sizeKey) => sizes.value[sizeKey])
 }
 
 export { default as slots } from './loaders/slots'

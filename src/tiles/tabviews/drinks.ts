@@ -4,8 +4,8 @@ import { ContainedStripInfo, newListStrip } from '@/api/strip'
 import { newButton } from '@/api/tile'
 import { useOrderStore, useUIStore } from '@/store'
 import { getChoicesBySlot } from '@/menu'
-import Sizes from '@/menu/sizes'
 import { isPriced, getItemPrice, slots, ChoiceSlot } from '@/api/menu'
+import { defaultSize } from '@/api/size'
 
 const drinkSlot = computed(() => slots.value['drink'] as ChoiceSlot | undefined)
 
@@ -20,7 +20,7 @@ async function addSeperateDrink(choiceItemID: string) {
 
     const lines = await orderStore.addSmartOrderLine({
         menuItemID: 'drink',
-        defaultSize: Sizes.Medium,
+        defaultSize: defaultSize.value,
     })
 
     await Promise.all(lines.map((line) => orderStore.addSmartChoice({ choiceItemID, line, slot })))

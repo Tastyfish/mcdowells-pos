@@ -1,12 +1,11 @@
-import { newLabel, newButton, withSeverity, Tile, Severity } from '@/api/tile'
-import { ContainedStripInfo, StripProvider, newListStrip, newDownwardStrip, newTileStrip, emptyStrip, newLeftwardStrip } from '@/api/strip'
-import Rectangle from '@/api/rectangle'
-
-import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
-import { getChoicesBySlot } from '@/menu'
-import Sizes from '@/menu/sizes'
-import { ChoiceItem, slots } from '@/api/menu'
+import { ChoiceItem, getMenuItemAllowedSizes, slots } from '@/api/menu'
 import { OrderLine } from '@/api/order'
+import Rectangle from '@/api/rectangle'
+import { ComboSize } from '@/api/size'
+import { ContainedStripInfo, StripProvider, newListStrip, newDownwardStrip, newTileStrip, emptyStrip, newLeftwardStrip } from '@/api/strip'
+import { newLabel, newButton, withSeverity, Tile, Severity } from '@/api/tile'
+import { getChoicesBySlot } from '@/menu'
+import { ChoiceMenuMode, useOrderStore, useUIStore } from '@/store'
 
 const choiceRect = new Rectangle(0, 0, 10, 2)
 
@@ -16,26 +15,26 @@ const choiceModeBack = withSeverity(
 )
 
 // A button to retroactively change an item's size.
-function newSizeButton(size: Sizes): Tile {
+function newSizeButton(size: ComboSize): Tile {
     return newButton(() => {
         const orderStore = useOrderStore()
         const line = orderStore.currentLine
 
         // Make sure the current line is exists and combo size still valid.
-        if (line?.menuItem.allowedSizes?.includes(size)) {
+        if (line && getMenuItemAllowedSizes(line.menuItem)?.includes(size)) {
             // Change size and repost.
             orderStore.replaceLine({ ...line, size })
         }
 
         // Regardless, return to normal choices.
         useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default)
-    }, size)
+    }, size.label)
 }
 
 function generateChoiceButtons(line: OrderLine): Tile[] {
     // Check if is still and item that does combos at all.
     if (line.menuItem.allowedSizes) {
-        return line.menuItem.allowedSizes.map(newSizeButton)
+        return (getMenuItemAllowedSizes(line.menuItem) ?? []).map(newSizeButton)
     }
     return []
 }

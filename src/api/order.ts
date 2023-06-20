@@ -1,5 +1,5 @@
-import Sizes from '@/menu/sizes'
-import { MenuItem, ChoiceItem } from './menu'
+import { ComboSize } from './size'
+import { MenuItem, ChoiceItem, getMenuItemAllowedSizes } from './menu'
 
 /**
   The new line before it's assigned an ID by the datastore.
@@ -9,12 +9,12 @@ export interface NewOrderLine {
     readonly menuItem: MenuItem
 
     /** If this is a combo, the size. */
-    readonly size?: Sizes
+    readonly size?: ComboSize
 }
 
-export function makeCombo(order: NewOrderLine, size: Sizes): NewOrderLine | null {
+export function makeCombo(order: NewOrderLine, size: ComboSize): NewOrderLine | null {
     // Can be made a combo and have this size?
-    if (order.menuItem.allowedSizes?.includes(size)) {
+    if (getMenuItemAllowedSizes(order.menuItem)?.includes(size)) {
         return { ...order, size }
     }
 

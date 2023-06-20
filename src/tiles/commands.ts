@@ -5,7 +5,7 @@ import Rectangle from '@/api/rectangle'
 import { ChoiceMenuMode, TileScreen, useOrderStore, useUIStore } from '@/store'
 
 import { getMenuItem } from '@/menu'
-import Sizes from '@/menu/sizes'
+import { defaultSize } from '@/api/size'
 
 function demoPromo() {
     const gift25 = getMenuItem('gift25')
@@ -47,7 +47,7 @@ export default function generateCommandsGraph(): ContainedStripInfo {
             newButton(async () => {
                 await orderStore.addSmartOrderLine({
                     menuItemID: 'side',
-                    defaultSize: Sizes.Medium,
+                    defaultSize: defaultSize.value,
                 })
                 uiStore.setChoiceMenuMode('side')
             }, 'Side Choice'),

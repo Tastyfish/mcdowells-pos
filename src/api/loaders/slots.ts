@@ -7,9 +7,8 @@ type RawSlotSchema = Record<string, Omit<ChoiceSlot, 'id'>>
 function parseSlots(rawSlots: RawSlotSchema): Record<string, ChoiceSlot> {
     return Object.fromEntries(
         Object.entries(rawSlots)
-            .map(([id, slot]) => ({ id, ...slot }))
-            .filter((slot) => isValidChoiceSlot(slot))
-            .map((slot) => [slot.id, slot])
+            .map(([id, slot]) => [id, { ...slot, id }] as [string, ChoiceSlot])
+            .filter(([_id, slot]) => isValidChoiceSlot(slot))
     )
 }
 

@@ -1,0 +1,41 @@
+{
+    "sizes": {
+        "happy": {
+            "label": "HM",
+            "icon": "home",
+            "priceOffset": -1.58
+        },
+        "xsmall": {
+            "label": "XS",
+            "icon": "angle-double-down",
+            "priceOffset": -3.08
+        },
+        "small": {
+            "label": "Sm",
+            "icon": "angle-down",
+            "priceOffset": -1.08
+        },
+        "medium": {
+            "label": "Med",
+            "icon": "angle-right",
+            "priceOffset": -1.08
+        },
+        "large": {
+            "label": "Lg",
+            "icon": "angle-up",
+            "priceOffset": -1.08
+        },
+        "senior": {
+            "label": "Sr",
+            "icon": "angle-left",
+            "priceOffset": -2.08
+        }
+    },
+    "order": ["xsmall", "small", "medium", "large", "senior"],
+    "groups": {
+        "base": ["xsmall", "small", "medium", "large"],
+        "allNoHM": ["xsmall", "small", "medium", "large", "senior"],
+        "all": ["happy", "xsmall", "small", "medium", "large", "senior"]
+    },
+    "default": "medium"
+}
