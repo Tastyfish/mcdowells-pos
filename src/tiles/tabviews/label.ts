@@ -5,6 +5,11 @@ import { useOrderStore, useUIStore } from '@/store'
 
 const varReplacement = /\{([^}]+)\}/g
 
+const staticVars: { [varName: string]: string } = {
+    appVersion: APP_VERSION,
+    menuVersion: MENU_VERSION,
+}
+
 /**
  * The string replacer where the variable magic happens.
  * Labels can have a variable in the label from a store eg. `"Order Number: {order:orderNumber}"`
@@ -39,14 +44,7 @@ function parseLabelVar(_whole: string, variable: string): string {
     }
 
     // Otherwise, we have some hardwired vars.
-    switch (variable) {
-        case 'appVersion':
-            return APP_VERSION
-        case 'menuVersion':
-            return MENU_VERSION
-        default:
-            return `VAR? ${variable}`
-    }
+    return variable in staticVars ? staticVars[variable] : `VAR? ${variable}`
 }
 
 export function generateLabelItem(item: LabelTabItem): Tile {
