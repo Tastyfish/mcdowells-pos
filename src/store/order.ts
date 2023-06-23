@@ -54,7 +54,7 @@ export const useOrderStore = defineStore(
             currentLineID.value = typeof line === 'number' ? line : line.uid
         }
 
-        function addLine(line: NewOrderLine): void {
+        function addLine(line: NewOrderLine): OrderLine {
             // Assign ID to line.
             _highestLineID++
             const realLine: OrderLine = { ...line, uid: _highestLineID }
@@ -63,6 +63,8 @@ export const useOrderStore = defineStore(
             currentLineID.value = _highestLineID
             sizeSelection.value = null
             countSelection.value = 1
+
+            return realLine
         }
 
         function clearLine(line: OrderLine): void {
@@ -100,12 +102,14 @@ export const useOrderStore = defineStore(
             })
         }
 
-        function addChoice(choice: NewOrderChoice): void {
+        function addChoice(choice: NewOrderChoice): OrderChoice {
             // Assign ID to choice.
             _highestChoiceID++
             const realChoice: OrderChoice = { ...choice, uid: _highestChoiceID }
 
             choices.value.push(realChoice)
+
+            return realChoice
         }
 
         function clearChoice(choice: OrderChoice): void {
@@ -150,8 +154,7 @@ export const useOrderStore = defineStore(
             const lines: OrderLine[] = Array(count)
 
             for (let i = 0; i < count; i += 1) {
-                addLine({ menuItem, size })
-                const line = currentLine.value
+                const line = addLine({ menuItem, size })
 
                 if (!line) {
                     throw new Error('Order store is in an invalid state and lines cannot be added.')
@@ -185,7 +188,7 @@ export const useOrderStore = defineStore(
          * Add a choice, removing any overlapping old one.
          * @param {Object} payload Info about choice.
          */
-        function addSmartChoice(payload: { choiceItemID: string; line: OrderLine; slot: ChoiceSlot }): Promise<void> {
+        function addSmartChoice(payload: { choiceItemID: string; line: OrderLine; slot: ChoiceSlot }): Promise<OrderChoice> {
             // Remove old choice, if applicable.
             const { choiceItemID, line, slot } = payload
 
@@ -207,18 +210,20 @@ export const useOrderStore = defineStore(
                 }
             } else {
                 // Otherwise, just ensure the same exact choice isn't selected multiple times.
-                if (choices.value.some((c) => c.line === line && c.choiceItem.id === choiceItemID)) {
-                    return new Promise((resolve) => resolve())
+                const duplicate = choices.value.find((c) => c.line === line && c.choiceItem.id === choiceItemID)
+
+                if (duplicate) {
+                    return new Promise((resolve) => resolve(duplicate))
                 }
             }
 
             // Add new choice
             const choiceItem = choiceItems.value[choiceItemID]
-            if (choiceItem) {
-                addChoice({ line, choiceItem })
+            if (!choiceItem) {
+                return new Promise((_resolve, reject) => reject(new Error(`Could not find order choice ${choiceItemID}.`)))
             }
 
-            return new Promise((resolve) => resolve())
+            return new Promise((resolve) => resolve(addChoice({ line, choiceItem })))
         }
 
         /**
