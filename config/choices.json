@@ -38,6 +38,42 @@
         "price": 1.0
     },
 
+    "beef": {
+        "displayName": "Beef Patty",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "cheese": {
+        "displayName": "Cheese",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "lettice": {
+        "displayName": "Lettice",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "tomato": {
+        "displayName": "Tomato",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "onion": {
+        "displayName": "Onion",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "pickle": {
+        "displayName": "Pickle",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+    "bacon": {
+        "displayName": "Bacon",
+        "simpleDisplayName": true,
+        "slot": "grill"
+    },
+
     "no_sauce": {
         "displayName": "No Sauce",
         "simpleDisplayName": true,
@@ -56,6 +92,16 @@
     },
     "bbq": {
         "displayName": "BBQ Sauce",
+        "simpleDisplayName": true,
+        "slot": "sauce"
+    },
+    "bigmacsauce": {
+        "displayName": "Big Mac Sauce",
+        "simpleDisplayName": true,
+        "slot": "sauce"
+    },
+    "ketchup_mustard": {
+        "displayName": "Ketchup & Mustard",
         "simpleDisplayName": true,
         "slot": "sauce"
     }

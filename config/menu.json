@@ -2,52 +2,57 @@
     "bigmac": {
         "displayName": "Big Mac",
         "choiceSlots": {
-            "grill": null,
+            "grill": [ "beef", "cheese", "lettice", "pickle" ],
+            "sauce": "bigmacsauce",
             "side": "fries",
             "drink": null
         },
         "allowedSizes": "all",
-        "price": 3.99
+        "price": 3.69
     },
     "2cheeseburgers": {
         "displayName": "2 Cheeseburgers",
         "choiceSlots": {
-            "grill": null,
+            "grill": [ "beef", "cheese" ],
+            "sauce": "no_sauce",
             "side": "fries",
             "drink": null
         },
         "allowedSizes": "all",
-        "price": 2.0
+        "price": 1.7
     },
     "quarterpounder": {
         "displayName": "¼ Pounder w/ Cheese",
         "choiceSlots": {
-            "grill": null,
+            "grill": [ "beef", "cheese", "pickle", "onion" ],
+            "sauce": "ketchup_mustard",
             "side": "fries",
             "drink": null
         },
         "allowedSizes": "all",
-        "price": 3.79
+        "price": 3.49
     },
     "DBLquarterpounder": {
         "displayName": "Double ¼ Pounder w/ Cheese",
         "choiceSlots": {
-            "grill": null,
-            "side": "fries",
-            "drink": null
-        },
-        "allowedSizes": "all",
-        "price": 4.79
-    },
-    "BCNclubhouseburger": {
-        "displayName": "Bacon Clubhouse Burger",
-        "choiceSlots": {
-            "grill": null,
+            "grill": [ "beef", "cheese", "pickle", "onion" ],
+            "sauce": "ketchup_mustard",
             "side": "fries",
             "drink": null
         },
         "allowedSizes": "all",
         "price": 4.49
+    },
+    "BCNDBLburger": {
+        "displayName": "Bacon Double Cheeseburger",
+        "choiceSlots": {
+            "grill": [ "beef", "cheese", "bacon", "pickle", "onion" ],
+            "sauce": "ketchup_mustard",
+            "side": "fries",
+            "drink": null
+        },
+        "allowedSizes": "all",
+        "price": 4.19
     },
     "nuggets10": {
         "displayName": "10pc Nuggets",
