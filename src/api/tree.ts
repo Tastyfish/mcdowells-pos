@@ -48,7 +48,7 @@ function getSlotStyle(selected: boolean, empty: boolean) {
 export function convertSlotToTreeNode(line: OrderLine, slot: ChoiceSlot, choice: OrderChoice | null, selected: boolean): TreeNode {
     return {
         key: `${line.uid}:${slot.id}`,
-        label: getChoiceSlotDisplayName(slot, choice ?? undefined),
+        label: `${slot.isMulti ? '• ' : ''}${getChoiceSlotDisplayName(slot, choice ?? undefined)}`,
         style: getSlotStyle(selected, choice === null),
     }
 }

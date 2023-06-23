@@ -161,9 +161,10 @@ export const useOrderStore = defineStore(
                 Object.entries(menuItem.choiceSlots).forEach(([slotID, slotDefault]) => {
                     if (slotDefault) {
                         const slot = choiceSlots.value[slotID]
-                        const choiceItem = choiceItems.value[slotDefault]
-                        if (slot && choiceItem) {
-                            addChoice({ line, choiceItem })
+                        if (slot) {
+                            const choices =
+                                typeof slotDefault === 'string' ? [choiceItems.value[slotDefault]] : slotDefault.map((d) => choiceItems.value[d])
+                            choices.filter((c) => c !== undefined).forEach((choiceItem) => addChoice({ line, choiceItem }))
                         }
                     }
                 })
@@ -188,11 +189,6 @@ export const useOrderStore = defineStore(
             // Remove old choice, if applicable.
             const { choiceItemID, line, slot } = payload
 
-            const oldChoice = choices.value.find((c) => c.line === line && c.choiceItem.slot === slot.id)
-            if (oldChoice) {
-                clearChoice(oldChoice)
-            }
-
             // Is this a valid choice?
             if (!(slot.id in line.menuItem.choiceSlots)) {
                 return new Promise((_resolve, reject) => reject(new Error(`${line.menuItem.id} can not accept slot ${slot.grillLabel ?? slot.id}`)))
@@ -201,6 +197,19 @@ export const useOrderStore = defineStore(
             // Is this a combo choice on a non-combo line?
             if (!line.size && slot.isComboOnly) {
                 return new Promise((_resolve, reject) => reject(new Error(`Line is not a combo so cannot accept slot ${slot.grillLabel ?? slot.id}`)))
+            }
+
+            if (!slot.isMulti) {
+                // Remove old choice if it's not a multi slot.
+                const oldChoice = choices.value.find((c) => c.line === line && c.choiceItem.slot === slot.id)
+                if (oldChoice) {
+                    clearChoice(oldChoice)
+                }
+            } else {
+                // Otherwise, just ensure the same exact choice isn't selected multiple times.
+                if (choices.value.some((c) => c.line === line && c.choiceItem.id === choiceItemID)) {
+                    return new Promise((resolve) => resolve())
+                }
             }
 
             // Add new choice
@@ -245,11 +254,15 @@ export const useOrderStore = defineStore(
                             return { slotID: s.slotID }
                         }
 
-                        // Get the order's choice, or null.
-                        const choice = choices.value.find((c) => c.line === line && c.choiceItem.slot === s.slotID) ?? null
-                        // It's good.
-                        return { slotID: s.slotID, slot: s.slot, choice }
+                        // Get the order's choices, or null.
+                        const slotChoices = choices.value
+                            .filter((c) => c.line === line && c.choiceItem.slot === s.slotID)
+                            .map((choice) => ({ slotID: s.slotID, slot: s.slot, choice }))
+
+                        // If there were no slots, return a null choice to clearly indicate the slot is valid but unfilled.
+                        return slotChoices.length !== 0 ? slotChoices : { slotID: s.slotID, slot: s.slot, choice: null }
                     })
+                    .flat()
             )
         }
 

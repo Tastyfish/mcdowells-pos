@@ -1,4 +1,4 @@
-import { validateRequired, validateRequiredArray } from './valid'
+import { VALID_NUMBER, VALID_STRING, validateRequired } from './valid'
 
 export interface ComboSize {
     /** Internal ID */
@@ -20,15 +20,15 @@ export interface ComboSizeGroup {
 
 export function isValidComboSize(size: Partial<ComboSize>): size is ComboSize {
     return (
-        validateRequired('ComboSize', size, 'id', 'string') &&
-        validateRequired('ComboSize', size, 'label', 'string') &&
-        validateRequired('ComboSize', size, 'icon', 'string') &&
-        validateRequired('ComboSize', size, 'priceOffset', 'number')
+        validateRequired('ComboSize', size, 'id', VALID_STRING) &&
+        validateRequired('ComboSize', size, 'label', VALID_STRING) &&
+        validateRequired('ComboSize', size, 'icon', VALID_STRING) &&
+        validateRequired('ComboSize', size, 'priceOffset', VALID_NUMBER)
     )
 }
 
 export function isValidComboGroup(group: Partial<ComboSizeGroup>): group is ComboSizeGroup {
-    return validateRequired('ComboSizeGroup', group, 'id', 'string') && validateRequiredArray('ComboSizeGroup', group, 'sizes', 'string')
+    return validateRequired('ComboSizeGroup', group, 'id', VALID_STRING) && validateRequired('ComboSizeGroup', group, 'sizes', [VALID_STRING])
 }
 
 export * from './loaders/sizes'

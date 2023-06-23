@@ -1,4 +1,4 @@
-import { validateOptional, validateRequired } from './valid'
+import { VALID_NUMBER, VALID_STRING, validateOptional, validateRequired } from './valid'
 
 /**
  * Base for advanced tab items that aren't just menu item keys.
@@ -57,10 +57,10 @@ export interface TabView {
 export function isPartialVarTabItem(item: AdvancedTabItem): item is PartialVarTabItem {
     return (
         item.type === 'var' &&
-        validateRequired('VarTabItem', item as PartialVarTabItem, 'base', 'string') &&
-        validateRequired('VarTabItem', item as PartialVarTabItem, 'label', 'string') &&
-        validateOptional('VarTabItem', item as PartialVarTabItem, 'replace', 'string') &&
-        validateOptional('VarTabItem', item as PartialVarTabItem, 'perPrice', 'number')
+        validateRequired('VarTabItem', item as PartialVarTabItem, 'base', VALID_STRING) &&
+        validateRequired('VarTabItem', item as PartialVarTabItem, 'label', VALID_STRING) &&
+        validateOptional('VarTabItem', item as PartialVarTabItem, 'replace', VALID_STRING) &&
+        validateOptional('VarTabItem', item as PartialVarTabItem, 'perPrice', VALID_NUMBER)
     )
 }
 
@@ -69,15 +69,15 @@ export function isVarTabItem(item: AdvancedTabItem): item is VarTabItem {
 }
 
 export function isSlotTabItem(item: AdvancedTabItem): item is SlotTabItem {
-    return item.type === 'slot' && validateRequired('SlotTabItem', item as SlotTabItem, 'slot', 'string')
+    return item.type === 'slot' && validateRequired('SlotTabItem', item as SlotTabItem, 'slot', VALID_STRING)
 }
 
 export function isActionTabItem(item: AdvancedTabItem): item is ActionTabItem {
-    return item.type === 'action' && validateRequired('ActionTabItem', item as ActionTabItem, 'action', 'string')
+    return item.type === 'action' && validateRequired('ActionTabItem', item as ActionTabItem, 'action', VALID_STRING)
 }
 
 export function isLabelTabItem(item: AdvancedTabItem): item is LabelTabItem {
-    return item.type === 'label' && validateRequired('LabelTabItem', item as LabelTabItem, 'label', 'string')
+    return item.type === 'label' && validateRequired('LabelTabItem', item as LabelTabItem, 'label', VALID_STRING)
 }
 
 export { default } from './loaders/tabviews'

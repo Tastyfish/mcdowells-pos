@@ -3,14 +3,14 @@
 * */
 
 import { ComboSize, defaultSize, sizeGroups, sizes } from './size'
-import { validateOptional, validateRequired, validateRequiredDictionary } from './valid'
+import { VALID_BOOLEAN, VALID_NULL, VALID_NUMBER, VALID_STRING, validateOptional, validateRequired } from './valid'
 
 /**
   Info about what choice slots a menu item has.
   Key is slot name and value is menu item that is default, or null for no default.
 */
 interface ChoiceSlotInfo {
-    [slot: string]: string | null
+    readonly [slot: string]: string | readonly string[] | null
 }
 
 interface ItemBase {
@@ -77,6 +77,8 @@ export interface ChoiceItem extends ItemBase, Partial<PricedItem> {
 export interface ChoiceSlot extends ItemBase, PricedItem {
     /** True if listed in a receipt as its own line. */
     readonly isListed?: boolean
+    /** True if allows multiple choices in slot at once. */
+    readonly isMulti?: boolean
     /** This choice is specific to combos. */
     readonly isComboOnly?: boolean
     /** The label in the grill bar, if applicable. */
@@ -98,9 +100,9 @@ export function getMenuItemAllowedSizes(item: MenuItem): ComboSize[] | undefined
  */
 export function isValidItemBase(item: Partial<ItemBase>): item is ItemBase {
     return (
-        validateRequired('ItemBase', item, 'id', 'string') &&
-        validateRequired('ItemBase', item, 'displayName', 'string') &&
-        validateOptional('ItemBase', item, 'simpleDisplayName', 'boolean')
+        validateRequired('ItemBase', item, 'id', VALID_STRING) &&
+        validateRequired('ItemBase', item, 'displayName', VALID_STRING) &&
+        validateOptional('ItemBase', item, 'simpleDisplayName', VALID_BOOLEAN)
     )
 }
 
@@ -112,7 +114,7 @@ export function isValidItemBase(item: Partial<ItemBase>): item is ItemBase {
 export function isValidPricedItem(item: Partial<PricedItem>): item is PricedItem {
     if (
         !('price' in item) ||
-        (typeof item.price !== 'number' && !validateRequiredDictionary('PricedItem', item as { price: Record<string, number> }, 'price', ['number']))
+        (typeof item.price !== 'number' && !validateRequired('PricedItem', item, 'price', { VALID_NUMBER } as Record<string, number> | number))
     ) {
         console.error('PricedItem missing required price in', item)
         return false
@@ -130,9 +132,10 @@ export function isValidChoiceSlot(slot: Partial<ChoiceSlot>): slot is ChoiceSlot
     return (
         isValidItemBase(slot) &&
         isValidPricedItem(slot as Partial<PricedItem>) &&
-        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isListed', 'boolean') &&
-        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isComboOnly', 'boolean') &&
-        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'grillLabel', 'string')
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isListed', VALID_BOOLEAN) &&
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isMulti', VALID_BOOLEAN) &&
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'isComboOnly', VALID_BOOLEAN) &&
+        validateOptional('ChoiceSlot', slot as ChoiceSlot, 'grillLabel', VALID_STRING)
     )
 }
 
@@ -145,7 +148,7 @@ export function isValidChoiceItem(item: Partial<ChoiceItem>): item is ChoiceItem
     return (
         isValidItemBase(item) &&
         (!('price' in item) || isValidPricedItem(item as Partial<PricedItem>)) &&
-        validateRequired('ChoiceItem', item as ChoiceItem, 'slot', 'string')
+        validateRequired('ChoiceItem', item as ChoiceItem, 'slot', VALID_STRING)
     )
 }
 
@@ -158,8 +161,10 @@ export function isValidMenuItem(item: Partial<MenuItem>): item is MenuItem {
     return (
         isValidItemBase(item) &&
         isValidPricedItem(item as Partial<PricedItem>) &&
-        validateRequiredDictionary('MenuItem', item as MenuItem, 'choiceSlots', ['string', 'null']) &&
-        validateOptional('MenuItem', item as MenuItem, 'allowedSizes', 'string')
+        validateRequired('MenuItem', item as MenuItem, 'choiceSlots', { VALID_STRING, a: [VALID_STRING], VALID_NULL } as {
+            [key: string]: string | readonly string[] | null
+        }) &&
+        validateOptional('MenuItem', item as MenuItem, 'allowedSizes', VALID_STRING)
     )
 }
 
