@@ -38,7 +38,7 @@ function generateSizeButtons(line: OrderLine): Tile[] {
     return []
 }
 
-function addChoice(slot: ChoiceSlot, choice: ChoiceItem) {
+function addChoice(slot: ChoiceSlot, choice: ChoiceItem, leaveScreen: boolean = true) {
     const orderStore = useOrderStore()
     const line = orderStore.currentLine
 
@@ -52,8 +52,10 @@ function addChoice(slot: ChoiceSlot, choice: ChoiceItem) {
         })
     }
 
-    // Regardless, return to normal choices.
-    useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default)
+    if (leaveScreen) {
+        // Regardless, return to normal choices.
+        useUIStore().setChoiceMenuMode(ChoiceMenuMode.Default)
+    }
 }
 
 // A button to replace the side of the current line
@@ -70,7 +72,7 @@ function newSlotButton(choice: ChoiceItem): Tile {
             ? orderStore.getLineChoices(orderStore.currentLine).find((c) => c.choice?.choiceItem.id === choice.id)?.choice
             : null
 
-        return newToggle(!!duplicate, () => (duplicate ? orderStore.clearChoice(duplicate) : addChoice(slot, choice)), choice.displayName)
+        return newToggle(!!duplicate, () => (duplicate ? orderStore.clearChoice(duplicate) : addChoice(slot, choice, false)), choice.displayName)
     }
 
     return newButton(() => addChoice(slot, choice), choice.displayName)
