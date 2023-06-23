@@ -14,6 +14,7 @@
     "grill": {
         "displayName": "Toppings",
         "isListed": true,
+        "isMulti": true,
         "grillLabel": "Grill",
         "price": 0.0
     },
